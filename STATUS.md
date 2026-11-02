@@ -2,21 +2,21 @@
 
 ## Resumen
 
-Fecha: 2026-11-02. Último commit: primer corte independiente (este avance). Publicado: pendiente de crear y subir el repositorio público.
+Fecha: 2026-11-02. Último commit: `1f88c70` (primer corte independiente). Publicado: pendiente de crear y subir el repositorio público.
 
 El proyecto independiente se llama Observatorio de Legislación de Género. Se separó código, pruebas y documentación técnica sin arrastrar historial ni documentación ajena al producto público. La Cámara, el Senado y la BCN permanecen como fuentes citadas. Los cuatro documentos técnicos se reunieron en `docs/documentacion-tecnica.md` y se redactaron para el proyecto independiente. El código se licencia con AGPL-3.0.
 
 ## Entorno
 
-Repositorio local: `/home/pedroaravenam/Desarrollo/observatorio-legislativo-abierto`. No tiene remoto ni despliegue. La propuesta de primera publicación usa Cloudflare Pages para el sitio estático y archivos de datos generados por la ingesta, con R2 si hace falta. La ingesta actual en .NET y PostgreSQL se conserva provisionalmente; el rediseño del frontend puede hacerse en SvelteKit.
+Repositorio local: `/home/pedroaravenam/Desarrollo/observatorio-legislativo-abierto`. No tiene remoto ni despliegue. Cloudflare Pages puede alojar el sitio y sus archivos JSON de consulta en el mismo despliegue. No se requiere VPS ni Google Drive para la primera versión. Hay que construir y medir la exportación antes de publicar el sitio; R2 queda como opción si crecen los textos o el historial. La ingesta actual en .NET y PostgreSQL se conserva provisionalmente; el rediseño del frontend puede hacerse en SvelteKit.
 
 ## Próximo paso exacto
 
-Auditar y publicar el repositorio independiente; después, medir el tamaño real de la base, exportar una muestra y construir el sitio estático.
+Crear el remoto público y subir este repositorio. Luego medir el tamaño real de la base y de una exportación JSON para Cloudflare Pages.
 
 ## Pendientes priorizados
 
-1. Crear el remoto público y subir el primer commit.
+1. Crear el remoto público y subir los commits.
 2. Medir la base PostgreSQL completa y el tamaño de una exportación pública.
 3. Rediseñar el frontend en SvelteKit con salida estática y estados de carga, vacío y error.
 4. Construir el exportador de índices y fichas con procedencia y fecha de verificación.
