@@ -12,19 +12,18 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 
 - VPS: `atendia-development` (116.203.181.6), `/opt/observatorio`, Compose `observatorio` (servicios `db` y `sitio` permanentes; `migraciones`, `ingesta` y `exportador` como trabajos).
 - Base de ingesta: restaurada en el VPS desde la máquina local el 2 de noviembre (18.616 boletines, 18.627 respuestas originales).
-- Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. **Escritas, pero aún no instaladas en el VPS.**
+- Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. Instaladas en el VPS el 2 de noviembre; primera carga completa el 3 de noviembre a la 01:00 y primera diaria a las 09:00.
 - Cloudflare: el Worker y la base D1 del primer corte se borraron el 2 de noviembre.
 
 ## Próximo paso exacto
 
-1. El desarrollador instala los temporizadores en el VPS: `ssh atendia-development 'sudo install -m 0644 /opt/observatorio/systemd/* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-fecha.timer observatorio-completa.timer'`.
-2. Desactivar en la máquina local `observatorio-senado-fecha.timer` y `observatorio-senado-completa.timer`, para no consultar dos veces al Senado.
-3. Verificar la primera ejecución de `observatorio-fecha` (`journalctl -u observatorio-fecha`).
-4. Comprar el dominio, apuntarlo al VPS y agregar su bloque en el Caddyfile.
+1. Desactivar en la máquina local `observatorio-senado-fecha.timer` y `observatorio-senado-completa.timer`, para no consultar dos veces al Senado.
+2. Verificar las primeras ejecuciones en el VPS (`journalctl -u observatorio-completa -u observatorio-fecha`) y que la fecha del pie del sitio avance.
+3. Comprar el dominio, apuntarlo al VPS y agregar su bloque en el Caddyfile.
 
 ## Pendientes priorizados
 
-1. Instalar y verificar los temporizadores del VPS.
+1. Verificar la primera ejecución de los temporizadores del VPS.
 2. Dominio propio.
 3. Respaldo periódico de la base de ingesta fuera del VPS.
 4. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.

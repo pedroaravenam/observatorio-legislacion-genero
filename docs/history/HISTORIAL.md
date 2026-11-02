@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-02 — Temporizadores instalados en el VPS (commit de este avance)
+
+El desarrollador instaló y activó `observatorio-fecha.timer` (09:00) y `observatorio-completa.timer` (01:00), en hora de Chile. Según `systemctl list-timers`, la primera ejecución será la carga completa del 3 de noviembre a las 04:00 UTC.
+
 ## 2026-11-02 — Retiro de Cloudflare (commit de este avance)
 
 A pedido del desarrollador, se borraron el Worker `observatorio-legislacion-genero` y la base D1 del mismo nombre. La dirección `workers.dev` ahora responde 404. No se tocaron los demás proyectos de la cuenta.
