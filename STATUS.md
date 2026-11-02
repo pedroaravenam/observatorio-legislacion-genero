@@ -13,7 +13,7 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 - VPS: `atendia-development` (116.203.181.6), `/opt/observatorio`, Compose `observatorio` (servicios `db` y `sitio` permanentes; `migraciones`, `ingesta` y `exportador` como trabajos).
 - Base de ingesta: restaurada en el VPS desde la máquina local el 2 de noviembre (18.616 boletines, 18.627 respuestas originales).
 - Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. **Escritas, pero aún no instaladas en el VPS.**
-- Cloudflare: el Worker y la base D1 del primer corte siguen en línea con 15.000 boletines sin actualizar.
+- Cloudflare: el Worker y la base D1 del primer corte se borraron el 2 de noviembre.
 
 ## Próximo paso exacto
 
@@ -26,13 +26,12 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 
 1. Instalar y verificar los temporizadores del VPS.
 2. Dominio propio.
-3. Retirar o redirigir el Worker y la base D1 de Cloudflare.
-4. Respaldo periódico de la base de ingesta fuera del VPS.
-5. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
-6. Validar manualmente la selección de género y publicar sus reglas en detalle.
-7. Incorporar datos de la Cámara (autores con identificador, votaciones) y textos de la BCN.
-8. CI del repositorio (pruebas del sitio y del exportador).
-9. Revisar los términos de reutilización de datos de las tres fuentes.
+3. Respaldo periódico de la base de ingesta fuera del VPS.
+4. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
+5. Validar manualmente la selección de género y publicar sus reglas en detalle.
+6. Incorporar datos de la Cámara (autores con identificador, votaciones) y textos de la BCN.
+7. CI del repositorio (pruebas del sitio y del exportador).
+8. Revisar los términos de reutilización de datos de las tres fuentes.
 
 ## Riesgos activos
 

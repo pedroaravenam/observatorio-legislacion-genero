@@ -24,7 +24,7 @@ El primer corte se publicó en Cloudflare Workers con D1. Se pasó al VPS el mis
 - La ingesta dependía de la máquina local. En el VPS, la ingesta, la base y el sitio quedan juntos.
 - Con todo en el VPS, la exportación es una sola transacción local: 18.616 boletines en unos 2,5 minutos, medidos con el VPS ocupado por otra compilación.
 
-El Worker `observatorio-legislacion-genero` y la base D1 siguen existiendo en Cloudflare con 15.000 boletines sin actualizar, hasta que se decida retirarlos.
+El Worker `observatorio-legislacion-genero` y su base D1 se borraron de Cloudflare el 2 de noviembre.
 
 ## Tamaño medido
 
