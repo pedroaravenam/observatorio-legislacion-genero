@@ -5,3 +5,5 @@ tests
 docs
 .git
 .github
+**/node_modules
+sitio

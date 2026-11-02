@@ -1,0 +1,10 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Carga completa reanudable del Senado y publicación (01:00, hora de Chile)
+
+[Timer]
+OnCalendar=*-*-* 01:00 America/Santiago
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

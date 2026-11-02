@@ -1,5 +1,5 @@
 // Tipos globales de SvelteKit: https://svelte.dev/docs/kit/types#app.d.ts
-// Las vinculaciones de Cloudflare (D1) se leen desde `cloudflare:workers`; ver src/lib/server/db.ts.
+// La base pública SQLite se abre en src/lib/server/db.ts (variable OBSERVATORIO_DB).
 declare global {
 	namespace App {}
 }

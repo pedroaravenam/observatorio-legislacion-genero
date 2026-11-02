@@ -2,7 +2,7 @@
 
 Proyecto independiente para seguir, explicar y consultar la tramitación de iniciativas legislativas relacionadas con género en Chile.
 
-**Estado:** primer corte publicado en https://observatorio-legislacion-genero.pedrosko-aravena.workers.dev
+**Estado:** primer corte publicado en https://observatorio.116-203-181-6.sslip.io (dirección provisoria hasta tener dominio propio)
 
 ## Principios
 
@@ -31,8 +31,10 @@ Este repositorio reúne el código y la documentación del proyecto independient
 | Carpeta | Qué contiene |
 |---|---|
 | `src/`, `db/`, `tests/` | Ingesta .NET y PostgreSQL desde las fuentes oficiales |
-| `exportador/` | Exportación de la base de ingesta a Cloudflare D1 y publicación diaria |
-| `sitio/` | Sitio público en SvelteKit sobre Cloudflare Workers |
+| `exportador/` | Exportación de la base de ingesta a la base pública SQLite |
+| `despliegue/` | Compose, trabajos programados y script de publicación en el VPS |
+| `sitio/` | Sitio público en SvelteKit con Node |
+| `datos/referencia/` | Catálogo de títulos de boletines 1990–2026 que usa la carga completa del Senado |
 | `datos/seleccion/` | Lista preliminar de la selección de género |
 | `web/` | Frontend Angular del primer corte, reemplazado por `sitio/` |
 

@@ -2,35 +2,55 @@
 
 ## Arquitectura publicada (2 de noviembre de 2026)
 
-| Pieza | Dónde corre | Costo |
-|---|---|---|
-| Ingesta .NET y base PostgreSQL con respuestas originales | Máquina local, con temporizadores de usuario | Sin costo |
-| Exportación y publicación de datos (`exportador/`) | Máquina local, temporizador diario | Sin costo |
-| Base pública | Cloudflare D1 | Plan gratuito |
-| Sitio (SvelteKit) | Cloudflare Workers con archivos estáticos | Plan gratuito |
-| Documentos completos (mensajes, mociones y leyes) | No se copian: se enlazan al Senado y a la BCN | Sin costo |
+Todo corre en un VPS Hetzner compartido (116.203.181.6, Ubuntu 26.04, 2 vCPU, 3,7 GB de RAM), en el proyecto Compose `observatorio` dentro de `/opt/observatorio`. El VPS también aloja Atendia y una plataforma educativa; cada proyecto tiene su Compose y sus redes.
 
-Se eligió Workers en vez de Pages porque el adaptador de SvelteKit para Cloudflare apunta a Workers con archivos estáticos, que es la vía que Cloudflare recomienda para proyectos nuevos. Ambos tienen el mismo plan gratuito. D1 reemplaza la exportación a JSON propuesta antes, porque permite búsqueda de texto completo (FTS5) y filtros combinados sin generar miles de archivos.
+| Pieza | Servicio | Detalle |
+|---|---|---|
+| Base de ingesta | `db` (PostgreSQL 17) | Respuestas originales del Senado y tablas normalizadas; volumen `observatorio_postgres`; red interna sin salida ni puertos publicados |
+| Ingesta | `ingesta` (.NET, trabajo) | Consulta diaria por fecha (09:00) y carga completa reanudable (01:00), hora de Chile |
+| Base pública | Archivo SQLite en el volumen `observatorio_publico` | Una fila por boletín, trámites en JSON, búsqueda FTS5 |
+| Exportador | `exportador` (trabajo) | Reescribe la base pública completa en una transacción después de cada ingesta |
+| Sitio | `sitio` (SvelteKit con Node) | Lee la base pública en solo lectura; red `observatorio-edge` |
+| HTTPS | Caddy compartido de la plataforma educativa | Bloque `observatorio.116-203-181-6.sslip.io`; Caddy conectado a `observatorio-edge` |
+| Documentos completos | No se copian | Se enlazan al Senado y a la BCN |
+
+Dirección provisoria: https://observatorio.116-203-181-6.sslip.io. Con dominio propio se agrega un bloque en el Caddyfile y se cambia `DOMINIO` en `/opt/observatorio/.env`.
+
+## Por qué se dejó Cloudflare
+
+El primer corte se publicó en Cloudflare Workers con D1. Se pasó al VPS el mismo día por tres razones:
+
+- El plan gratuito de D1 permite 100.000 filas escritas al día y cada boletín escribe unas 6. La carga completa necesitaba dos días y había que enviar lotes de 150 sentencias con wrangler.
+- La ingesta dependía de la máquina local. En el VPS, la ingesta, la base y el sitio quedan juntos.
+- Con todo en el VPS, la exportación es una sola transacción local: 18.616 boletines en unos 2,5 minutos, medidos con el VPS ocupado por otra compilación.
+
+El Worker `observatorio-legislacion-genero` y la base D1 siguen existiendo en Cloudflare con 15.000 boletines sin actualizar, hasta que se decida retirarlos.
 
 ## Tamaño medido
 
 | Qué | Tamaño |
 |---|---|
-| Base PostgreSQL local, con 18.627 respuestas originales del Senado | 227 MB |
-| Trámites del Senado (199.853) en JSON | 28 MB |
-| Exportación SQL completa (18.616 boletines) | 59 MB |
-| Base D1 con 15.000 boletines, índices y búsqueda | 44,5 MB |
+| Base de ingesta (respaldo `pg_dump -Fc`) | 30 MB comprimido; 227 MB en disco |
+| Base pública SQLite (18.616 boletines, índices y búsqueda) | 56 MB |
+| Imágenes: sitio / exportador / ingesta | 173 / 463 / 234 MB |
+| Memoria máxima asignada: db / sitio / ingesta / exportador | 768 / 256 / 512 / 512 MB |
 
-La base D1 completa se estima en ~55 MB, lejos del límite de 500 MB del plan gratuito.
+## Operación
 
-## Límites que condicionan la operación
+| Tarea | Cómo |
+|---|---|
+| Publicar una versión nueva | `despliegue/subir-version.sh`: construye las tres imágenes del commit en la máquina local, las sube una por una, copia Compose, trabajos y migraciones, y reinicia el sitio |
+| Ejecutar un trabajo a mano | `sudo /opt/observatorio/trabajo.sh fecha`, `completa` o `publicar` |
+| Programación | `despliegue/systemd/observatorio-{fecha,completa}.{service,timer}`, instaladas en `/etc/systemd/system/` |
+| Secretos | `/opt/observatorio/.env` (root, 600): contraseña de PostgreSQL generada en el VPS, `VERSION` y `DOMINIO`. No se versiona |
 
-- **Filas escritas en D1:** 100.000 al día en el plan gratuito, con reinicio a las 00:00 UTC. Cada boletín escribe unas 6 filas (tabla, tres índices y búsqueda). La actualización diaria toca cientos de boletines; una carga inicial completa necesita dos días. `publicar.py` corta en 14.000 boletines por ejecución.
-- **Tamaño de lote:** se envían archivos de 150 sentencias, cada una en una sola línea. Wrangler interpreta «--» como comentario aun dentro de un texto, por eso el exportador parte esa secuencia.
-- **Disponibilidad de las fuentes:** medida desde esta máquina, 94,7 % en la Cámara, 93,6 % en el Senado y 81,8–98,8 % en la BCN. Afecta solo a los enlaces de documentos completos; los encabezados y la tramitación se sirven desde D1.
-- **Lectura directa desde el navegador:** la Cámara permite CORS abierto; el Senado no envía cabeceras CORS y la BCN solo autoriza `bcn.cl`. Por eso el sitio no consulta las fuentes desde el navegador: usa los datos ya publicados y enlaces normales.
+Caddy pertenece a la plataforma educativa (`/opt/plataforma-educativa/app/`). Para el observatorio se agregó un bloque al `Caddyfile` y la red externa `observatorio-edge` en `compose.production.yaml`, con respaldos `*.bak-<fecha>-observatorio`. Si esa plataforma recrea Caddy desde otra copia de su Compose, hay que volver a agregar la red.
 
-## Si la operación crece
+Las imágenes se suben por separado porque `podman save` con varias imágenes generó un archivo en que las tres etiquetas apuntaban a la misma imagen.
 
-- Si la máquina local deja de estar disponible, la ingesta puede pasar a GitHub Actions (gratuito en repositorios públicos), dividiendo la carga completa del Senado en tramos de menos de 6 horas.
-- Si se decide alojar documentos completos, R2 ofrece 10 GB gratuitos sin costo por descarga. El expediente completo de todos los boletines no está medido; la estimación de orden de magnitud es de 100 a 400 GB.
+## Límites y riesgos
+
+- El VPS es compartido y su RAM está justa: 2,2 GB disponibles en reposo, con swap en uso. Una compilación de la plataforma educativa llevó la carga a 8.
+- El VPS guarda también la firma electrónica de Centro Alma (Atendia). El observatorio no comparte redes ni volúmenes con Atendia.
+- **Disponibilidad de las fuentes**, medida desde la máquina local: 94,7 % en la Cámara, 93,6 % en el Senado y 81,8–98,8 % en la BCN. Afecta solo a los enlaces de documentos completos.
+- **Lectura desde el navegador:** la Cámara permite CORS abierto; el Senado no envía cabeceras CORS y la BCN solo autoriza `bcn.cl`. Por eso el sitio no consulta las fuentes desde el navegador.

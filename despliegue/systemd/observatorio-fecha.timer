@@ -1,0 +1,10 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Consulta diaria del Senado por fecha y publicación (09:00, hora de Chile)
+
+[Timer]
+OnCalendar=*-*-* 09:00 America/Santiago
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

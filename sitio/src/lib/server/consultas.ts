@@ -1,5 +1,6 @@
-// Consultas a D1. Todos los valores van como parámetros enlazados; nunca se concatenan en el SQL.
+// Consultas a la base pública SQLite. Todos los valores van como parámetros enlazados; nunca se concatenan en el SQL.
 import { consultaBusqueda, esBoletin } from '#lib/formato';
+import type { Base } from '#lib/server/db';
 
 export const ESTADOS = [
 	'En tramitación',
@@ -68,7 +69,7 @@ export function leerFiltros(url: URL): Filtros {
 	};
 }
 
-export async function listar(db: D1Database, f: Filtros) {
+export async function listar(db: Base, f: Filtros) {
 	const condiciones: string[] = [];
 	const valores: (string | number)[] = [];
 	let desde = 'proyecto p';
@@ -111,51 +112,50 @@ export async function listar(db: D1Database, f: Filtros) {
 	const base = `FROM ${desde} LEFT JOIN seleccion_genero g ON g.boletin = p.boletin ${donde}`;
 	const desplazamiento = (f.pagina - 1) * POR_PAGINA;
 
-	const [total, filas] = await db.batch([
-		db.prepare(`SELECT count(*) AS n ${base}`).bind(...valores),
-		db
-			.prepare(
-				`SELECT p.boletin, p.titulo, p.fecha_ingreso, p.iniciativa, p.camara_origen, p.estado, p.etapa,
-				        p.ley_numero, p.ultimo_tramite, g.boletin IS NOT NULL AS genero
-				 ${base} ORDER BY ${orden} LIMIT ? OFFSET ?`
-			)
-			.bind(...valores, POR_PAGINA, desplazamiento)
-	]);
+	const total = db.prepare(`SELECT count(*) AS n ${base}`).get(...valores) as { n: number };
+	const filas = db
+		.prepare(
+			`SELECT p.boletin, p.titulo, p.fecha_ingreso, p.iniciativa, p.camara_origen, p.estado, p.etapa,
+			        p.ley_numero, p.ultimo_tramite, g.boletin IS NOT NULL AS genero
+			 ${base} ORDER BY ${orden} LIMIT ? OFFSET ?`
+		)
+		.all(...valores, POR_PAGINA, desplazamiento);
 	return {
 		porNumero,
-		total: (total.results[0] as { n: number }).n,
-		filas: filas.results as unknown as FilaLista[]
+		total: total.n,
+		// node:sqlite entrega objetos sin prototipo; se copian para serializarlos sin sorpresas.
+		filas: filas.map((f) => ({ ...f }) as unknown as FilaLista)
 	};
 }
 
-export async function ficha(db: D1Database, boletin: string): Promise<Ficha | null> {
-	const fila = await db
+export async function ficha(db: Base, boletin: string): Promise<Ficha | null> {
+	const fila = db
 		.prepare(
 			`SELECT p.*, g.boletin IS NOT NULL AS genero, g.nivel_senal, g.version AS version_seleccion
 			 FROM proyecto p LEFT JOIN seleccion_genero g ON g.boletin = p.boletin
 			 WHERE p.boletin = ?`
 		)
-		.bind(boletin)
-		.first<Record<string, unknown>>();
+		.get(boletin) as Record<string, unknown> | undefined;
 	if (!fila) return null;
 	return {
-		...(fila as unknown as Ficha),
+		...({ ...fila } as unknown as Ficha),
 		materias: JSON.parse(fila.materias as string),
 		autores: JSON.parse(fila.autores as string),
 		tramites: JSON.parse(fila.tramites as string)
 	};
 }
 
-export async function annos(db: D1Database): Promise<number[]> {
-	const r = await db
+export async function annos(db: Base): Promise<number[]> {
+	const r = db
 		.prepare('SELECT DISTINCT anno FROM proyecto WHERE anno IS NOT NULL ORDER BY anno DESC')
-		.all<{ anno: number }>();
-	return r.results.map((x) => x.anno);
+		.all() as { anno: number }[];
+	return r.map((x) => x.anno);
 }
 
-export async function publicacion(db: D1Database): Promise<Record<string, string>> {
-	const r = await db
-		.prepare('SELECT clave, valor FROM publicacion')
-		.all<{ clave: string; valor: string }>();
-	return Object.fromEntries(r.results.map((x) => [x.clave, x.valor]));
+export async function publicacion(db: Base): Promise<Record<string, string>> {
+	const r = db.prepare('SELECT clave, valor FROM publicacion').all() as {
+		clave: string;
+		valor: string;
+	}[];
+	return Object.fromEntries(r.map((x) => [x.clave, x.valor]));
 }

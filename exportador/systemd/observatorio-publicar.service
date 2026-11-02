@@ -1,9 +1,0 @@
-[Unit]
-Description=Observatorio de Legislación de Género: publica en Cloudflare D1 los boletines que cambiaron
-After=network-online.target
-
-[Service]
-Type=oneshot
-WorkingDirectory=%h/Desarrollo/observatorio-legislativo-abierto/exportador
-ExecStart=/usr/bin/python3 -I %h/Desarrollo/observatorio-legislativo-abierto/exportador/publicar.py
-TimeoutStartSec=6h

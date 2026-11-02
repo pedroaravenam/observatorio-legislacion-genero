@@ -1,0 +1,99 @@
+# Producción en el VPS: docker compose -p observatorio (en /opt/observatorio, con .env junto a este archivo).
+#
+#   db           PostgreSQL de ingesta (respuestas originales y tablas normalizadas); sin puertos publicados
+#   sitio        SvelteKit con Node; lee la base pública SQLite; Caddy le llega por la red observatorio-edge
+#   migraciones  Liquibase sobre db (trabajo)
+#   ingesta      consulta al Senado (trabajo; modo por variable de entorno)
+#   exportador   reescribe la base pública SQLite desde db (trabajo)
+#
+# Los trabajos los lanza trabajo.sh desde los temporizadores de systemd (ver systemd/).
+name: observatorio
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: observatorio
+      POSTGRES_USER: observatorio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD en .env}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks: [interna]
+    mem_limit: 768m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U observatorio -d observatorio"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sitio:
+    image: observatorio-sitio:${VERSION:?falta VERSION en .env}
+    restart: unless-stopped
+    environment:
+      ORIGIN: https://${DOMINIO:?falta DOMINIO en .env}
+      OBSERVATORIO_DB: /publico/observatorio.db
+    volumes:
+      - publico:/publico
+    networks: [borde]
+    read_only: true
+    tmpfs: [/tmp]
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/acerca || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  migraciones:
+    image: liquibase/liquibase:4.33.0
+    profiles: [trabajos]
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./changelog:/liquibase/changelog:ro
+    networks: [interna]
+    command:
+      - --changelog-file=changelog/raiz.yaml
+      - --url=jdbc:postgresql://db:5432/observatorio
+      - --username=observatorio
+      - --password=${POSTGRES_PASSWORD}
+      - update
+
+  ingesta:
+    image: observatorio-ingesta:${VERSION}
+    profiles: [trabajos]
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      ConnectionStrings__Observatorio: Host=db;Database=observatorio;Username=observatorio;Password=${POSTGRES_PASSWORD};GssEncryptionMode=Disable
+    networks: [interna, salida]
+    mem_limit: 512m
+
+  exportador:
+    image: observatorio-exportador:${VERSION}
+    profiles: [trabajos]
+    user: "1000:1000"
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      PGHOST: db
+      PGUSER: observatorio
+      PGDATABASE: observatorio
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      HOME: /tmp
+    volumes:
+      - publico:/publico
+    networks: [interna]
+    mem_limit: 512m
+
+volumes:
+  postgres:
+  publico:
+
+networks:
+  interna:
+    internal: true
+  salida: {}
+  borde:
+    name: observatorio-edge

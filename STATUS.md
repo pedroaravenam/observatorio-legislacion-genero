@@ -2,44 +2,45 @@
 
 ## Resumen
 
-Fecha: 2026-11-02. Último commit: sitio público en Cloudflare (este avance). **Publicado:** https://observatorio-legislacion-genero.pedrosko-aravena.workers.dev
+Fecha: 2026-11-02. Último commit: sitio, ingesta y base movidos a un VPS (este avance). **Publicado:** https://observatorio.116-203-181-6.sslip.io (dirección provisoria, sin dominio propio).
 
-El sitio está en línea con datos reales del Senado: listado con búsqueda de texto completo, filtros por año, estado y origen, ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género preliminar (lista v5, 2.155 boletines; 2.154 cruzan con la base), con aviso explícito de que no está validada.
+El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género preliminar (lista v5, 2.155 boletines; 2.154 cruzan con la base), con aviso explícito de que no está validada.
 
-Arquitectura vigente: la ingesta .NET + PostgreSQL sigue en la máquina local con sus temporizadores. Un exportador convierte la base en sentencias para Cloudflare D1, con una fila por boletín y los trámites en JSON. El sitio es SvelteKit sobre Cloudflare Workers y lee D1. Los documentos completos no se copian: se enlazan a la fuente.
-
-Mediciones del 2 de noviembre: base local completa 227 MB con respuestas crudas; 18.616 boletines y 199.853 trámites; exportación 59 MB de SQL; D1 remota 44,5 MB con 15.000 boletines. Cada boletín escribe unas 6 filas en D1. Las fuentes medidas tuvieron 94,7 % (Cámara), 93,6 % (Senado) y 81,8–98,8 % (BCN) de disponibilidad desde esta máquina.
+Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compose `observatorio`. PostgreSQL de ingesta, ingesta .NET del Senado, exportador a SQLite (una transacción, ~2,5 min) y sitio SvelteKit con Node detrás del Caddy compartido. Detalle en [docs/alojamiento.md](docs/alojamiento.md).
 
 ## Entorno
 
-- Sitio: Cloudflare Workers `observatorio-legislacion-genero` (subdominio `workers.dev`, sin dominio propio todavía).
-- Datos: Cloudflare D1 `observatorio-legislacion-genero` (región ENAM), plan gratuito: 500 MB por base y 100.000 filas escritas al día.
-- Ingesta: base PostgreSQL persistente en `~/.local/share/observatorio-genero/postgres`, alimentada por los temporizadores `observatorio-senado-fecha` (09:00) y `observatorio-senado-completa` (cada 15 días, 01:00).
-- Publicación: `exportador/publicar.py`; temporizador diario `observatorio-publicar` (10:30), **pendiente de instalar** con `exportador/instalar-publicacion.sh`.
+- VPS: `atendia-development` (116.203.181.6), `/opt/observatorio`, Compose `observatorio` (servicios `db` y `sitio` permanentes; `migraciones`, `ingesta` y `exportador` como trabajos).
+- Base de ingesta: restaurada en el VPS desde la máquina local el 2 de noviembre (18.616 boletines, 18.627 respuestas originales).
+- Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. **Escritas, pero aún no instaladas en el VPS.**
+- Cloudflare: el Worker y la base D1 del primer corte siguen en línea con 15.000 boletines sin actualizar.
 
 ## Próximo paso exacto
 
-1. Después de las 21:00 (reinicio del contador de D1 a las 00:00 UTC) cargar los 3.616 boletines antiguos que faltan: `python3 -I exportador/publicar.py --faltantes`.
-2. Instalar el temporizador: `exportador/instalar-publicacion.sh 2026-11-02T20:30:00+00:00`.
-3. Comprar el dominio y asociarlo al Worker.
+1. El desarrollador instala los temporizadores en el VPS: `ssh atendia-development 'sudo install -m 0644 /opt/observatorio/systemd/* /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-fecha.timer observatorio-completa.timer'`.
+2. Desactivar en la máquina local `observatorio-senado-fecha.timer` y `observatorio-senado-completa.timer`, para no consultar dos veces al Senado.
+3. Verificar la primera ejecución de `observatorio-fecha` (`journalctl -u observatorio-fecha`).
+4. Comprar el dominio, apuntarlo al VPS y agregar su bloque en el Caddyfile.
 
 ## Pendientes priorizados
 
-1. Cargar los boletines faltantes (1990–1996 aprox., números 2 a 4035).
-2. Instalar el temporizador de publicación diaria y verificar su primera ejecución.
-3. Dominio propio.
-4. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa y, por ficha, la del último cambio registrado.
-5. Validar manualmente la selección de género y publicar sus reglas en detalle.
-6. Incorporar datos de la Cámara (autores con identificador, votaciones) y textos de la BCN.
-7. CI del repositorio (pruebas del sitio y del exportador).
-8. Revisar los términos de reutilización de datos de las tres fuentes.
+1. Instalar y verificar los temporizadores del VPS.
+2. Dominio propio.
+3. Retirar o redirigir el Worker y la base D1 de Cloudflare.
+4. Respaldo periódico de la base de ingesta fuera del VPS.
+5. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
+6. Validar manualmente la selección de género y publicar sus reglas en detalle.
+7. Incorporar datos de la Cámara (autores con identificador, votaciones) y textos de la BCN.
+8. CI del repositorio (pruebas del sitio y del exportador).
+9. Revisar los términos de reutilización de datos de las tres fuentes.
 
 ## Riesgos activos
 
-- La actualización depende de que esta máquina esté encendida; si se apaga, el sitio sigue en línea con el último dato publicado.
-- Una carga completa que cambie más de ~16.000 boletines en un día excedería el límite gratuito de D1; `publicar.py` corta en 14.000 y continúa en la siguiente ejecución.
+- VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados.
+- El Caddy es de la plataforma educativa: si esa plataforma recrea Caddy desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.
+- No hay respaldo de la base de ingesta fuera del VPS, salvo la copia local del 2 de noviembre.
 - La selección de género es automática y no está validada; el sitio lo declara en la portada, la ficha y «Cómo funciona».
-- Enlaces a documentos completos fallan cuando la fuente no responde; el sitio lo advierte en cada ficha.
+- Los enlaces a documentos completos fallan cuando la fuente no responde; el sitio lo advierte en cada ficha.
 
 ## Enlaces
 

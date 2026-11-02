@@ -1,0 +1,9 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Consulta diaria del Senado por fecha y publicación
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/observatorio/trabajo.sh fecha
+TimeoutStartSec=12h

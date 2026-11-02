@@ -1,0 +1,6 @@
+# Bloque que se agrega al Caddyfile compartido del VPS (/opt/plataforma-educativa/app/Caddyfile).
+# Caddy debe estar conectado a la red observatorio-edge (ver docs/alojamiento.md).
+observatorio.116-203-181-6.sslip.io {
+	encode zstd gzip
+	reverse_proxy observatorio-sitio-1:3000
+}

@@ -1,4 +1,4 @@
--- Genera sentencias SQLite (D1) con los encabezados y trámites de cada boletín.
+-- Genera sentencias SQLite con los encabezados y trámites de cada boletín.
 -- Se ejecuta con psql -At contra la base de ingesta; la variable desde (ISO 8601) limita
 -- la exportación a los boletines consultados después de esa fecha.
 -- Uso: psql -At -v desde='1900-01-01' -f exportar-proyectos.sql > proyectos.sql
@@ -19,8 +19,8 @@ LEFT JOIN respuesta_cruda r ON r.id = p.respuesta_senado_id
 WHERE coalesce(p.fecha_consulta_senado, p.fecha_consulta) >= :'desde'::timestamptz;
 
 -- Literal SQLite en una sola línea: comillas simples duplicadas, sin secuencias de escape.
--- Los saltos de línea pasan a espacios y «--» se escribe como '-' || '-', porque wrangler
--- separa las sentencias del archivo y trata «--» como inicio de comentario incluso dentro de un texto.
+-- Los saltos de línea pasan a espacios, para que cada sentencia ocupe una línea, y «--» se escribe
+-- como '-' || '-' para que ninguna herramienta que corte por líneas lo confunda con un comentario.
 CREATE FUNCTION pg_temp.lit(v text) RETURNS text LANGUAGE sql IMMUTABLE AS
 $$ SELECT CASE WHEN v IS NULL THEN 'NULL'
           ELSE '''' || regexp_replace(replace(regexp_replace(v, '[\r\n]+', ' ', 'g'), '''', ''''''), '-(?=-)', '-'' || ''', 'g') || ''''

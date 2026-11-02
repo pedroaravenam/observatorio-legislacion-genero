@@ -1,6 +1,6 @@
--- Esquema público en Cloudflare D1 (SQLite).
+-- Esquema de la base pública SQLite que lee el sitio.
 -- Una fila por boletín: los trámites, autores y materias van en JSON dentro de la fila,
--- para que una carga completa escriba ~18.600 filas y no ~200.000.
+-- para que el sitio lea una ficha completa con una sola consulta.
 
 CREATE TABLE IF NOT EXISTS proyecto (
   boletin            TEXT PRIMARY KEY,
