@@ -11,15 +11,15 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 ## Entorno
 
 - VPS: `atendia-development` (116.203.181.6), `/opt/observatorio`, Compose `observatorio` (servicios `db` y `sitio` permanentes; `migraciones`, `ingesta` y `exportador` como trabajos).
+- Máquina local: temporizadores del Senado desactivados el 2 de noviembre; ya no consulta ni publica.
 - Base de ingesta: restaurada en el VPS desde la máquina local el 2 de noviembre (18.616 boletines, 18.627 respuestas originales).
 - Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. Instaladas en el VPS el 2 de noviembre; primera carga completa el 3 de noviembre a la 01:00 y primera diaria a las 09:00.
 - Cloudflare: el Worker y la base D1 del primer corte se borraron el 2 de noviembre.
 
 ## Próximo paso exacto
 
-1. Desactivar en la máquina local `observatorio-senado-fecha.timer` y `observatorio-senado-completa.timer`, para no consultar dos veces al Senado.
-2. Verificar las primeras ejecuciones en el VPS (`journalctl -u observatorio-completa -u observatorio-fecha`) y que la fecha del pie del sitio avance.
-3. Comprar el dominio, apuntarlo al VPS y agregar su bloque en el Caddyfile.
+1. Verificar las primeras ejecuciones en el VPS (`journalctl -u observatorio-completa -u observatorio-fecha`) y que la fecha del pie del sitio avance.
+2. Comprar el dominio, apuntarlo al VPS y agregar su bloque en el Caddyfile.
 
 ## Pendientes priorizados
 

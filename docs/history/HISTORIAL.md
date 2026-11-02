@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-02 — Ingesta local desactivada (commit de este avance)
+
+El desarrollador desactivó en la máquina local `observatorio-senado-fecha.timer` y `observatorio-senado-completa.timer`. Desde ahora, solo el VPS consulta al Senado.
+
 ## 2026-11-02 — Temporizadores instalados en el VPS (commit de este avance)
 
 El desarrollador instaló y activó `observatorio-fecha.timer` (09:00) y `observatorio-completa.timer` (01:00), en hora de Chile. Según `systemctl list-timers`, la primera ejecución será la carga completa del 3 de noviembre a las 04:00 UTC.
