@@ -1,0 +1,157 @@
+:root {
+	color-scheme: light dark;
+	--fondo: #fbfaf8;
+	--superficie: #ffffff;
+	--texto: #1d1b20;
+	--texto-suave: #57525e;
+	--borde: #dcd7e0;
+	--acento: #5b2a86;
+	--acento-texto: #ffffff;
+	--acento-suave: #f1eaf7;
+	--enlace: #4a1f73;
+	--foco: #c2410c;
+	--ok: #1d6b3a;
+	--ok-suave: #e5f3ea;
+	--aviso: #7a4b00;
+	--aviso-suave: #fdf3dc;
+	--neutro-suave: #eeecf1;
+	--radio: 10px;
+	--ancho: 72rem;
+	font-family:
+		'Source Sans 3',
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		sans-serif;
+	font-size: 17px;
+	line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--fondo: #141217;
+		--superficie: #1d1a22;
+		--texto: #ece9f0;
+		--texto-suave: #b5aebf;
+		--borde: #3a3542;
+		--acento: #c9a6ef;
+		--acento-texto: #1d1027;
+		--acento-suave: #2c2238;
+		--enlace: #d9bff7;
+		--foco: #fb923c;
+		--ok: #8fd6a6;
+		--ok-suave: #1d3326;
+		--aviso: #f3c46b;
+		--aviso-suave: #3a2e14;
+		--neutro-suave: #2a2630;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--fondo);
+	color: var(--texto);
+}
+
+a {
+	color: var(--enlace);
+	text-underline-offset: 0.18em;
+}
+
+:focus-visible {
+	outline: 3px solid var(--foco);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+h1,
+h2,
+h3 {
+	line-height: 1.25;
+	text-wrap: balance;
+}
+
+.contenedor {
+	max-width: var(--ancho);
+	margin: 0 auto;
+	padding: 0 16px;
+}
+
+.visualmente-oculto {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.boton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	min-height: 44px;
+	padding: 0.5rem 1.1rem;
+	border-radius: var(--radio);
+	border: 1px solid var(--acento);
+	background: var(--acento);
+	color: var(--acento-texto);
+	font: inherit;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.boton.secundario {
+	background: transparent;
+	color: var(--enlace);
+	border-color: var(--borde);
+}
+
+.boton[aria-disabled='true'],
+.boton:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+.etiqueta {
+	display: inline-block;
+	padding: 0.1rem 0.6rem;
+	border-radius: 999px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	background: var(--neutro-suave);
+	color: var(--texto);
+	white-space: nowrap;
+}
+
+.etiqueta.publicado {
+	background: var(--ok-suave);
+	color: var(--ok);
+}
+
+.etiqueta.tramitacion {
+	background: var(--acento-suave);
+	color: var(--enlace);
+}
+
+.etiqueta.genero {
+	background: var(--aviso-suave);
+	color: var(--aviso);
+}
+
+.aviso {
+	padding: 0.85rem 1rem;
+	border-radius: var(--radio);
+	background: var(--aviso-suave);
+	color: var(--texto);
+	border-left: 4px solid var(--aviso);
+}

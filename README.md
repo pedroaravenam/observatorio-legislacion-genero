@@ -2,7 +2,7 @@
 
 Proyecto independiente para seguir, explicar y consultar la tramitación de iniciativas legislativas relacionadas con género en Chile.
 
-**Estado:** preparación del primer corte público.
+**Estado:** primer corte publicado en https://observatorio-legislacion-genero.pedrosko-aravena.workers.dev
 
 ## Principios
 
@@ -25,6 +25,16 @@ El alcance y los criterios de publicación están en [PLAN.md](PLAN.md).
 ## Origen del código
 
 Este repositorio reúne el código y la documentación del proyecto independiente. El código se publica bajo [AGPL-3.0](LICENSE). El acceso al sitio es gratuito; una API alojada con mayor capacidad podría tener planes de pago sin cambiar la licencia del código.
+
+## Estructura
+
+| Carpeta | Qué contiene |
+|---|---|
+| `src/`, `db/`, `tests/` | Ingesta .NET y PostgreSQL desde las fuentes oficiales |
+| `exportador/` | Exportación de la base de ingesta a Cloudflare D1 y publicación diaria |
+| `sitio/` | Sitio público en SvelteKit sobre Cloudflare Workers |
+| `datos/seleccion/` | Lista preliminar de la selección de género |
+| `web/` | Frontend Angular del primer corte, reemplazado por `sitio/` |
 
 ## Documentación
 
