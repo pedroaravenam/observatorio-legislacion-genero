@@ -1,0 +1,1481 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://opendata.camara.cl/camaradiputados/v1" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://opendata.camara.cl/camaradiputados/v1" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://opendata.camara.cl/camaradiputados/v1">
+      <s:element name="retornarPeriodosLegislativos">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarPeriodosLegislativosResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarPeriodosLegislativosResult" type="tns:PeriodosLegislativosColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="PeriodosLegislativosColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="PeriodoLegislativo" type="tns:PeriodoLegislativo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="PeriodoLegislativo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="FechaInicio" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="FechaTermino" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Legislaturas" type="tns:LegislaturasColeccion" />
+          <s:element minOccurs="0" maxOccurs="1" name="Diputados" type="tns:DiputadosPeriodoColeccion" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="LegislaturasColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Legislatura" type="tns:Legislatura" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Legislatura">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="Numero" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaInicio" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaTermino" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Tipo" type="tns:TipoLegislatura" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TipoLegislatura">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="Tipo">
+        <s:simpleContent>
+          <s:extension base="s:string">
+            <s:attribute name="Valor" type="s:int" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TipoSexo">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="DiputadosPeriodoColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="DiputadoPeriodo" type="tns:DiputadoPeriodo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DiputadoPeriodo">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="FechaInicio" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaTermino" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Diputado" type="tns:Diputado" />
+          <s:element minOccurs="0" maxOccurs="1" name="Distrito" type="tns:Distrito" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Diputado">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre2" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ApellidoPaterno" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ApellidoMaterno" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="FechaNacimiento" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="FechaDefucion" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="RUT" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="RUTDV" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Sexo" type="tns:TipoSexo" />
+          <s:element minOccurs="0" maxOccurs="1" name="Militancias" type="tns:MilitanciasColeccion" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MilitanciasColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Militancia" type="tns:Militancia" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Militancia">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="FechaInicio" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaTermino" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Partido" type="tns:PartidoPolitico" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="PartidoPolitico">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Id" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Alias" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Distrito">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Numero" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Comunas" type="tns:ComunasColeccion" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ComunasColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Comuna" type="tns:Comuna" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Comuna">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Numero" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="retornarPeriodoLegislativoActual">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarPeriodoLegislativoActualResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarPeriodoLegislativoActualResult" type="tns:PeriodoLegislativo" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarLegislaturas">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarLegislaturasResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarLegislaturasResult" type="tns:LegislaturasColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarLegislaturaActual">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarLegislaturaActualResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarLegislaturaActualResult" type="tns:Legislatura" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarMensajesXAnno">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="prmAnno" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarMensajesXAnnoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarMensajesXAnnoResult" type="tns:ProyectosLeyColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ProyectosLeyColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ProyectoLey" type="tns:ProyectoLey" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ProyectoLey">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="NumeroBoletin" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaIngreso" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="TipoIniciativa" type="tns:TipoIniciativaProyectoLey" />
+          <s:element minOccurs="0" maxOccurs="1" name="CamaraOrigen" type="tns:TipoCamaraOrigen" />
+          <s:element minOccurs="0" maxOccurs="1" name="Autores" type="tns:ParlamentariosAutoresColeccion" />
+          <s:element minOccurs="0" maxOccurs="1" name="MinisteriosPatrocinantes" type="tns:MinisteriosColeccion" />
+          <s:element minOccurs="0" maxOccurs="1" name="Votaciones" type="tns:VotacionesProyectoLeyCollecion" />
+          <s:element minOccurs="0" maxOccurs="1" name="Materias" type="tns:MateriasColeccion" />
+          <s:element minOccurs="1" maxOccurs="1" name="Admisible" type="s:boolean" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TipoIniciativaProyectoLey">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TipoCamaraOrigen">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="ParlamentariosAutoresColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ParlamentarioAutor" type="tns:ParlamentarioAutor" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ParlamentarioAutor">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Orden" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Diputado" type="tns:Diputado" />
+          <s:element minOccurs="0" maxOccurs="1" name="Senador" type="tns:Senador" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Senador">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ApellidoPaterno" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ApellidoMaterno" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MinisteriosColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Ministerio" type="tns:Ministerio" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Ministerio">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VotacionesProyectoLeyCollecion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="VotacionProyectoLey" type="tns:VotacionProyectoLey" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VotacionProyectoLey">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:Votacion">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="1" name="TipoVotacionProyectoLey" type="tns:TipoVotacionProyectoLey" />
+              <s:element minOccurs="0" maxOccurs="1" name="Articulo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="TramiteConstitucional" type="tns:TramiteConstitucional" />
+              <s:element minOccurs="0" maxOccurs="1" name="TramiteReglamentario" type="tns:TramiteReglamentario" />
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="Votacion">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Descripcion" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Fecha" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalSi" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalNo" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalAbstencion" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalDispensado" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Quorum" type="tns:TipoQuorumVotacion" />
+          <s:element minOccurs="0" maxOccurs="1" name="Resultado" type="tns:TipoResultadoVotacion" />
+          <s:element minOccurs="0" maxOccurs="1" name="Tipo" type="tns:TipoVotacion" />
+          <s:element minOccurs="0" maxOccurs="1" name="Votos" type="tns:VotosColeccion" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TipoQuorumVotacion">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TipoResultadoVotacion">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TipoVotacion">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="VotosColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Voto" type="tns:Voto" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Voto">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Diputado" type="tns:Diputado" />
+          <s:element minOccurs="0" maxOccurs="1" name="OpcionVoto" type="tns:TipoOpcionVoto" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="TipoOpcionVoto">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TipoVotacionProyectoLey">
+        <s:simpleContent>
+          <s:extension base="tns:Tipo" />
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TramiteConstitucional">
+        <s:simpleContent>
+          <s:extension base="s:string">
+            <s:attribute name="Id" type="s:int" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="TramiteReglamentario">
+        <s:simpleContent>
+          <s:extension base="s:string">
+            <s:attribute name="Id" type="s:int" use="required" />
+          </s:extension>
+        </s:simpleContent>
+      </s:complexType>
+      <s:complexType name="MateriasColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Materia" type="tns:Materia" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Materia">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="retornarMocionesXAnno">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="prmAnno" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarMocionesXAnnoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarMocionesXAnnoResult" type="tns:ProyectosLeyColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarMaterias">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarMateriasResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarMateriasResult" type="tns:MateriasColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarTramitesConstitucionales">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarTramitesConstitucionalesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarTramitesConstitucionalesResult" type="tns:TramitesConstitucionalesColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="TramitesConstitucionalesColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="TramiteConstitucional" type="tns:TramiteConstitucional" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="retornarTramitesReglamentarios">
+        <s:complexType />
+      </s:element>
+      <s:element name="retornarTramitesReglamentariosResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarTramitesReglamentariosResult" type="tns:TramitesReglamentariosColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="TramitesReglamentariosColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="TramiteReglamentario" type="tns:TramiteReglamentario" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="retornarVotacionesXProyectoLey">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="prmNumeroBoletin" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarVotacionesXProyectoLeyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarVotacionesXProyectoLeyResult" type="tns:ProyectoLey" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarVotacionesXAnno">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="prmAnno" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarVotacionesXAnnoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarVotacionesXAnnoResult" type="tns:VotacionesColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="VotacionesColeccion">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Votacion" type="tns:Votacion" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="retornarVotacionDetalle">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="prmVotacionId" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarVotacionDetalleResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarVotacionDetalleResult" type="tns:Votacion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarProyectoLey">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="prmNumeroBoletin" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarProyectoLeyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarProyectoLeyResult" type="tns:ProyectoLey" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarProyectosLeyxNumeroLey">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="prmNumeroLey" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarProyectosLeyxNumeroLeyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarProyectosLeyxNumeroLeyResult" type="tns:ProyectosLeyColeccion" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarDocumentoIngresoProyectoLey">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="prmNumeroBoletin" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="retornarDocumentoIngresoProyectoLeyResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="retornarDocumentoIngresoProyectoLeyResult" type="tns:Documento" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Documento">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ContentType" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Archivo" type="s:base64Binary" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="PeriodosLegislativosColeccion" nillable="true" type="tns:PeriodosLegislativosColeccion" />
+      <s:element name="PeriodoLegislativo" nillable="true" type="tns:PeriodoLegislativo" />
+      <s:element name="LegislaturasColeccion" nillable="true" type="tns:LegislaturasColeccion" />
+      <s:element name="Legislatura" nillable="true" type="tns:Legislatura" />
+      <s:element name="ProyectosLeyColeccion" nillable="true" type="tns:ProyectosLeyColeccion" />
+      <s:element name="MateriasColeccion" nillable="true" type="tns:MateriasColeccion" />
+      <s:element name="TramitesConstitucionalesColeccion" nillable="true" type="tns:TramitesConstitucionalesColeccion" />
+      <s:element name="TramitesReglamentariosColeccion" nillable="true" type="tns:TramitesReglamentariosColeccion" />
+      <s:element name="ProyectoLey" nillable="true" type="tns:ProyectoLey" />
+      <s:element name="VotacionesColeccion" nillable="true" type="tns:VotacionesColeccion" />
+      <s:element name="Votacion" nillable="true" type="tns:Votacion" />
+      <s:element name="Documento" nillable="true" type="tns:Documento" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="retornarPeriodosLegislativosSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarPeriodosLegislativos" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodosLegislativosSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarPeriodosLegislativosResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodoLegislativoActualSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarPeriodoLegislativoActual" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodoLegislativoActualSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarPeriodoLegislativoActualResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturasSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarLegislaturas" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturasSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarLegislaturasResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturaActualSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarLegislaturaActual" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturaActualSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarLegislaturaActualResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarMensajesXAnnoSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarMensajesXAnno" />
+  </wsdl:message>
+  <wsdl:message name="retornarMensajesXAnnoSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarMensajesXAnnoResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarMocionesXAnnoSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarMocionesXAnno" />
+  </wsdl:message>
+  <wsdl:message name="retornarMocionesXAnnoSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarMocionesXAnnoResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarMateriasSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarMaterias" />
+  </wsdl:message>
+  <wsdl:message name="retornarMateriasSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarMateriasResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesConstitucionalesSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarTramitesConstitucionales" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesConstitucionalesSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarTramitesConstitucionalesResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesReglamentariosSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarTramitesReglamentarios" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesReglamentariosSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarTramitesReglamentariosResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXProyectoLeySoapIn">
+    <wsdl:part name="parameters" element="tns:retornarVotacionesXProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXProyectoLeySoapOut">
+    <wsdl:part name="parameters" element="tns:retornarVotacionesXProyectoLeyResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXAnnoSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarVotacionesXAnno" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXAnnoSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarVotacionesXAnnoResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionDetalleSoapIn">
+    <wsdl:part name="parameters" element="tns:retornarVotacionDetalle" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionDetalleSoapOut">
+    <wsdl:part name="parameters" element="tns:retornarVotacionDetalleResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectoLeySoapIn">
+    <wsdl:part name="parameters" element="tns:retornarProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectoLeySoapOut">
+    <wsdl:part name="parameters" element="tns:retornarProyectoLeyResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectosLeyxNumeroLeySoapIn">
+    <wsdl:part name="parameters" element="tns:retornarProyectosLeyxNumeroLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectosLeyxNumeroLeySoapOut">
+    <wsdl:part name="parameters" element="tns:retornarProyectosLeyxNumeroLeyResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarDocumentoIngresoProyectoLeySoapIn">
+    <wsdl:part name="parameters" element="tns:retornarDocumentoIngresoProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarDocumentoIngresoProyectoLeySoapOut">
+    <wsdl:part name="parameters" element="tns:retornarDocumentoIngresoProyectoLeyResponse" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodosLegislativosHttpGetIn" />
+  <wsdl:message name="retornarPeriodosLegislativosHttpGetOut">
+    <wsdl:part name="Body" element="tns:PeriodosLegislativosColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodoLegislativoActualHttpGetIn" />
+  <wsdl:message name="retornarPeriodoLegislativoActualHttpGetOut">
+    <wsdl:part name="Body" element="tns:PeriodoLegislativo" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturasHttpGetIn" />
+  <wsdl:message name="retornarLegislaturasHttpGetOut">
+    <wsdl:part name="Body" element="tns:LegislaturasColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturaActualHttpGetIn" />
+  <wsdl:message name="retornarLegislaturaActualHttpGetOut">
+    <wsdl:part name="Body" element="tns:Legislatura" />
+  </wsdl:message>
+  <wsdl:message name="retornarMensajesXAnnoHttpGetIn">
+    <wsdl:part name="prmAnno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarMensajesXAnnoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ProyectosLeyColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarMocionesXAnnoHttpGetIn">
+    <wsdl:part name="prmAnno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarMocionesXAnnoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ProyectosLeyColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarMateriasHttpGetIn" />
+  <wsdl:message name="retornarMateriasHttpGetOut">
+    <wsdl:part name="Body" element="tns:MateriasColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesConstitucionalesHttpGetIn" />
+  <wsdl:message name="retornarTramitesConstitucionalesHttpGetOut">
+    <wsdl:part name="Body" element="tns:TramitesConstitucionalesColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesReglamentariosHttpGetIn" />
+  <wsdl:message name="retornarTramitesReglamentariosHttpGetOut">
+    <wsdl:part name="Body" element="tns:TramitesReglamentariosColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXProyectoLeyHttpGetIn">
+    <wsdl:part name="prmNumeroBoletin" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXProyectoLeyHttpGetOut">
+    <wsdl:part name="Body" element="tns:ProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXAnnoHttpGetIn">
+    <wsdl:part name="prmAnno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXAnnoHttpGetOut">
+    <wsdl:part name="Body" element="tns:VotacionesColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionDetalleHttpGetIn">
+    <wsdl:part name="prmVotacionId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionDetalleHttpGetOut">
+    <wsdl:part name="Body" element="tns:Votacion" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectoLeyHttpGetIn">
+    <wsdl:part name="prmNumeroBoletin" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectoLeyHttpGetOut">
+    <wsdl:part name="Body" element="tns:ProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectosLeyxNumeroLeyHttpGetIn">
+    <wsdl:part name="prmNumeroLey" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectosLeyxNumeroLeyHttpGetOut">
+    <wsdl:part name="Body" element="tns:ProyectosLeyColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarDocumentoIngresoProyectoLeyHttpGetIn">
+    <wsdl:part name="prmNumeroBoletin" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarDocumentoIngresoProyectoLeyHttpGetOut">
+    <wsdl:part name="Body" element="tns:Documento" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodosLegislativosHttpPostIn" />
+  <wsdl:message name="retornarPeriodosLegislativosHttpPostOut">
+    <wsdl:part name="Body" element="tns:PeriodosLegislativosColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarPeriodoLegislativoActualHttpPostIn" />
+  <wsdl:message name="retornarPeriodoLegislativoActualHttpPostOut">
+    <wsdl:part name="Body" element="tns:PeriodoLegislativo" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturasHttpPostIn" />
+  <wsdl:message name="retornarLegislaturasHttpPostOut">
+    <wsdl:part name="Body" element="tns:LegislaturasColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarLegislaturaActualHttpPostIn" />
+  <wsdl:message name="retornarLegislaturaActualHttpPostOut">
+    <wsdl:part name="Body" element="tns:Legislatura" />
+  </wsdl:message>
+  <wsdl:message name="retornarMensajesXAnnoHttpPostIn">
+    <wsdl:part name="prmAnno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarMensajesXAnnoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ProyectosLeyColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarMocionesXAnnoHttpPostIn">
+    <wsdl:part name="prmAnno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarMocionesXAnnoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ProyectosLeyColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarMateriasHttpPostIn" />
+  <wsdl:message name="retornarMateriasHttpPostOut">
+    <wsdl:part name="Body" element="tns:MateriasColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesConstitucionalesHttpPostIn" />
+  <wsdl:message name="retornarTramitesConstitucionalesHttpPostOut">
+    <wsdl:part name="Body" element="tns:TramitesConstitucionalesColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarTramitesReglamentariosHttpPostIn" />
+  <wsdl:message name="retornarTramitesReglamentariosHttpPostOut">
+    <wsdl:part name="Body" element="tns:TramitesReglamentariosColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXProyectoLeyHttpPostIn">
+    <wsdl:part name="prmNumeroBoletin" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXProyectoLeyHttpPostOut">
+    <wsdl:part name="Body" element="tns:ProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXAnnoHttpPostIn">
+    <wsdl:part name="prmAnno" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionesXAnnoHttpPostOut">
+    <wsdl:part name="Body" element="tns:VotacionesColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionDetalleHttpPostIn">
+    <wsdl:part name="prmVotacionId" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarVotacionDetalleHttpPostOut">
+    <wsdl:part name="Body" element="tns:Votacion" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectoLeyHttpPostIn">
+    <wsdl:part name="prmNumeroBoletin" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectoLeyHttpPostOut">
+    <wsdl:part name="Body" element="tns:ProyectoLey" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectosLeyxNumeroLeyHttpPostIn">
+    <wsdl:part name="prmNumeroLey" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarProyectosLeyxNumeroLeyHttpPostOut">
+    <wsdl:part name="Body" element="tns:ProyectosLeyColeccion" />
+  </wsdl:message>
+  <wsdl:message name="retornarDocumentoIngresoProyectoLeyHttpPostIn">
+    <wsdl:part name="prmNumeroBoletin" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="retornarDocumentoIngresoProyectoLeyHttpPostOut">
+    <wsdl:part name="Body" element="tns:Documento" />
+  </wsdl:message>
+  <wsdl:portType name="WSLegislativoSoap">
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <wsdl:input message="tns:retornarPeriodosLegislativosSoapIn" />
+      <wsdl:output message="tns:retornarPeriodosLegislativosSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <wsdl:input message="tns:retornarPeriodoLegislativoActualSoapIn" />
+      <wsdl:output message="tns:retornarPeriodoLegislativoActualSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <wsdl:input message="tns:retornarLegislaturasSoapIn" />
+      <wsdl:output message="tns:retornarLegislaturasSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <wsdl:input message="tns:retornarLegislaturaActualSoapIn" />
+      <wsdl:output message="tns:retornarLegislaturaActualSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <wsdl:input message="tns:retornarMensajesXAnnoSoapIn" />
+      <wsdl:output message="tns:retornarMensajesXAnnoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <wsdl:input message="tns:retornarMocionesXAnnoSoapIn" />
+      <wsdl:output message="tns:retornarMocionesXAnnoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <wsdl:input message="tns:retornarMateriasSoapIn" />
+      <wsdl:output message="tns:retornarMateriasSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <wsdl:input message="tns:retornarTramitesConstitucionalesSoapIn" />
+      <wsdl:output message="tns:retornarTramitesConstitucionalesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <wsdl:input message="tns:retornarTramitesReglamentariosSoapIn" />
+      <wsdl:output message="tns:retornarTramitesReglamentariosSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <wsdl:input message="tns:retornarVotacionesXProyectoLeySoapIn" />
+      <wsdl:output message="tns:retornarVotacionesXProyectoLeySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <wsdl:input message="tns:retornarVotacionesXAnnoSoapIn" />
+      <wsdl:output message="tns:retornarVotacionesXAnnoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <wsdl:input message="tns:retornarVotacionDetalleSoapIn" />
+      <wsdl:output message="tns:retornarVotacionDetalleSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <wsdl:input message="tns:retornarProyectoLeySoapIn" />
+      <wsdl:output message="tns:retornarProyectoLeySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <wsdl:input message="tns:retornarProyectosLeyxNumeroLeySoapIn" />
+      <wsdl:output message="tns:retornarProyectosLeyxNumeroLeySoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <wsdl:input message="tns:retornarDocumentoIngresoProyectoLeySoapIn" />
+      <wsdl:output message="tns:retornarDocumentoIngresoProyectoLeySoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="WSLegislativoHttpGet">
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <wsdl:input message="tns:retornarPeriodosLegislativosHttpGetIn" />
+      <wsdl:output message="tns:retornarPeriodosLegislativosHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <wsdl:input message="tns:retornarPeriodoLegislativoActualHttpGetIn" />
+      <wsdl:output message="tns:retornarPeriodoLegislativoActualHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <wsdl:input message="tns:retornarLegislaturasHttpGetIn" />
+      <wsdl:output message="tns:retornarLegislaturasHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <wsdl:input message="tns:retornarLegislaturaActualHttpGetIn" />
+      <wsdl:output message="tns:retornarLegislaturaActualHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <wsdl:input message="tns:retornarMensajesXAnnoHttpGetIn" />
+      <wsdl:output message="tns:retornarMensajesXAnnoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <wsdl:input message="tns:retornarMocionesXAnnoHttpGetIn" />
+      <wsdl:output message="tns:retornarMocionesXAnnoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <wsdl:input message="tns:retornarMateriasHttpGetIn" />
+      <wsdl:output message="tns:retornarMateriasHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <wsdl:input message="tns:retornarTramitesConstitucionalesHttpGetIn" />
+      <wsdl:output message="tns:retornarTramitesConstitucionalesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <wsdl:input message="tns:retornarTramitesReglamentariosHttpGetIn" />
+      <wsdl:output message="tns:retornarTramitesReglamentariosHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <wsdl:input message="tns:retornarVotacionesXProyectoLeyHttpGetIn" />
+      <wsdl:output message="tns:retornarVotacionesXProyectoLeyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <wsdl:input message="tns:retornarVotacionesXAnnoHttpGetIn" />
+      <wsdl:output message="tns:retornarVotacionesXAnnoHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <wsdl:input message="tns:retornarVotacionDetalleHttpGetIn" />
+      <wsdl:output message="tns:retornarVotacionDetalleHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <wsdl:input message="tns:retornarProyectoLeyHttpGetIn" />
+      <wsdl:output message="tns:retornarProyectoLeyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <wsdl:input message="tns:retornarProyectosLeyxNumeroLeyHttpGetIn" />
+      <wsdl:output message="tns:retornarProyectosLeyxNumeroLeyHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <wsdl:input message="tns:retornarDocumentoIngresoProyectoLeyHttpGetIn" />
+      <wsdl:output message="tns:retornarDocumentoIngresoProyectoLeyHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="WSLegislativoHttpPost">
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <wsdl:input message="tns:retornarPeriodosLegislativosHttpPostIn" />
+      <wsdl:output message="tns:retornarPeriodosLegislativosHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <wsdl:input message="tns:retornarPeriodoLegislativoActualHttpPostIn" />
+      <wsdl:output message="tns:retornarPeriodoLegislativoActualHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <wsdl:input message="tns:retornarLegislaturasHttpPostIn" />
+      <wsdl:output message="tns:retornarLegislaturasHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <wsdl:input message="tns:retornarLegislaturaActualHttpPostIn" />
+      <wsdl:output message="tns:retornarLegislaturaActualHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <wsdl:input message="tns:retornarMensajesXAnnoHttpPostIn" />
+      <wsdl:output message="tns:retornarMensajesXAnnoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <wsdl:input message="tns:retornarMocionesXAnnoHttpPostIn" />
+      <wsdl:output message="tns:retornarMocionesXAnnoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <wsdl:input message="tns:retornarMateriasHttpPostIn" />
+      <wsdl:output message="tns:retornarMateriasHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <wsdl:input message="tns:retornarTramitesConstitucionalesHttpPostIn" />
+      <wsdl:output message="tns:retornarTramitesConstitucionalesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <wsdl:input message="tns:retornarTramitesReglamentariosHttpPostIn" />
+      <wsdl:output message="tns:retornarTramitesReglamentariosHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <wsdl:input message="tns:retornarVotacionesXProyectoLeyHttpPostIn" />
+      <wsdl:output message="tns:retornarVotacionesXProyectoLeyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <wsdl:input message="tns:retornarVotacionesXAnnoHttpPostIn" />
+      <wsdl:output message="tns:retornarVotacionesXAnnoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <wsdl:input message="tns:retornarVotacionDetalleHttpPostIn" />
+      <wsdl:output message="tns:retornarVotacionDetalleHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <wsdl:input message="tns:retornarProyectoLeyHttpPostIn" />
+      <wsdl:output message="tns:retornarProyectoLeyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <wsdl:input message="tns:retornarProyectosLeyxNumeroLeyHttpPostIn" />
+      <wsdl:output message="tns:retornarProyectosLeyxNumeroLeyHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <wsdl:input message="tns:retornarDocumentoIngresoProyectoLeyHttpPostIn" />
+      <wsdl:output message="tns:retornarDocumentoIngresoProyectoLeyHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSLegislativoSoap" type="tns:WSLegislativoSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarPeriodosLegislativos" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarPeriodoLegislativoActual" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarLegislaturas" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarLegislaturaActual" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarMensajesXAnno" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarMocionesXAnno" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarMaterias" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarTramitesConstitucionales" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarTramitesReglamentarios" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarVotacionesXProyectoLey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarVotacionesXAnno" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarVotacionDetalle" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarProyectoLey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarProyectosLeyxNumeroLey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <soap:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarDocumentoIngresoProyectoLey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WSLegislativoSoap12" type="tns:WSLegislativoSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarPeriodosLegislativos" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarPeriodoLegislativoActual" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarLegislaturas" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarLegislaturaActual" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarMensajesXAnno" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarMocionesXAnno" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarMaterias" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarTramitesConstitucionales" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarTramitesReglamentarios" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarVotacionesXProyectoLey" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarVotacionesXAnno" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarVotacionDetalle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarProyectoLey" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarProyectosLeyxNumeroLey" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <soap12:operation soapAction="http://opendata.camara.cl/camaradiputados/v1/retornarDocumentoIngresoProyectoLey" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WSLegislativoHttpGet" type="tns:WSLegislativoHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <http:operation location="/retornarPeriodosLegislativos" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <http:operation location="/retornarPeriodoLegislativoActual" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <http:operation location="/retornarLegislaturas" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <http:operation location="/retornarLegislaturaActual" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <http:operation location="/retornarMensajesXAnno" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <http:operation location="/retornarMocionesXAnno" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <http:operation location="/retornarMaterias" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <http:operation location="/retornarTramitesConstitucionales" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <http:operation location="/retornarTramitesReglamentarios" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <http:operation location="/retornarVotacionesXProyectoLey" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <http:operation location="/retornarVotacionesXAnno" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <http:operation location="/retornarVotacionDetalle" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <http:operation location="/retornarProyectoLey" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <http:operation location="/retornarProyectosLeyxNumeroLey" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <http:operation location="/retornarDocumentoIngresoProyectoLey" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WSLegislativoHttpPost" type="tns:WSLegislativoHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="retornarPeriodosLegislativos">
+      <http:operation location="/retornarPeriodosLegislativos" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarPeriodoLegislativoActual">
+      <http:operation location="/retornarPeriodoLegislativoActual" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturas">
+      <http:operation location="/retornarLegislaturas" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarLegislaturaActual">
+      <http:operation location="/retornarLegislaturaActual" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMensajesXAnno">
+      <http:operation location="/retornarMensajesXAnno" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMocionesXAnno">
+      <http:operation location="/retornarMocionesXAnno" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarMaterias">
+      <http:operation location="/retornarMaterias" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesConstitucionales">
+      <http:operation location="/retornarTramitesConstitucionales" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarTramitesReglamentarios">
+      <http:operation location="/retornarTramitesReglamentarios" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXProyectoLey">
+      <http:operation location="/retornarVotacionesXProyectoLey" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionesXAnno">
+      <http:operation location="/retornarVotacionesXAnno" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarVotacionDetalle">
+      <http:operation location="/retornarVotacionDetalle" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectoLey">
+      <http:operation location="/retornarProyectoLey" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarProyectosLeyxNumeroLey">
+      <http:operation location="/retornarProyectosLeyxNumeroLey" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retornarDocumentoIngresoProyectoLey">
+      <http:operation location="/retornarDocumentoIngresoProyectoLey" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSLegislativo">
+    <wsdl:port name="WSLegislativoSoap" binding="tns:WSLegislativoSoap">
+      <soap:address location="https://opendata.camara.cl/camaradiputados/WServices/WSLegislativo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WSLegislativoSoap12" binding="tns:WSLegislativoSoap12">
+      <soap12:address location="https://opendata.camara.cl/camaradiputados/WServices/WSLegislativo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WSLegislativoHttpGet" binding="tns:WSLegislativoHttpGet">
+      <http:address location="https://opendata.camara.cl/camaradiputados/WServices/WSLegislativo.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WSLegislativoHttpPost" binding="tns:WSLegislativoHttpPost">
+      <http:address location="https://opendata.camara.cl/camaradiputados/WServices/WSLegislativo.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

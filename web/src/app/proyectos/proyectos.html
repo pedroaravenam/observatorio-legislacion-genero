@@ -1,0 +1,95 @@
+<h1>Proyectos de ley</h1>
+
+<section class="filtros" aria-label="Filtros de búsqueda">
+  <label class="campo campo-texto">
+    <span>Buscar</span>
+    <input
+      type="search"
+      placeholder="Título o número de boletín"
+      [value]="criterios().texto"
+      (input)="cambiar({ texto: $any($event.target).value })"
+    />
+  </label>
+  <label class="campo">
+    <span>Tipo de iniciativa</span>
+    <select (change)="cambiar({ tipo: numeroONulo($any($event.target).value) })">
+      <option value="">Todos</option>
+      @for (t of filtros()?.tiposIniciativa ?? []; track t.id) {
+        <option [value]="t.id">{{ t.nombre }}</option>
+      }
+    </select>
+  </label>
+  <label class="campo">
+    <span>Cámara de origen</span>
+    <select (change)="cambiar({ camara: numeroONulo($any($event.target).value) })">
+      <option value="">Todas</option>
+      @for (c of filtros()?.camaras ?? []; track c.id) {
+        <option [value]="c.id">{{ c.nombre }}</option>
+      }
+    </select>
+  </label>
+  <label class="campo">
+    <span>Año de ingreso</span>
+    <select (change)="cambiar({ anno: numeroONulo($any($event.target).value) })">
+      <option value="">Todos</option>
+      @for (a of filtros()?.annos ?? []; track a) {
+        <option [value]="a">{{ a }}</option>
+      }
+    </select>
+  </label>
+</section>
+
+@switch (estado().tipo) {
+  @case ('cargando') {
+    <p class="aviso" role="status">Cargando proyectos…</p>
+  }
+  @case ('error') {
+    <div class="aviso aviso-error" role="alert">
+      <p>No fue posible obtener los proyectos. Puede ser un problema transitorio.</p>
+      <button type="button" (click)="reintentar()">Reintentar</button>
+    </div>
+  }
+  @case ('listo') {
+    @let pagina = $any(estado()).pagina;
+    @if (pagina.total === 0) {
+      <p class="aviso" role="status">No hay proyectos que coincidan con la búsqueda.</p>
+    } @else {
+      <p class="resumen" role="status">{{ pagina.total }} proyectos</p>
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Boletín</th>
+              <th scope="col">Título</th>
+              <th scope="col">Ingreso</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of pagina.elementos; track p.boletin) {
+              <tr>
+                <td class="boletin"><a [routerLink]="['/proyectos', p.boletin]">{{ p.boletin }}</a></td>
+                <td>{{ p.titulo }}</td>
+                <td class="fecha">{{ p.fechaIngreso | date: 'dd-MM-yyyy' }}</td>
+                <td>{{ p.tipoIniciativa }}</td>
+                <td>{{ p.camaraOrigen }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <nav class="paginacion" aria-label="Paginación">
+        <button type="button" [disabled]="pagina.numeroPagina <= 1" (click)="irA(pagina.numeroPagina - 1)">Anterior</button>
+        <span>Página {{ pagina.numeroPagina }} de {{ totalPaginas() }}</span>
+        <button type="button" [disabled]="pagina.numeroPagina >= totalPaginas()" (click)="irA(pagina.numeroPagina + 1)">Siguiente</button>
+      </nav>
+      @if (pagina.elementos[0]; as primero) {
+        <p class="procedencia">
+          Fuente: Cámara de Diputadas y Diputados, servicio de datos abiertos (opendata.camara.cl).
+          Consultado el {{ primero.fechaConsulta | date: 'dd-MM-yyyy HH:mm' }}.
+        </p>
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+:host { display: block; max-width: 48rem; }
+.volver { margin: 0 0 1rem; font-size: 0.9375rem; }
+.boletin { margin: 0 0 0.25rem; color: var(--texto-suave); font-variant-numeric: tabular-nums; }
+h2 { font-size: 1.125rem; margin: 1.5rem 0 0.5rem; }
+.datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem 1.5rem; margin: 0; }
+.datos dt { font-size: 0.8125rem; font-weight: 600; color: var(--texto-suave); }
+.datos dd { margin: 0.125rem 0 0; }
+.autores { margin: 0; padding-left: 1.25rem; }
+.autores li { margin: 0.25rem 0; }
+.camara { color: var(--texto-suave); font-size: 0.875rem; margin-left: 0.25rem; }
+.nota { color: var(--texto-suave); }
+.aviso { padding: 1rem; border: 1px solid var(--borde); border-radius: 6px; background: var(--fondo-suave); }
+.aviso h1 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+.aviso p:last-child { margin-bottom: 0; }
+.aviso-error { border-color: var(--error); }
+.procedencia { margin-top: 2rem; font-size: 0.8125rem; color: var(--texto-suave); }

@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0004-proyecto-senado
+      author: observatorio
+      comment: Estado y procedencia de la ficha del Senado sin alterar los datos de la Cámara.
+      changes:
+        - addColumn:
+            tableName: proyecto_ley
+            columns:
+              - column: { name: estado_senado, type: VARCHAR(200) }
+              - column: { name: etapa_senado, type: VARCHAR(300) }
+              - column: { name: subetapa_senado, type: VARCHAR(300) }
+              - column:
+                  name: respuesta_senado_id
+                  type: BIGINT
+                  constraints: { foreignKeyName: fk_proyecto_respuesta_senado, references: respuesta_cruda(id) }
+              - column: { name: fecha_consulta_senado, type: TIMESTAMP WITH TIME ZONE }
+              - column: { name: hash_senado, type: CHAR(64) }
+
+  - changeSet:
+      id: 0004-tramite-senado
+      author: observatorio
+      comment: Trámites ordenados de la ficha del Senado con procedencia por fila.
+      changes:
+        - createTable:
+            tableName: tramite_senado
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, primaryKeyName: pk_tramite_senado } }
+              - column:
+                  name: proyecto_id
+                  type: BIGINT
+                  constraints: { nullable: false, foreignKeyName: fk_tramite_proyecto, references: proyecto_ley(id) }
+              - column: { name: posicion, type: INT, constraints: { nullable: false } }
+              - column: { name: fecha, type: DATE }
+              - column: { name: sesion, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: descripcion, type: CLOB, constraints: { nullable: false } }
+              - column: { name: etapa, type: VARCHAR(300), constraints: { nullable: false } }
+              - column: { name: camara, type: VARCHAR(100), constraints: { nullable: false } }
+              - column:
+                  name: respuesta_cruda_id
+                  type: BIGINT
+                  constraints: { nullable: false, foreignKeyName: fk_tramite_respuesta, references: respuesta_cruda(id) }
+        - addUniqueConstraint:
+            tableName: tramite_senado
+            columnNames: proyecto_id, posicion
+            constraintName: uq_tramite_posicion

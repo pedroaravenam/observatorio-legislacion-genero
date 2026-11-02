@@ -1,0 +1,51 @@
+<p class="volver"><a routerLink="/">← Volver a los proyectos</a></p>
+
+@switch (estado().tipo) {
+  @case ('cargando') {
+    <p class="aviso" role="status">Cargando el proyecto {{ boletin() }}…</p>
+  }
+  @case ('no-encontrado') {
+    <div class="aviso" role="alert">
+      <h1>Proyecto no encontrado</h1>
+      <p>No hay un proyecto con el boletín {{ boletin() }} en el Observatorio. Revisa el número o búscalo en la lista.</p>
+    </div>
+  }
+  @case ('error') {
+    <div class="aviso aviso-error" role="alert">
+      <p>No fue posible obtener el proyecto. Puede ser un problema transitorio; intenta de nuevo en unos momentos.</p>
+    </div>
+  }
+  @case ('listo') {
+    @let p = $any(estado()).proyecto;
+    <article>
+      <p class="boletin">Boletín {{ p.boletin }}</p>
+      <h1>{{ p.titulo }}</h1>
+
+      <dl class="datos">
+        <div><dt>Fecha de ingreso</dt><dd>{{ p.fechaIngreso | date: 'dd-MM-yyyy' }}</dd></div>
+        <div><dt>Tipo de iniciativa</dt><dd>{{ p.tipoIniciativa }}</dd></div>
+        <div><dt>Cámara de origen</dt><dd>{{ p.camaraOrigen }}</dd></div>
+      </dl>
+
+      <section aria-labelledby="titulo-autores">
+        <h2 id="titulo-autores">Autores</h2>
+        @if (p.autores.length > 0) {
+          <ul class="autores">
+            @for (a of p.autores; track $index) {
+              <li>{{ nombreCompleto(a) }} <span class="camara">{{ a.camara }}</span></li>
+            }
+          </ul>
+        } @else if (p.tipoIniciativa === 'Mensaje') {
+          <p class="nota">Es un mensaje del Ejecutivo: no tiene autores parlamentarios.</p>
+        } @else {
+          <p class="nota">La fuente no informa autores para este proyecto.</p>
+        }
+      </section>
+
+      <p class="procedencia">
+        Fuente: Cámara de Diputadas y Diputados, servicio de datos abiertos (opendata.camara.cl), identificador {{ p.idOrigen }}.
+        Consultado el {{ p.fechaConsulta | date: 'dd-MM-yyyy HH:mm' }}.
+      </p>
+    </article>
+  }
+}

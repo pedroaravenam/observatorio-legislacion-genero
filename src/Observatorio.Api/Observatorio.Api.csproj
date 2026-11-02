@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\Observatorio.Datos\Observatorio.Datos.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0003-parlamentario
+      author: observatorio
+      comment: >
+        Parlamentarios autores de proyectos. La fuente identifica a diputados y senadores
+        en espacios de identificadores distintos: la clave natural incluye la cámara.
+      changes:
+        - createTable:
+            tableName: parlamentario
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, primaryKeyName: pk_parlamentario } }
+              - column: { name: fuente, type: VARCHAR(50), constraints: { nullable: false } }
+              - column:
+                  name: camara_id
+                  type: INT
+                  constraints: { nullable: false, foreignKeyName: fk_parlamentario_camara, references: camara(id) }
+              - column: { name: id_origen, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: nombre, type: VARCHAR(200), constraints: { nullable: false } }
+              - column: { name: apellido_paterno, type: VARCHAR(200), constraints: { nullable: false } }
+              - column: { name: apellido_materno, type: VARCHAR(200) }
+              - column: { name: creado, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }
+              - column: { name: actualizado, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: parlamentario
+            columnNames: fuente, camara_id, id_origen
+            constraintName: uq_parlamentario_origen
+
+  - changeSet:
+      id: 0003-proyecto-autor
+      author: observatorio
+      comment: Autoría de un proyecto, con el orden de la fuente y la respuesta de la que salió.
+      changes:
+        - createTable:
+            tableName: proyecto_autor
+            columns:
+              - column:
+                  name: proyecto_id
+                  type: BIGINT
+                  constraints: { nullable: false, foreignKeyName: fk_proyecto_autor_proyecto, references: proyecto_ley(id) }
+              - column:
+                  name: parlamentario_id
+                  type: BIGINT
+                  constraints: { nullable: false, foreignKeyName: fk_proyecto_autor_parlam, references: parlamentario(id) }
+              - column: { name: orden, type: INT, constraints: { nullable: false } }
+              - column:
+                  name: respuesta_cruda_id
+                  type: BIGINT
+                  constraints: { nullable: false, foreignKeyName: fk_proyecto_autor_respuesta, references: respuesta_cruda(id) }
+        - addPrimaryKey:
+            tableName: proyecto_autor
+            columnNames: proyecto_id, parlamentario_id
+            constraintName: pk_proyecto_autor
+        - createIndex:
+            tableName: proyecto_autor
+            indexName: ix_proyecto_autor_parlam
+            columns:
+              - column: { name: parlamentario_id }

@@ -1,0 +1,79 @@
+# Ambiente local completo: docker compose up --build
+#
+#   db           PostgreSQL
+#   migraciones  aplica db/changelog con Liquibase y termina
+#   ingesta      consulta la fuente oficial, guarda lo crudo, normaliza y termina
+#   api          servicios de consulta (http://localhost:8080/api/proyectos)
+#   web          sitio Angular (http://localhost:4200)
+#
+# La configuración se toma de variables de entorno o de un archivo .env (ver .env.example).
+name: observatorio-genero-libre
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: observatorio
+      POSTGRES_USER: observatorio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-observatorio_local}
+    ports:
+      - "${PUERTO_DB:-5433}:5432"
+    volumes:
+      - datos:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U observatorio -d observatorio"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migraciones:
+    image: liquibase/liquibase:4.33.0
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      # z: etiqueta SELinux compartida, necesaria en Fedora/RHEL; no afecta a otros sistemas.
+      - ./db/changelog:/liquibase/changelog:ro,z
+    command:
+      - --changelog-file=changelog/raiz.yaml
+      - --url=jdbc:postgresql://db:5432/observatorio
+      - --username=observatorio
+      - --password=${POSTGRES_PASSWORD:-observatorio_local}
+      - update
+
+  ingesta:
+    build: { context: ., target: ingesta }
+    depends_on:
+      migraciones: { condition: service_completed_successfully }
+    environment:
+      ConnectionStrings__Observatorio: Host=db;Database=observatorio;Username=observatorio;Password=${POSTGRES_PASSWORD:-observatorio_local};GssEncryptionMode=Disable
+      Ingesta__AnnoDesde: ${INGESTA_ANNO_DESDE:-2025}
+      Ingesta__AnnoHasta: ${INGESTA_ANNO_HASTA:-2026}
+      Ingesta__BoletinSenado: ${INGESTA_BOLETIN_SENADO:-}
+      Ingesta__FechaSenado: ${INGESTA_FECHA_SENADO:-false}
+      Ingesta__CompletaSenado: ${INGESTA_COMPLETA_SENADO:-false}
+      Fuentes__Camara__UrlBase: ${CAMARA_URL_BASE:-https://opendata.camara.cl/camaradiputados/WServices/}
+      Fuentes__Senado__UrlServicio: ${SENADO_URL_SERVICIO:-https://tramitacion.senado.cl/wspublico/tramitacion.php}
+
+  api:
+    build: { context: ., target: api }
+    depends_on:
+      migraciones: { condition: service_completed_successfully }
+    environment:
+      ConnectionStrings__Observatorio: Host=db;Database=observatorio;Username=observatorio;Password=${POSTGRES_PASSWORD:-observatorio_local};GssEncryptionMode=Disable
+    ports:
+      - "${PUERTO_API:-8081}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /salud HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q \"200 OK\" <&3'"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build: { context: ./web }
+    depends_on:
+      api: { condition: service_started }
+    ports:
+      - "${PUERTO_WEB:-4201}:80"
+
+volumes:
+  datos:

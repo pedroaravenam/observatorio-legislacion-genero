@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Observatorio.Api/Observatorio.Api.csproj" />
+    <Project Path="src/Observatorio.Datos/Observatorio.Datos.csproj" />
+    <Project Path="src/Observatorio.Dominio/Observatorio.Dominio.csproj" />
+    <Project Path="src/Observatorio.Fuentes.Camara/Observatorio.Fuentes.Camara.csproj" />
+    <Project Path="src/Observatorio.Fuentes.Senado/Observatorio.Fuentes.Senado.csproj" />
+    <Project Path="src/Observatorio.Ingesta/Observatorio.Ingesta.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Observatorio.Pruebas/Observatorio.Pruebas.csproj" />
+  </Folder>
+</Solution>

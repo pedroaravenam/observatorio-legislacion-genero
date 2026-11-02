@@ -1,0 +1,70 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0005-ejecucion-padre
+      author: observatorio
+      comment: Vinculo entre la carga completa y las ejecuciones individuales reanudables.
+      changes:
+        - addColumn:
+            tableName: ingesta_ejecucion
+            columns:
+              - column:
+                  name: ejecucion_padre_id
+                  type: BIGINT
+                  constraints: { foreignKeyName: fk_ejecucion_padre, references: ingesta_ejecucion(id) }
+  - changeSet:
+      id: 0005-observacion-tramite
+      author: observatorio
+      comment: Primera observacion de cada version de tramite, independiente de su posicion.
+      changes:
+        - createTable:
+            tableName: senado_observacion
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, primaryKeyName: pk_senado_observacion } }
+              - column: { name: proyecto_id, type: BIGINT, constraints: { nullable: false, foreignKeyName: fk_sen_obs_proyecto, references: proyecto_ley(id) } }
+              - column: { name: huella, type: CHAR(64), constraints: { nullable: false } }
+              - column: { name: fecha_tramite, type: DATE }
+              - column: { name: primera_vista, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }
+              - column: { name: retraso_dias, type: INT }
+              - column: { name: origen, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: respuesta_cruda_id, type: BIGINT, constraints: { nullable: false, foreignKeyName: fk_sen_obs_respuesta, references: respuesta_cruda(id) } }
+        - addUniqueConstraint:
+            tableName: senado_observacion
+            columnNames: proyecto_id, huella
+            constraintName: uq_sen_obs_huella
+  - changeSet:
+      id: 0005-desactualizacion-senado
+      author: observatorio
+      comment: Diferencias que solo descubre una carga completa posterior a la linea base.
+      changes:
+        - createTable:
+            tableName: senado_desactualizacion
+            columns:
+              - column: { name: id, type: BIGINT, autoIncrement: true, constraints: { primaryKey: true, primaryKeyName: pk_sen_desactualizacion } }
+              - column: { name: proyecto_id, type: BIGINT, constraints: { nullable: false, foreignKeyName: fk_sen_des_proyecto, references: proyecto_ley(id) } }
+              - column: { name: ejecucion_id, type: BIGINT, constraints: { nullable: false, foreignKeyName: fk_sen_des_ejecucion, references: ingesta_ejecucion(id) } }
+              - column: { name: respuesta_cruda_id, type: BIGINT, constraints: { nullable: false, foreignKeyName: fk_sen_des_respuesta, references: respuesta_cruda(id) } }
+              - column: { name: detectado, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }
+              - column: { name: ultima_confirmacion, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }
+              - column: { name: insertados, type: INT, constraints: { nullable: false } }
+              - column: { name: actualizados, type: INT, constraints: { nullable: false } }
+              - column: { name: hash_anterior, type: CHAR(64) }
+              - column: { name: hash_actual, type: CHAR(64) }
+        - addUniqueConstraint:
+            tableName: senado_desactualizacion
+            columnNames: ejecucion_id, proyecto_id
+            constraintName: uq_sen_des_ejec_proy
+  - changeSet:
+      id: 0005-fuente-estado
+      author: observatorio
+      comment: Estado de frescura de la fuente y ultimas sincronizaciones satisfactorias.
+      changes:
+        - createTable:
+            tableName: fuente_estado
+            columns:
+              - column: { name: fuente, type: VARCHAR(30), constraints: { primaryKey: true, primaryKeyName: pk_fuente_estado } }
+              - column: { name: estado, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: ultima_diaria, type: TIMESTAMP WITH TIME ZONE }
+              - column: { name: ultima_completa, type: TIMESTAMP WITH TIME ZONE }
+              - column: { name: ultima_respuesta, type: TIMESTAMP WITH TIME ZONE }
+              - column: { name: ultimo_error, type: VARCHAR(4000) }
+              - column: { name: actualizado, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }

@@ -1,0 +1,6 @@
+.encabezado { border-bottom: 1px solid var(--borde); background: var(--fondo-suave); margin-bottom: 1.5rem; }
+.encabezado .contenedor { padding-top: 1rem; padding-bottom: 1rem; }
+.sitio { font-weight: 600; color: var(--texto); text-decoration: none; }
+.sitio:hover { text-decoration: underline; }
+.sitio:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.contenedor { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }

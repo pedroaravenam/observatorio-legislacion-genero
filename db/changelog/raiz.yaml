@@ -1,0 +1,9 @@
+# Changelog raíz. Cada cambio vive en su propio archivo, en orden, y nunca se edita
+# una vez aplicado: las correcciones se hacen con un cambio nuevo.
+#
+# Portabilidad (decisión 0002): solo tipos genéricos de Liquibase o tipos estándar
+# compatibles con PostgreSQL; identificadores de 30 caracteres o menos.
+databaseChangeLog:
+  - includeAll:
+      path: cambios/
+      relativeToChangelogFile: true
