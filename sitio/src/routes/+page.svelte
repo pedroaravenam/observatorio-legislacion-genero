@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { fechaCorta } from '#lib/formato';
+	import GraficoAnual from '../lib/GraficoAnual.svelte';
+	import { claseEstado, fechaCorta } from '#lib/formato';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -7,6 +8,13 @@
 	const hayFiltros = $derived(
 		Boolean(f.texto || f.anno || f.estado || f.iniciativa || !f.soloGenero)
 	);
+	const totales = $derived(
+		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
+			total: 0,
+			leyes: 0
+		})
+	);
+	const desde = $derived(data.resumen[0]?.anno ?? 1990);
 
 	function enlacePagina(n: number, todos = !f.soloGenero): string {
 		const p = new URLSearchParams();
@@ -20,12 +28,6 @@
 		return s ? `/?${s}` : '/';
 	}
 
-	function claseEstado(estado: string | null): string {
-		if (estado === 'Publicado') return 'publicado';
-		if (estado === 'En tramitación') return 'tramitacion';
-		return '';
-	}
-
 	const numero = new Intl.NumberFormat('es-CL');
 </script>
 
@@ -33,270 +35,426 @@
 	<title>{f.texto ? `«${f.texto}» · ` : ''}Proyectos · Observatorio de Legislación de Género</title>
 	<meta
 		name="description"
-		content="Busca proyectos de ley relacionados con género en Chile, con su tramitación y enlace a la fuente oficial."
+		content="Busca proyectos de ley relacionados con género en Chile desde 1990, con su tramitación y enlace a la fuente oficial."
 	/>
 </svelte:head>
 
-<h1>Proyectos de ley</h1>
-<p class="intro">
-	Proyectos presentados desde 1990, con su tramitación según el Senado. Por defecto se muestran los
-	que una selección automática <strong>preliminar</strong> relaciona con género;
-	<a href="/acerca#seleccion">ver cómo se seleccionan</a>.
-</p>
-
-<form method="GET" action="/" class="filtros" role="search" aria-label="Buscar proyectos">
-	<div class="campo ancho">
-		<label for="q">Buscar <span class="opcional">(opcional)</span></label>
-		<input
-			id="q"
-			name="q"
-			type="search"
-			value={f.texto}
-			maxlength="200"
-			placeholder="Palabras del título, materia, autor o número de boletín"
-			aria-describedby="q-ayuda"
-		/>
-		<span id="q-ayuda" class="ayuda">Ejemplos: «violencia mujer», «sala cuna», «11077-07».</span>
+<section class="franja" aria-labelledby="titulo">
+	<div class="contenedor">
+		<h1 id="titulo">Proyectos de ley sobre género en Chile, desde {desde}</h1>
+		<p class="bajada">
+			{numero.format(totales.total)} proyectos en la selección preliminar; {numero.format(
+				totales.leyes
+			)} ya son ley. Cada ficha muestra su tramitación y enlaza al Senado y a la Biblioteca del Congreso.
+		</p>
+		<GraficoAnual resumen={data.resumen} seleccionado={f.anno} />
 	</div>
+</section>
 
-	<div class="campo">
-		<label for="anno">Año de ingreso</label>
-		<select id="anno" name="anno">
-			<option value="">Todos</option>
-			{#each data.opciones.annos as a (a)}
-				<option value={a} selected={f.anno === a}>{a}</option>
-			{/each}
-		</select>
-	</div>
+<div class="contenedor">
+	<form method="GET" action="/" class="filtros" role="search" aria-label="Buscar proyectos">
+		<div class="busqueda">
+			<label for="q">Buscar <span class="opcional">(opcional)</span></label>
+			<div class="busqueda-fila">
+				<input
+					id="q"
+					name="q"
+					type="search"
+					value={f.texto}
+					maxlength="200"
+					placeholder="Palabras o número de boletín"
+					aria-describedby="q-ayuda"
+					enterkeyhint="search"
+				/>
+				<button class="boton" type="submit">Buscar</button>
+			</div>
+			<p id="q-ayuda" class="ayuda">
+				Por ejemplo: violencia contra la mujer, sala cuna, 11077-07. Busca en títulos, materias y
+				autores.
+			</p>
+		</div>
 
-	<div class="campo">
-		<label for="estado">Estado</label>
-		<select id="estado" name="estado">
-			<option value="">Todos</option>
-			{#each data.opciones.estados as e (e)}
-				<option value={e} selected={f.estado === e}>{e}</option>
-			{/each}
-		</select>
-	</div>
+		<div class="selectores">
+			<div class="campo">
+				<label for="anno">Año de ingreso</label>
+				<select id="anno" name="anno">
+					<option value="">Todos</option>
+					{#each data.opciones.annos as a (a)}
+						<option value={a} selected={f.anno === a}>{a}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="estado">Estado</label>
+				<select id="estado" name="estado">
+					<option value="">Todos</option>
+					{#each data.opciones.estados as e (e)}
+						<option value={e} selected={f.estado === e}>{e}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="iniciativa">Origen</label>
+				<select id="iniciativa" name="iniciativa">
+					<option value="">Todos</option>
+					{#each data.opciones.iniciativas as i (i)}
+						<option value={i} selected={f.iniciativa === i}>
+							{i === 'Mensaje' ? 'Mensaje (Presidencia)' : 'Moción (parlamentarios)'}
+						</option>
+					{/each}
+				</select>
+			</div>
+			<fieldset class="alcance">
+				<legend>Mostrar</legend>
+				<div class="segmentos">
+					<label>
+						<input type="radio" name="alcance" value="genero" checked={f.soloGenero} />
+						<span>Selección de género</span>
+					</label>
+					<label>
+						<input type="radio" name="alcance" value="todos" checked={!f.soloGenero} />
+						<span>Todos</span>
+					</label>
+				</div>
+			</fieldset>
+		</div>
 
-	<div class="campo">
-		<label for="iniciativa">Origen</label>
-		<select id="iniciativa" name="iniciativa">
-			<option value="">Todos</option>
-			{#each data.opciones.iniciativas as i (i)}
-				<option value={i} selected={f.iniciativa === i}>
-					{i === 'Mensaje' ? 'Mensaje (Presidencia)' : 'Moción (parlamentarios)'}
-				</option>
-			{/each}
-		</select>
-	</div>
+		<div class="acciones">
+			<button class="boton secundario" type="submit">Aplicar filtros</button>
+			{#if hayFiltros}
+				<a class="limpiar" href="/">Quitar filtros</a>
+			{/if}
+		</div>
+	</form>
 
-	<fieldset class="campo alcance">
-		<legend>Mostrar</legend>
-		<label class="opcion">
-			<input type="radio" name="alcance" value="genero" checked={f.soloGenero} />
-			Selección de género (preliminar)
-		</label>
-		<label class="opcion">
-			<input type="radio" name="alcance" value="todos" checked={!f.soloGenero} />
-			Todos los proyectos
-		</label>
-	</fieldset>
-
-	<div class="acciones">
-		<button class="boton" type="submit">Buscar</button>
-		{#if hayFiltros}
-			<a class="boton secundario" href="/">Limpiar filtros</a>
+	<div class="resultados-cabecera">
+		<h2 class="resumen" role="status">
+			{#if data.total === 0}
+				Sin resultados
+			{:else}
+				{numero.format(data.total)}
+				{data.total === 1 ? 'proyecto' : 'proyectos'}
+				{#if f.anno}<span class="suave">de {f.anno}</span>{/if}
+			{/if}
+		</h2>
+		{#if data.paginas > 1}
+			<p class="suave">Página {f.pagina} de {numero.format(data.paginas)}</p>
 		{/if}
 	</div>
-</form>
 
-<p class="resumen" role="status">
 	{#if data.total === 0}
-		Sin resultados.
+		<div class="vacio">
+			<h3>No hay proyectos con esos criterios</h3>
+			<ul>
+				{#if f.soloGenero && !data.porNumero}
+					<li>
+						La búsqueda se limitó a la selección de género.
+						<a href={enlacePagina(1, true)}>Buscar en todos los proyectos</a>.
+					</li>
+				{/if}
+				<li>Prueba con menos palabras. Los acentos no son necesarios.</li>
+				<li>Si buscas un boletín, escríbelo con su guion, por ejemplo 11077-07.</li>
+			</ul>
+		</div>
 	{:else}
-		{numero.format(data.total)}
-		{data.total === 1 ? 'proyecto' : 'proyectos'}{data.paginas > 1
-			? ` · página ${f.pagina} de ${numero.format(data.paginas)}`
-			: ''}
-	{/if}
-</p>
-
-{#if data.total === 0}
-	<div class="vacio">
-		<h2>No encontramos proyectos con esos criterios</h2>
-		<ul>
-			{#if f.soloGenero && !data.porNumero}
-				<li>
-					La búsqueda se limitó a la selección de género.
-					<a href={enlacePagina(1, true)}> Buscar en todos los proyectos </a>.
+		<ol class="lista">
+			{#each data.filas as p (p.boletin)}
+				<li class="fila {claseEstado(p.estado)}">
+					<div class="fila-meta">
+						<span class="boletin">Boletín {p.boletin}</span>
+						{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
+						{#if p.genero && !f.soloGenero}<span class="marca-genero">Selección de género</span
+							>{/if}
+					</div>
+					<h3 class="titulo"><a href="/boletin/{p.boletin}">{p.titulo}</a></h3>
+					<p class="datos">
+						{#if p.iniciativa}<span
+								>{p.iniciativa}{p.camara_origen ? `, ${p.camara_origen}` : ''}</span
+							>{/if}
+						{#if p.fecha_ingreso}<span>Ingreso {fechaCorta(p.fecha_ingreso)}</span>{/if}
+						{#if p.ultimo_tramite}<span>Último trámite {fechaCorta(p.ultimo_tramite)}</span>{/if}
+						{#if p.ley_numero}<span class="ley">{p.ley_numero}</span>{/if}
+					</p>
 				</li>
-			{/if}
-			<li>Prueba con menos palabras o sin acentos.</li>
-			<li>Si buscas un boletín, escríbelo con su guion, por ejemplo 11077-07.</li>
-		</ul>
-	</div>
-{:else}
-	<ol class="lista">
-		{#each data.filas as p (p.boletin)}
-			<li class="tarjeta">
-				<div class="meta">
-					<span class="boletin">Boletín {p.boletin}</span>
-					{#if p.estado}<span class="etiqueta {claseEstado(p.estado)}">{p.estado}</span>{/if}
-					{#if p.genero}<span class="etiqueta genero">Selección de género</span>{/if}
-				</div>
-				<h2 class="titulo"><a href="/boletin/{p.boletin}">{p.titulo}</a></h2>
-				<p class="datos">
-					{#if p.fecha_ingreso}Ingreso {fechaCorta(p.fecha_ingreso)}{/if}
-					{#if p.iniciativa}· {p.iniciativa}{/if}
-					{#if p.camara_origen}· origen {p.camara_origen}{/if}
-					{#if p.ley_numero}· <strong>{p.ley_numero}</strong>{/if}
-					{#if p.ultimo_tramite}· último trámite {fechaCorta(p.ultimo_tramite)}{/if}
-				</p>
-			</li>
-		{/each}
-	</ol>
+			{/each}
+		</ol>
 
-	{#if data.paginas > 1}
-		<nav class="paginacion" aria-label="Páginas de resultados">
-			<a
-				class="boton secundario"
-				href={f.pagina > 1 ? enlacePagina(f.pagina - 1) : undefined}
-				aria-disabled={f.pagina <= 1 ? 'true' : undefined}
-				rel="prev">← Anterior</a
-			>
-			<span>Página {f.pagina} de {numero.format(data.paginas)}</span>
-			<a
-				class="boton secundario"
-				href={f.pagina < data.paginas ? enlacePagina(f.pagina + 1) : undefined}
-				aria-disabled={f.pagina >= data.paginas ? 'true' : undefined}
-				rel="next">Siguiente →</a
-			>
-		</nav>
+		{#if data.paginas > 1}
+			<nav class="paginacion" aria-label="Páginas de resultados">
+				<a
+					class="boton secundario"
+					href={f.pagina > 1 ? enlacePagina(f.pagina - 1) : undefined}
+					aria-disabled={f.pagina <= 1 ? 'true' : undefined}
+					rel="prev">Anterior</a
+				>
+				<span>Página {f.pagina} de {numero.format(data.paginas)}</span>
+				<a
+					class="boton secundario"
+					href={f.pagina < data.paginas ? enlacePagina(f.pagina + 1) : undefined}
+					aria-disabled={f.pagina >= data.paginas ? 'true' : undefined}
+					rel="next">Siguiente</a
+				>
+			</nav>
+		{/if}
 	{/if}
-{/if}
+</div>
 
 <style>
-	h1 {
-		margin: 0 0 0.4rem;
-		font-size: clamp(1.6rem, 4vw, 2.2rem);
+	.franja {
+		background: var(--franja);
+		color: var(--franja-texto);
+		padding: 2.25rem 0 1.75rem;
 	}
-	.intro {
-		max-width: 48rem;
-		color: var(--texto-suave);
-		margin-top: 0;
+	h1 {
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: clamp(2rem, 5.2vw, 3.4rem);
+		line-height: 1.05;
+		letter-spacing: -0.01em;
+		max-width: 20ch;
+		margin: 0 0 0.9rem;
+	}
+	.bajada {
+		max-width: 60ch;
+		margin: 0 0 2rem;
+		font-size: 1.05rem;
+		color: var(--franja-suave);
 	}
 	.filtros {
+		position: relative;
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-		gap: 1rem;
-		padding: 1.1rem;
-		margin: 1.25rem 0;
+		gap: 1.1rem;
+		margin: -0.75rem 0 2rem;
+		padding: 1.25rem;
 		background: var(--superficie);
 		border: 1px solid var(--borde);
-		border-radius: var(--radio);
+		border-radius: 10px;
+		box-shadow: 0 10px 30px -18px rgb(43 23 72 / 0.45);
 	}
-	.campo {
-		display: flex;
-		flex-direction: column;
-		gap: 0.3rem;
-		min-width: 0;
-	}
-	.campo.ancho {
-		grid-column: 1 / -1;
+	@media (min-width: 48rem) {
+		.filtros {
+			padding: 1.5rem 1.75rem;
+		}
 	}
 	label,
 	legend {
 		font-weight: 600;
+		font-size: 0.95rem;
 	}
 	.opcional,
 	.ayuda {
 		font-weight: 400;
-		color: var(--texto-suave);
-		font-size: 0.9rem;
+		color: var(--tinta-suave);
+		font-size: 0.88rem;
+	}
+	.ayuda {
+		margin: 0.35rem 0 0;
+	}
+	.busqueda-fila {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.35rem;
 	}
 	input[type='search'],
 	select {
 		font: inherit;
-		min-height: 44px;
-		padding: 0.45rem 0.7rem;
-		border: 1px solid var(--borde);
-		border-radius: 8px;
-		background: var(--fondo);
-		color: var(--texto);
+		min-height: 48px;
+		padding: 0.5rem 0.8rem;
+		border: 1px solid var(--borde-fuerte);
+		border-radius: var(--radio);
+		background: var(--papel);
+		color: var(--tinta);
 		width: 100%;
+		min-width: 0;
 	}
-	fieldset.alcance {
+	input[type='search'] {
+		font-size: 1.05rem;
+	}
+	input[type='search']:hover,
+	select:hover {
+		border-color: var(--violeta-medio);
+	}
+	.selectores {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
+		gap: 1rem;
+		align-items: end;
+	}
+	.campo {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		min-width: 0;
+	}
+	.alcance {
 		border: 0;
 		padding: 0;
 		margin: 0;
+		min-width: 0;
 	}
-	.opcion {
+	.alcance legend {
+		padding: 0;
+		margin-bottom: 0.35rem;
+	}
+	.segmentos {
+		display: flex;
+		border: 1px solid var(--borde-fuerte);
+		border-radius: var(--radio);
+		overflow: hidden;
+	}
+	.segmentos label {
+		flex: 1;
+		position: relative;
+		font-weight: 500;
+	}
+	.segmentos input {
+		position: absolute;
+		opacity: 0;
+		inset: 0;
+		margin: 0;
+		cursor: pointer;
+	}
+	.segmentos span {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		font-weight: 400;
-		min-height: 36px;
+		justify-content: center;
+		min-height: 46px;
+		padding: 0 0.6rem;
+		text-align: center;
+		line-height: 1.15;
+		font-size: 0.92rem;
+		background: var(--papel);
 	}
-	.opcion input {
-		width: 1.15rem;
-		height: 1.15rem;
-		accent-color: var(--acento);
+	.segmentos label + label span {
+		border-left: 1px solid var(--borde-fuerte);
+	}
+	.segmentos input:checked + span {
+		background: var(--violeta);
+		color: var(--sobre-violeta);
+		font-weight: 600;
+	}
+	.segmentos input:focus-visible + span {
+		outline: 3px solid var(--foco);
+		outline-offset: -3px;
 	}
 	.acciones {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: end;
-		gap: 0.6rem;
+		align-items: center;
+		gap: 0.5rem 1.25rem;
+	}
+	.limpiar {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+	}
+	.resultados-cabecera {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.25rem 1rem;
+		border-bottom: 2px solid var(--tinta);
+		padding-bottom: 0.5rem;
 	}
 	.resumen {
-		font-weight: 600;
-		color: var(--texto-suave);
+		font-family: var(--serif);
+		font-size: 1.6rem;
+		font-weight: 500;
+		margin: 0;
+	}
+	.suave {
+		color: var(--tinta-suave);
+		font-size: 0.95rem;
+		margin: 0;
+	}
+	.resumen .suave {
+		font-size: inherit;
 	}
 	.lista {
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		display: grid;
-		gap: 0.75rem;
 	}
-	.tarjeta {
-		background: var(--superficie);
-		border: 1px solid var(--borde);
-		border-radius: var(--radio);
-		padding: 0.9rem 1.1rem;
+	.fila {
+		position: relative;
+		padding: 1.1rem 0 1.15rem 1.1rem;
+		border-bottom: 1px solid var(--borde);
 	}
-	.meta {
+	.fila::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 1.2rem;
+		bottom: 1.2rem;
+		width: 3px;
+		border-radius: 2px;
+		background: var(--cerrado);
+		opacity: 0.5;
+	}
+	.fila.publicado::before {
+		background: var(--verde);
+		opacity: 1;
+	}
+	.fila.tramitacion::before {
+		background: var(--violeta-medio);
+		opacity: 1;
+	}
+	.fila-meta {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.4rem 0.6rem;
+		gap: 0.3rem 0.9rem;
 	}
 	.boletin {
 		font-variant-numeric: tabular-nums;
+		font-size: 0.86rem;
 		font-weight: 600;
-		color: var(--texto-suave);
-		font-size: 0.9rem;
+		color: var(--tinta-suave);
 	}
 	.titulo {
-		font-size: 1.05rem;
-		margin: 0.45rem 0 0.35rem;
-		font-weight: 600;
+		font-family: var(--serif);
+		font-size: 1.22rem;
+		font-weight: 500;
+		line-height: 1.3;
+		margin: 0.3rem 0 0.4rem;
+		max-width: 62ch;
 		overflow-wrap: anywhere;
 	}
+	.titulo a {
+		color: var(--tinta);
+		text-decoration: none;
+	}
+	.titulo a:hover {
+		color: var(--violeta-medio);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+	}
 	.datos {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.15rem 1.1rem;
 		margin: 0;
-		font-size: 0.92rem;
-		color: var(--texto-suave);
+		font-size: 0.88rem;
+		color: var(--tinta-suave);
+		font-variant-numeric: tabular-nums;
+	}
+	.datos .ley {
+		color: var(--verde);
+		font-weight: 600;
 	}
 	.vacio {
-		padding: 1.25rem;
-		border: 1px dashed var(--borde);
-		border-radius: var(--radio);
+		margin-top: 1.5rem;
+		padding: 1.25rem 1.5rem;
+		background: var(--superficie);
+		border: 1px dashed var(--borde-fuerte);
+		border-radius: 10px;
 	}
-	.vacio h2 {
+	.vacio h3 {
 		margin-top: 0;
-		font-size: 1.15rem;
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: 1.3rem;
 	}
 	.paginacion {
 		display: flex;
@@ -304,6 +462,6 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.75rem;
-		margin-top: 1.5rem;
+		margin-top: 2rem;
 	}
 </style>

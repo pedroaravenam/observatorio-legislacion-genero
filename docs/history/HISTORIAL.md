@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-02 — Rediseño del sitio (commit de este avance)
+
+Se rediseñó la interfaz para que sea más seria, moderna e informativa, con identidad de género. Los colores son el violeta y el verde del movimiento feminista: el verde marca lo que llegó a ser ley y el violeta lo que sigue en tramitación. Las tipografías son Newsreader para títulos y nombres de proyectos y Public Sans para la interfaz, incluidas en el sitio sin depender de Google Fonts. La portada abre con una franja violeta y un gráfico de los proyectos de la selección por año (1990–2026), con la parte que hoy es ley en verde; cada barra filtra por su año y se anuncia a los lectores de pantalla. El listado pasó a filas con una barra de color según el estado, que siempre va acompañada del texto. La ficha muestra el avance en cinco pasos del proceso legislativo, deducido del estado y la etapa del Senado (con una prueba unitaria nueva), y en escritorio se ordena en dos columnas: la tramitación agrupada por año y, al lado, los datos, los autores y las materias. Revisión con Chromium sin interfaz a 375 y 1.280 px, en modo claro y oscuro, sobre 6 rutas: sin desbordes, todos los campos con etiqueta, áreas táctiles de 44 px o más y foco visible. Tipos sin errores y 5 pruebas unitarias.
+
 ## 2026-11-02 — Ingesta local desactivada (commit de este avance)
 
 El desarrollador desactivó en la máquina local `observatorio-senado-fecha.timer` y `observatorio-senado-completa.timer`. Desde ahora, solo el VPS consulta al Senado.

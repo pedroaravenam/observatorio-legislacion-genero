@@ -6,7 +6,7 @@
 	/>
 </svelte:head>
 
-<article class="texto">
+<article class="contenedor texto">
 	<h1>Cómo funciona</h1>
 
 	<p>
@@ -75,16 +75,27 @@
 </article>
 
 <style>
-	.texto {
-		max-width: 46rem;
+	.texto > :global(*) {
+		max-width: 44rem;
 	}
 	h1 {
-		font-size: clamp(1.6rem, 4vw, 2.2rem);
-		margin-top: 0;
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: clamp(2rem, 5vw, 3rem);
+		line-height: 1.1;
+		margin: 2rem 0 1rem;
+	}
+	h1 + p {
+		font-size: 1.12rem;
+		color: var(--tinta-suave);
 	}
 	h2 {
-		margin-top: 2rem;
-		font-size: 1.25rem;
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: 1.4rem;
+		margin-top: 2.5rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--borde);
 		scroll-margin-top: 1rem;
 	}
 	table {
@@ -96,11 +107,13 @@
 	td {
 		text-align: left;
 		vertical-align: top;
-		padding: 0.55rem 0.6rem;
+		padding: 0.6rem 0.7rem 0.6rem 0;
 		border-bottom: 1px solid var(--borde);
 	}
 	th {
-		color: var(--texto-suave);
+		font-size: 0.88rem;
+		color: var(--tinta-suave);
+		font-weight: 600;
 	}
 	td:first-child {
 		font-weight: 600;

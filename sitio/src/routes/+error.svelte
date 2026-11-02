@@ -8,7 +8,7 @@
 	>
 </svelte:head>
 
-<section class="error" role="alert">
+<section class="contenedor error" role="alert">
 	<h1>{page.status === 404 ? 'No encontramos esta página' : 'No pudimos cargar esta página'}</h1>
 	<p>{page.error?.message ?? 'Ocurrió un error inesperado.'}</p>
 	{#if page.status !== 404}
@@ -22,10 +22,16 @@
 
 <style>
 	.error {
+		padding-top: 3rem;
+		padding-bottom: 2rem;
+	}
+	.error > :global(*) {
 		max-width: 40rem;
-		padding: 1.5rem 0;
 	}
 	h1 {
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: clamp(1.8rem, 4.5vw, 2.6rem);
 		margin-top: 0;
 	}
 </style>

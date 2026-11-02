@@ -159,3 +159,21 @@ export async function publicacion(db: Base): Promise<Record<string, string>> {
 	}[];
 	return Object.fromEntries(r.map((x) => [x.clave, x.valor]));
 }
+
+export interface ResumenAnno {
+	anno: number;
+	total: number;
+	leyes: number;
+}
+
+/** Proyectos de la selección de género por año de ingreso, y cuántos de ellos ya son ley publicada. */
+export async function resumenGenero(db: Base): Promise<ResumenAnno[]> {
+	const filas = db
+		.prepare(
+			`SELECT p.anno AS anno, count(*) AS total, sum(p.estado = 'Publicado') AS leyes
+			 FROM seleccion_genero g JOIN proyecto p ON p.boletin = g.boletin
+			 WHERE p.anno IS NOT NULL GROUP BY p.anno ORDER BY p.anno`
+		)
+		.all() as unknown as ResumenAnno[];
+	return filas.map((f) => ({ anno: f.anno, total: f.total, leyes: f.leyes }));
+}

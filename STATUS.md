@@ -2,7 +2,7 @@
 
 ## Resumen
 
-Fecha: 2026-11-02. Último commit: sitio, ingesta y base movidos a un VPS (este avance). **Publicado:** https://observatorio.116-203-181-6.sslip.io (dirección provisoria, sin dominio propio).
+Fecha: 2026-11-02. Último commit: rediseño del sitio (este avance). **Publicado:** https://observatorio.116-203-181-6.sslip.io (dirección provisoria, sin dominio propio).
 
 El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género preliminar (lista v5, 2.155 boletines; 2.154 cruzan con la base), con aviso explícito de que no está validada.
 

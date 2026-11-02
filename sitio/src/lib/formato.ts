@@ -94,3 +94,32 @@ export function etiquetaSenal(nivel: string): string {
 	};
 	return etiquetas[nivel] ?? 'Señal automática';
 }
+
+export const PASOS_TRAMITACION = [
+	'Primer trámite',
+	'Segundo trámite',
+	'Tercer trámite o comisión mixta',
+	'Aprobación presidencial',
+	'Ley publicada'
+] as const;
+
+/**
+ * Paso del proceso legislativo (índice en PASOS_TRAMITACION) según el estado y la etapa del Senado.
+ * Devuelve null cuando el proyecto no avanza (archivado, retirado, rechazado) o la etapa no se reconoce.
+ */
+export function pasoTramitacion(estado: string | null, etapa: string | null): number | null {
+	if (estado === 'Publicado') return 4;
+	if (estado !== 'En tramitación' || !etapa) return null;
+	if (/^Primer trámite/i.test(etapa)) return 0;
+	if (/^Segundo trámite/i.test(etapa)) return 1;
+	if (/Tercer trámite|Mixta|insistencia|finalización/i.test(etapa)) return 2;
+	if (/aprobaci[oó]n presidencial|veto|Congreso Pleno|Tribunal/i.test(etapa)) return 3;
+	return null;
+}
+
+/** Clase visual del estado: publicado, en tramitación o cerrado. */
+export function claseEstado(estado: string | null): string {
+	if (estado === 'Publicado') return 'publicado';
+	if (estado === 'En tramitación') return 'tramitacion';
+	return 'cerrado';
+}

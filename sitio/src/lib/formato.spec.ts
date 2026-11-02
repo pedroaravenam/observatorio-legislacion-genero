@@ -3,6 +3,7 @@ import {
 	consultaBusqueda,
 	esBoletin,
 	fechaCorta,
+	pasoTramitacion,
 	fechaLarga,
 	numeroLey,
 	urlFichaSenado
@@ -42,5 +43,20 @@ describe('boletín y enlaces', () => {
 		expect(esBoletin('11077')).toBe(false);
 		expect(esBoletin("1'; drop")).toBe(false);
 		expect(urlFichaSenado('11077-07')).toContain('boletin_ini=11077-07');
+	});
+});
+
+describe('pasoTramitacion', () => {
+	it('ubica la etapa del Senado en el proceso legislativo', () => {
+		expect(pasoTramitacion('Publicado', 'Tramitación terminada')).toBe(4);
+		expect(pasoTramitacion('En tramitación', 'Primer trámite constitucional (Senado)')).toBe(0);
+		expect(pasoTramitacion('En tramitación', 'Segundo trámite constitucional (C.Diputados)')).toBe(
+			1
+		);
+		expect(
+			pasoTramitacion('En tramitación', 'Comisión Mixta por rechazo de modificaciones (Senado)')
+		).toBe(2);
+		expect(pasoTramitacion('En tramitación', 'Discusión veto en Cámara Revisora (Senado)')).toBe(3);
+		expect(pasoTramitacion('Archivado', 'Archivado')).toBeNull();
 	});
 });
