@@ -2,9 +2,9 @@
 
 ## Resumen
 
-Fecha: 2026-11-03. Último commit: descarga, orden y filtros por autor y cámara (este avance). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí).
+Fecha: 2026-11-03. Último commit: pruebas de compatibilidad, accesibilidad y consistencia (este avance). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí).
 
-El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género (lista v5, 2.155 boletines; 2.154 cruzan con la base), presentada como criterio propio del Observatorio. «Cómo funciona» explica el criterio, los cinco pasos de selección con conteos en vivo, los temas, las fuentes y la actualización. «Panorama» (/panorama) muestra estados, mensajes frente a mociones, temas, temas por período, tiempo hasta ser ley y los 15 parlamentarios con más proyectos. La portada filtra por tema, cámara de origen y autor, ordena de cuatro maneras y descarga los resultados en CSV o JSON (`/datos/proyectos.csv` y `.json`, con los mismos filtros); los temas se asignan por el título con el léxico de `sitio/src/lib/temas.ts`.
+El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género (lista v5, 2.155 boletines; 2.154 cruzan con la base), presentada como criterio propio del Observatorio. «Cómo funciona» explica el criterio, los cinco pasos de selección con conteos en vivo, los temas, las fuentes y la actualización. «Panorama» (/panorama) muestra estados, mensajes frente a mociones, temas, temas por período, tiempo hasta ser ley y los 15 parlamentarios con más proyectos. La portada filtra por tema, cámara de origen y autor, ordena de cuatro maneras y descarga los resultados en CSV o JSON (`/datos/proyectos.csv` y `.json`, con los mismos filtros). Las pruebas con navegador (Chromium, Firefox y WebKit), axe y consistencia están en `sitio/pruebas/` y su informe en [docs/pruebas](docs/pruebas/2026-11-03-pruebas-del-sitio.md); los temas se asignan por el título con el léxico de `sitio/src/lib/temas.ts`.
 
 Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compose `observatorio`. PostgreSQL de ingesta, ingesta .NET del Senado, exportador a SQLite (una transacción, ~2,5 min) y sitio SvelteKit con Node detrás del Caddy compartido. Detalle en [docs/alojamiento.md](docs/alojamiento.md).
 
@@ -25,13 +25,12 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 ## Pendientes priorizados
 
 1. Alerta cuando falle una ejecución programada.
-2. Pruebas con evidencia del sitio (corte 2 del TDR): compatibilidad en Firefox y WebKit, accesibilidad con axe y consistencia entre datos y gráficos.
-3. Respaldo periódico de la base de ingesta fuera del VPS.
-4. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
-5. Volver a aplicar el criterio a los proyectos ingresados después del 22-10-2026 (hoy solo aparecen en «Todos») y validar casos dudosos.
-6. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
-7. CI del repositorio (pruebas del sitio y del exportador).
-8. Revisar los términos de reutilización de datos de las tres fuentes.
+2. Respaldo periódico de la base de ingesta fuera del VPS.
+3. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
+4. Volver a aplicar el criterio a los proyectos ingresados después del 22-10-2026 (hoy solo aparecen en «Todos») y validar casos dudosos.
+5. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
+6. CI del repositorio (pruebas del sitio y del exportador).
+7. Revisar los términos de reutilización de datos de las tres fuentes.
 
 ## Riesgos activos
 

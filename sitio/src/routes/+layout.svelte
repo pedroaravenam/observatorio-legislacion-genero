@@ -17,6 +17,9 @@
 </svelte:head>
 
 <a class="saltar visualmente-oculto" href="#contenido">Saltar al contenido</a>
+{#if page.url.pathname === '/'}
+	<a class="saltar visualmente-oculto" href="#filtros">Saltar al buscador</a>
+{/if}
 
 <header class="cabecera">
 	<div class="contenedor fila">

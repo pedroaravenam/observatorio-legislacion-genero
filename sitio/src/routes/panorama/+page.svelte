@@ -68,6 +68,11 @@
 		</p>
 		<div
 			class="estados"
+			data-cifra="estados"
+			data-total={d.total}
+			data-leyes={d.leyes}
+			data-tramitacion={d.enTramitacion}
+			data-cerrados={d.cerrados}
 			role="img"
 			aria-label="{n(d.leyes)} son ley, {n(d.enTramitacion)} en tramitación y {n(
 				d.cerrados
@@ -100,7 +105,14 @@
 		</p>
 		<div class="comparacion">
 			{#each [mensaje, mocion] as o (o.iniciativa)}
-				<article class="tarjeta-origen {o.iniciativa === 'Mensaje' ? 'mensaje' : 'mocion'}">
+				<article
+					class="tarjeta-origen {o.iniciativa === 'Mensaje' ? 'mensaje' : 'mocion'}"
+					data-cifra="origen"
+					data-iniciativa={o.iniciativa}
+					data-total={o.total}
+					data-leyes={o.leyes}
+					data-mediana={o.medianaDias ?? ''}
+				>
 					<h3>
 						{o.iniciativa === 'Mensaje' ? 'Mensajes de la Presidencia' : 'Mociones parlamentarias'}
 					</h3>
@@ -118,7 +130,12 @@
 				</article>
 			{/each}
 		</div>
-		<p class="nota">
+		<p
+			class="nota"
+			data-cifra="camaras"
+			data-diputados={d.camaras.find((c) => c.camara !== 'Senado')?.total}
+			data-senado={d.camaras.find((c) => c.camara === 'Senado')?.total}
+		>
 			Por cámara de origen,
 			{#each d.camaras as c, i (c.camara)}{i > 0 ? ' y ' : ''}{n(c.total)} proyectos ingresaron por
 				{c.camara === 'Senado' ? 'el Senado' : 'la Cámara de Diputadas y Diputados'}{/each}.
@@ -136,7 +153,7 @@
 		</p>
 		<ul class="barras-h">
 			{#each d.temas as t (t.clave)}
-				<li>
+				<li data-cifra="tema" data-clave={t.clave} data-total={t.total} data-leyes={t.leyes}>
 					<a href="/?tema={t.clave}" class="fila-barra">
 						<span class="b-nombre">{t.nombre}</span>
 						<span class="b-pista" aria-hidden="true">
@@ -172,7 +189,13 @@
 					<tr>
 						<th scope="col">Tema</th>
 						{#each d.periodos as p (p.nombre)}
-							<th scope="col" class="num">
+							<th
+								scope="col"
+								class="num"
+								data-cifra="periodo"
+								data-nombre={p.nombre}
+								data-total={p.total}
+							>
 								{p.nombre}<span class="th-total">{n(p.total)} proyectos</span>
 							</th>
 						{/each}
@@ -204,7 +227,12 @@
 		</p>
 		<dl class="tiempos">
 			{#each d.tiempoPorPeriodo as t (t.nombre)}
-				<div>
+				<div
+					data-cifra="tiempo"
+					data-nombre={t.nombre}
+					data-leyes={t.leyes}
+					data-mediana={t.medianaDias ?? ''}
+				>
 					<dt>{t.nombre}</dt>
 					<dd>
 						<span class="tiempo">{duracion(t.medianaDias)}</span>
@@ -226,7 +254,7 @@
 		</p>
 		<ol class="autores">
 			{#each d.autores as a, i (a.nombre)}
-				<li>
+				<li data-cifra="autor" data-nombre={a.nombre} data-total={a.total} data-leyes={a.leyes}>
 					<span class="a-pos" aria-hidden="true">{i + 1}</span>
 					<a class="a-nombre" href="/?autor={encodeURIComponent(a.nombre)}"
 						>{nombrePersona(a.nombre)}</a

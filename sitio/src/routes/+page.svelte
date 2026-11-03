@@ -6,6 +6,10 @@
 
 	let { data }: PageProps = $props();
 	const f = $derived(data.filtros);
+	// Con bind:value, lo que alguien escribe antes de que cargue el JavaScript se conserva al hidratar.
+	// Son derivados asignables: los enlaces de navegación siguen actualizando los campos.
+	let texto = $derived(f.texto);
+	let autor = $derived(f.autor ?? '');
 	const hayFiltros = $derived(
 		Boolean(
 			f.texto ||
@@ -41,6 +45,11 @@
 		const s = parametrosFiltros(f, { pagina: 1 }).toString();
 		return `/datos/proyectos.${formato}${s ? `?${s}` : ''}`;
 	}
+
+	/** Filtros vigentes como campos ocultos del formulario de orden; el orden mismo lo elige el selector. */
+	const camposOcultos = $derived(
+		[...parametrosFiltros(f, { pagina: 1 })].filter(([nombre]) => nombre !== 'orden')
+	);
 
 	// La pertinencia solo existe cuando hay palabras que buscar.
 	const ordenMostrado = $derived(f.orden === 'pertinencia' && !f.texto ? 'recientes' : f.orden);
@@ -84,7 +93,7 @@
 					id="q"
 					name="q"
 					type="search"
-					value={f.texto}
+					bind:value={texto}
 					maxlength="200"
 					placeholder="Palabras o número de boletín"
 					aria-describedby="q-ayuda"
@@ -153,7 +162,7 @@
 					name="autor"
 					type="text"
 					list="autores"
-					value={f.autor ?? ''}
+					bind:value={autor}
 					maxlength="120"
 					autocomplete="off"
 					placeholder="Empieza a escribir un apellido"
@@ -212,14 +221,13 @@
 
 	{#if data.total > 0}
 		<div class="herramientas">
-			<div class="campo-orden">
+			<!-- Formulario propio: así una búsqueda nueva no arrastra el orden anterior y conserva el que corresponde. -->
+			<form class="campo-orden" method="GET" action="/" aria-label="Ordenar resultados">
+				{#each camposOcultos as [nombre, valor] (nombre)}
+					<input type="hidden" name={nombre} value={valor} />
+				{/each}
 				<label for="orden">Ordenar por</label>
-				<select
-					id="orden"
-					name="orden"
-					form="filtros"
-					onchange={(e) => e.currentTarget.form?.requestSubmit()}
-				>
+				<select id="orden" name="orden">
 					{#if f.texto}
 						<option value="pertinencia" selected={ordenMostrado === 'pertinencia'}>
 							Más pertinentes
@@ -231,10 +239,8 @@
 						Con movimiento reciente
 					</option>
 				</select>
-				<noscript
-					><button class="boton secundario" type="submit" form="filtros">Ordenar</button></noscript
-				>
-			</div>
+				<button class="boton secundario" type="submit">Ordenar</button>
+			</form>
 			<p class="descarga">
 				<span
 					>Descargar {numero.format(data.total)}
