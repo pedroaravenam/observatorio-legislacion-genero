@@ -202,13 +202,6 @@ await p.goto(BASE + '/');
 comparar('portada', 'total de la selección', total, primerNumero(await p.textContent('.resumen')));
 const csv = await (await p.request.get(BASE + '/datos/proyectos.csv')).text();
 comparar('descarga', 'filas del CSV', total, csv.split('\r\n').filter(Boolean).length - 1);
-await p.goto(BASE + '/?alcance=todos');
-comparar(
-	'portada',
-	'total de todos los proyectos',
-	uno('SELECT count(*) n FROM proyecto').n,
-	primerNumero(await p.textContent('.resumen'))
-);
 
 // 2. Muestra de fichas, con semilla fija.
 const MESES = [
@@ -234,10 +227,11 @@ const azar = () => (
 	(semilla = (semilla + 0x6d2b79f5) | 0),
 	(Math.imul(semilla ^ (semilla >>> 15), 1 | semilla) >>> 0) / 4294967296
 );
-const boletines = todos('SELECT boletin FROM proyecto ORDER BY boletin').map((r) => r.boletin);
+const boletines = todos('SELECT boletin FROM seleccion_genero ORDER BY boletin').map(
+	(r) => r.boletin
+);
 const muestra = new Set();
 while (muestra.size < 30) muestra.add(boletines[Math.floor(azar() * boletines.length)]);
-const enSeleccion = new Set(todos('SELECT boletin FROM seleccion_genero').map((r) => r.boletin));
 for (const b of [...muestra].sort()) {
 	const r = uno('SELECT * FROM proyecto WHERE boletin = ?', b);
 	await p.goto(`${BASE}/boletin/${b}`);
@@ -273,11 +267,22 @@ for (const b of [...muestra].sort()) {
 			.catch(() => '')
 	);
 	comparar(`ficha ${b}`, 'número de ley', r.ley_numero ?? '', ley ? ley.replace(/,.*$/, '') : '');
+}
+// Lo que no cumple el criterio no se muestra: sin ficha (404) y sin aparecer en la búsqueda por número.
+const fuera = todos(
+	'SELECT boletin FROM proyecto WHERE boletin NOT IN (SELECT boletin FROM seleccion_genero) ORDER BY boletin'
+).map((r) => r.boletin);
+const muestraFuera = new Set();
+while (muestraFuera.size < 10) muestraFuera.add(fuera[Math.floor(azar() * fuera.length)]);
+for (const b of [...muestraFuera].sort()) {
+	const resp = await p.goto(`${BASE}/boletin/${b}`);
+	comparar(`fuera ${b}`, 'la ficha responde 404', 404, resp.status());
+	await p.goto(`${BASE}/?q=${encodeURIComponent(b)}`);
 	comparar(
-		`ficha ${b}`,
-		'marca de selección',
-		enSeleccion.has(b) ? 'sí' : 'no',
-		(await p.locator('.encabezado .marca-genero').count()) ? 'sí' : 'no'
+		`fuera ${b}`,
+		'la búsqueda por número no lo muestra',
+		'Sin resultados',
+		(await p.textContent('.resumen')).replace(/\s+/g, ' ').trim()
 	);
 }
 await navegador.close();
@@ -285,7 +290,7 @@ await navegador.close();
 const fallas = filas.filter((f) => f.coincide !== 'sí');
 const grupos = Object.values(
 	filas.reduce((a, f) => {
-		const g = f.grupo.replace(/^(ficha|autor|tema) .*/, '$1');
+		const g = f.grupo.replace(/^(ficha|autor|tema|fuera) .*/, '$1');
 		a[g] ??= { grupo: g, comparaciones: 0, coinciden: 0 };
 		a[g].comparaciones++;
 		if (f.coincide === 'sí') a[g].coinciden++;

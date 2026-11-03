@@ -173,9 +173,9 @@
 		</li>
 	</ol>
 	<p>
-		El resultado es una selección de <strong>{total}</strong> proyectos, que la portada muestra por defecto.
-		Aun así, la búsqueda permite consultar todos los proyectos presentados, de modo que ninguno queda
-		oculto por esta decisión.
+		El resultado es una selección de <strong>{total}</strong> proyectos, que es lo único que muestra el
+		Observatorio. Un proyecto que no cumple el criterio no aparece en las búsquedas ni tiene ficha aquí,
+		aunque sí puedes encontrarlo en el sitio del Senado.
 	</p>
 	<p>
 		Para comprobar que las reglas no dejan fuera demasiados casos, leímos una muestra de 100 leyes
@@ -282,9 +282,8 @@
 			sus materias, porque las reglas sobre el texto se aplican desde ese año.
 		</li>
 		<li>
-			La selección se calculó el 22 de octubre de 2026. Los proyectos presentados después ya
-			aparecen en la búsqueda de todos los proyectos y se sumarán a la selección cuando volvamos a
-			aplicar el criterio.
+			La selección se calculó el 22 de octubre de 2026. Los proyectos presentados después aún no se
+			han evaluado y por eso todavía no aparecen.
 		</li>
 		<li>
 			Todavía no mostramos datos propios de la Cámara, como el sexo de quienes firman cada proyecto,
@@ -304,10 +303,8 @@
 		Cada fila es un proyecto, con su boletín, título, fecha de ingreso, tipo de iniciativa, cámara
 		de origen, estado, etapa, número de ley, fecha de publicación en el Diario Oficial, fecha del
 		último trámite, autores y temas, además de un enlace a su ficha. Los autores y los temas vienen
-		separados por punto y coma. La columna <code>seleccion_genero</code> indica si el proyecto está en
-		la selección, algo útil cuando buscas entre todos los proyectos. Los datos provienen de fuentes públicas
-		oficiales y se actualizan con la frecuencia descrita arriba; la fecha de la última consulta aparece
-		al pie de cada página.
+		separados por punto y coma. Los datos provienen de fuentes públicas oficiales y se actualizan
+		con la frecuencia descrita arriba; la fecha de la última consulta aparece al pie de cada página.
 	</p>
 
 	<h2>Código, datos y correcciones</h2>

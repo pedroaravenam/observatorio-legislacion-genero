@@ -21,8 +21,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				tema: filtros.tema,
 				camara: filtros.camara,
 				autor: filtros.autor,
-				orden: filtros.orden,
-				alcance: filtros.soloGenero ? 'genero' : 'todos'
+				orden: filtros.orden
 			},
 			total: proyectos.length,
 			proyectos: proyectos.map((p) => ({ ...p, ficha: `${url.origin}/boletin/${p.boletin}` }))

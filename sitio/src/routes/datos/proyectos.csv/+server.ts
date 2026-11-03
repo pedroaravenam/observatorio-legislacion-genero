@@ -17,7 +17,6 @@ const COLUMNAS = [
 	'ultimo_tramite',
 	'autores',
 	'temas',
-	'seleccion_genero',
 	'ficha'
 ] as const;
 
@@ -28,7 +27,6 @@ export const GET: RequestHandler = async ({ url }) => {
 			...f,
 			autores: f.autores.join('; '),
 			temas: f.temas.join('; '),
-			seleccion_genero: f.seleccion_genero ? 'si' : 'no',
 			ficha: `${url.origin}/boletin/${f.boletin}`
 		})),
 		[...COLUMNAS]

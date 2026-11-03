@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	if (!proyecto)
 		error(
 			404,
-			`No encontramos el boletín ${params.boletin} entre los proyectos presentados desde 1990. Revisa el número o búscalo desde la portada.`
+			`El boletín ${params.boletin} no está entre los proyectos de género del Observatorio: o el número no existe, o el proyecto no cumple nuestro criterio de selección. Puedes revisar el número o buscar desde la portada, y consultar el criterio en «Cómo funciona».`
 		);
 	setHeaders({ 'cache-control': 'public, max-age=300' });
 	return { proyecto };

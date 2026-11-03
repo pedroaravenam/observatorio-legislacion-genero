@@ -144,14 +144,13 @@ export interface FiltrosUrl {
 	camara: string | null;
 	autor: string | null;
 	orden: Orden;
-	soloGenero: boolean;
 	pagina: number;
 }
 
 /** Parámetros de URL de unos filtros; omite los que tienen su valor por defecto. */
 export function parametrosFiltros(
 	f: FiltrosUrl,
-	cambios: { pagina?: number; todos?: boolean } = {}
+	cambios: { pagina?: number } = {}
 ): URLSearchParams {
 	const p = new URLSearchParams();
 	if (f.texto) p.set('q', f.texto);
@@ -162,7 +161,6 @@ export function parametrosFiltros(
 	if (f.camara) p.set('camara', f.camara);
 	if (f.autor) p.set('autor', f.autor);
 	if (f.orden !== ordenPorDefecto(f.texto)) p.set('orden', f.orden);
-	if (cambios.todos ?? !f.soloGenero) p.set('alcance', 'todos');
 	const pagina = cambios.pagina ?? f.pagina;
 	if (pagina > 1) p.set('pagina', String(pagina));
 	return p;

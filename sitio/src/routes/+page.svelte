@@ -11,16 +11,7 @@
 	let texto = $derived(f.texto);
 	let autor = $derived(f.autor ?? '');
 	const hayFiltros = $derived(
-		Boolean(
-			f.texto ||
-			f.anno ||
-			f.estado ||
-			f.iniciativa ||
-			f.tema ||
-			f.camara ||
-			f.autor ||
-			!f.soloGenero
-		)
+		Boolean(f.texto || f.anno || f.estado || f.iniciativa || f.tema || f.camara || f.autor)
 	);
 	const totales = $derived(
 		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
@@ -30,8 +21,8 @@
 	);
 	const desde = $derived(data.resumen[0]?.anno ?? 1990);
 
-	function enlacePagina(n: number, todos = !f.soloGenero): string {
-		const s = parametrosFiltros(f, { pagina: n, todos }).toString();
+	function enlacePagina(n: number): string {
+		const s = parametrosFiltros(f, { pagina: n }).toString();
 		return s ? `/?${s}` : '/';
 	}
 
@@ -181,19 +172,6 @@
 					{/if}
 				</p>
 			</div>
-			<fieldset class="alcance">
-				<legend>Mostrar</legend>
-				<div class="segmentos">
-					<label>
-						<input type="radio" name="alcance" value="genero" checked={f.soloGenero} />
-						<span>Selección de género</span>
-					</label>
-					<label>
-						<input type="radio" name="alcance" value="todos" checked={!f.soloGenero} />
-						<span>Todos</span>
-					</label>
-				</div>
-			</fieldset>
 		</div>
 
 		<div class="acciones">
@@ -256,12 +234,6 @@
 		<div class="vacio">
 			<h3>No hay proyectos con esos criterios</h3>
 			<ul>
-				{#if f.soloGenero && !data.porNumero}
-					<li>
-						La búsqueda se limitó a la selección de género.
-						<a href={enlacePagina(1, true)}>Buscar en todos los proyectos</a>.
-					</li>
-				{/if}
 				{#if f.autor}
 					<li>
 						Revisa que el nombre del autor sea uno de la lista del campo «Autor o autora».
@@ -279,8 +251,6 @@
 					<div class="fila-meta">
 						<span class="boletin">Boletín {p.boletin}</span>
 						{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
-						{#if p.genero && !f.soloGenero}<span class="marca-genero">Selección de género</span
-							>{/if}
 					</div>
 					<h3 class="titulo"><a href="/boletin/{p.boletin}">{p.titulo}</a></h3>
 					<p class="datos">
@@ -352,8 +322,7 @@
 			padding: 1.5rem 1.75rem;
 		}
 	}
-	label,
-	legend {
+	label {
 		font-weight: 600;
 		font-size: 0.95rem;
 	}
@@ -457,57 +426,6 @@
 		flex-direction: column;
 		gap: 0.35rem;
 		min-width: 0;
-	}
-	.alcance {
-		border: 0;
-		padding: 0;
-		margin: 0;
-		min-width: 0;
-	}
-	.alcance legend {
-		padding: 0;
-		margin-bottom: 0.35rem;
-	}
-	.segmentos {
-		display: flex;
-		border: 1px solid var(--borde-fuerte);
-		border-radius: var(--radio);
-		overflow: hidden;
-	}
-	.segmentos label {
-		flex: 1;
-		position: relative;
-		font-weight: 500;
-	}
-	.segmentos input {
-		position: absolute;
-		opacity: 0;
-		inset: 0;
-		margin: 0;
-		cursor: pointer;
-	}
-	.segmentos span {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 46px;
-		padding: 0 0.6rem;
-		text-align: center;
-		line-height: 1.15;
-		font-size: 0.92rem;
-		background: var(--papel);
-	}
-	.segmentos label + label span {
-		border-left: 1px solid var(--borde-fuerte);
-	}
-	.segmentos input:checked + span {
-		background: var(--violeta);
-		color: var(--sobre-violeta);
-		font-weight: 600;
-	}
-	.segmentos input:focus-visible + span {
-		outline: 3px solid var(--foco);
-		outline-offset: -3px;
 	}
 	.acciones {
 		display: flex;

@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-03 — La selección de género pasa a ser el único universo del sitio (commit de este avance)
+
+Se quitó la opción «Mostrar: Todos» del buscador. El sitio ya no muestra proyectos que no cumplen el criterio: la lista, la búsqueda por número de boletín, las descargas y las fichas parten de la selección, y la ficha de un boletín fuera de ella responde 404 con un mensaje que remite a «Cómo funciona». Los proyectos presentados después del 22 de octubre de 2026 quedan sin aparecer hasta que se evalúen. El guion de consistencia ahora comprueba también lo contrario: 10 boletines fuera de la selección, elegidos al azar, no tienen ficha ni aparecen en la búsqueda (246 comparaciones, todas coinciden).
+
 ## 2026-11-03 — Respaldo de la base de ingesta en la máquina de desarrollo (commit de este avance)
 
 `despliegue/respaldar-ingesta.sh` trae cada día un volcado de PostgreSQL del VPS a esta máquina, comprueba su SHA-256 y que sea legible, y conserva 7 diarios y 4 domingos. `despliegue/probar-respaldo.sh` lo restaura en un contenedor desechable y compara cinco tablas con las del VPS: las cinco quedaron iguales (por ejemplo, 18.622 proyectos y 199.910 trámites). Si el respaldo falla, el VPS envía un correo (modo nuevo `alertar.sh aviso`), y su comprobación diaria avisa si pasan 48 horas sin un respaldo bueno. La poda se probó en una carpeta aparte con 40 archivos falsos y conservó exactamente lo esperado. Al simular el entorno mínimo de systemd apareció una falla real: `docker` está en `~/.local/bin` y no estaba en el PATH, lo que habría roto el respaldo todas las noches; los scripts ahora lo agregan. El único destino es esta máquina, con el disco al 91 %. La recuperación ante la pérdida del VPS está documentada, pero no se ensayó sobre el servidor real. El temporizador de usuario quedó instalado y se probó ejecutando el servicio por systemd: terminó con éxito y actualizó la marca del VPS.

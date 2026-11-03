@@ -89,7 +89,6 @@ describe('parametrosFiltros', () => {
 		camara: null,
 		autor: null,
 		orden: 'recientes' as const,
-		soloGenero: true,
 		pagina: 1
 	};
 	it('no escribe valores por defecto', () => {
@@ -102,14 +101,13 @@ describe('parametrosFiltros', () => {
 		).toBe('q=sala+cuna');
 		expect(parametrosFiltros({ ...base, orden: 'antiguos' }).get('orden')).toBe('antiguos');
 	});
-	it('arrastra autor, cámara y alcance, y cambia de página', () => {
+	it('arrastra autor y cámara, y cambia de página', () => {
 		const p = parametrosFiltros(
-			{ ...base, autor: 'Pérez Ana', camara: 'Senado', soloGenero: false, pagina: 2 },
+			{ ...base, autor: 'Pérez Ana', camara: 'Senado', pagina: 2 },
 			{ pagina: 3 }
 		);
 		expect(p.get('autor')).toBe('Pérez Ana');
 		expect(p.get('camara')).toBe('Senado');
-		expect(p.get('alcance')).toBe('todos');
 		expect(p.get('pagina')).toBe('3');
 	});
 });

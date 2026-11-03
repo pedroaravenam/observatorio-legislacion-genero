@@ -45,7 +45,6 @@
 		<p class="meta">
 			<span class="boletin">Boletín {p.boletin}</span>
 			{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
-			{#if p.genero}<span class="marca-genero">Selección de género</span>{/if}
 		</p>
 		<h1>{p.titulo}</h1>
 
@@ -139,7 +138,7 @@
 				</dl>
 			</section>
 
-			{#if p.genero && p.nivel_senal}
+			{#if p.nivel_senal}
 				<section class="aviso" aria-labelledby="seleccion-titulo">
 					<h2 id="seleccion-titulo">Por qué está en la selección de género</h2>
 					<p>{etiquetaSenal(p.nivel_senal)}.</p>
