@@ -2,7 +2,7 @@
 
 Proyecto independiente para seguir, explicar y consultar la tramitación de iniciativas legislativas relacionadas con género en Chile.
 
-**Estado:** primer corte publicado en https://observatorio.116-203-181-6.sslip.io (dirección provisoria hasta tener dominio propio)
+**Estado:** publicado en https://legislaciongenero.cl
 
 ## Principios
 

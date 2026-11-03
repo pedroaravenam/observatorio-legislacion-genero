@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-03 — Dominio legislaciongenero.cl con Cloudflare (commit de este avance)
+
+Se delegó `legislaciongenero.cl` a Cloudflare. Con un token limitado a la zona se crearon los registros `A @` (116.203.181.6) y `CNAME www`, SSL «Full (strict)», «Always Use HTTPS» y una regla de caché para GET que respeta las cabeceras del sitio (`max-age=300`; se comprobó MISS y luego HIT). En el Caddy compartido se agregaron los bloques del dominio con respaldo `Caddyfile.bak-20261103T122049Z-observatorio`; primero se obtuvo el certificado de Let's Encrypt con el DNS sin proxy y después se activó el proxy. `www` y la dirección sslip.io redirigen con 301. `DOMINIO` del `.env` del VPS pasó a `legislaciongenero.cl`. La plataforma educativa y la agenda de Centro Alma siguen respondiendo. Primeras ejecuciones programadas en el VPS: carga completa sin trabajo pendiente y consulta diaria con 6 boletines nuevos.
+
 ## 2026-11-02 — Metodología, textos y panel «Panorama» (commit de este avance)
 
 «Cómo funciona» se reescribió: criterio en tres grupos (tema central, componente, fuera), neutralidad de postura, cinco pasos de selección con conteos desde la base, temas, fuentes, actualización y límites. Se quitó «preliminar» de todo el sitio y se reescribieron los textos de portada, ficha, pie y errores con frases completas. Nueva página /panorama con estados, mensajes frente a mociones (88 % y 8 % llegan a ley), temas, temas por período, mediana de tiempo hasta ser ley y autores. Nuevo filtro por tema (función SQLite `tiene_tema`). Revisión con Playwright headless en 6 rutas, 375 y 1280 px, claro y oscuro: sin desbordes, campos etiquetados, áreas táctiles ≥44 px.

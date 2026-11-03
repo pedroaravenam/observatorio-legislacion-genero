@@ -11,10 +11,10 @@ Todo corre en un VPS Hetzner compartido (116.203.181.6, Ubuntu 26.04, 2 vCPU, 3,
 | Base pública | Archivo SQLite en el volumen `observatorio_publico` | Una fila por boletín, trámites en JSON, búsqueda FTS5 |
 | Exportador | `exportador` (trabajo) | Reescribe la base pública completa en una transacción después de cada ingesta |
 | Sitio | `sitio` (SvelteKit con Node) | Lee la base pública en solo lectura; red `observatorio-edge` |
-| HTTPS | Caddy compartido de la plataforma educativa | Bloque `observatorio.116-203-181-6.sslip.io`; Caddy conectado a `observatorio-edge` |
+| HTTPS | Cloudflare (proxy, SSL «Full (strict)», caché de 5 min) delante del Caddy compartido de la plataforma educativa | Bloques de `despliegue/Caddyfile.observatorio`; Caddy conectado a `observatorio-edge` y con certificado propio de Let's Encrypt |
 | Documentos completos | No se copian | Se enlazan al Senado y a la BCN |
 
-Dirección provisoria: https://observatorio.116-203-181-6.sslip.io. Con dominio propio se agrega un bloque en el Caddyfile y se cambia `DOMINIO` en `/opt/observatorio/.env`.
+Dirección: https://legislaciongenero.cl. `www` y la dirección provisoria anterior (observatorio.116-203-181-6.sslip.io) redirigen con 301. `DOMINIO` en `/opt/observatorio/.env` fija el `ORIGIN` del sitio. El DNS está en Cloudflare; si se cambia el proxy, Caddy sigue renovando su certificado por HTTP-01 a través de Cloudflare.
 
 ## Por qué se dejó Cloudflare
 

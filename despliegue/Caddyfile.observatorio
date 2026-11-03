@@ -1,6 +1,16 @@
-# Bloque que se agrega al Caddyfile compartido del VPS (/opt/plataforma-educativa/app/Caddyfile).
+# Bloques que se agregan al Caddyfile compartido del VPS (/opt/plataforma-educativa/app/Caddyfile).
 # Caddy debe estar conectado a la red observatorio-edge (ver docs/alojamiento.md).
-observatorio.116-203-181-6.sslip.io {
+# El DNS está en Cloudflare con proxy y SSL «Full (strict)»; Caddy obtiene su propio certificado.
+legislaciongenero.cl {
 	encode zstd gzip
 	reverse_proxy observatorio-sitio-1:3000
+}
+
+www.legislaciongenero.cl {
+	redir https://legislaciongenero.cl{uri} permanent
+}
+
+# Dirección provisoria anterior; se mantiene para no romper enlaces ya compartidos.
+observatorio.116-203-181-6.sslip.io {
+	redir https://legislaciongenero.cl{uri} permanent
 }
