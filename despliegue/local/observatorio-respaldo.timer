@@ -1,0 +1,10 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Respaldo diario de la base de ingesta (06:00, hora de Chile)
+
+[Timer]
+OnCalendar=*-*-* 06:00 America/Santiago
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

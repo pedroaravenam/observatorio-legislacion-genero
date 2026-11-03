@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Avisos por correo del Observatorio, enviados con la API de Resend. Uso:
 #   alertar.sh falla <unidad>   avisa que una unidad systemd terminó con error (la llama OnFailure=)
-#   alertar.sh atraso           avisa si el sitio no responde o sus datos tienen más de 36 horas
+#   alertar.sh atraso           avisa si el sitio no responde, si sus datos tienen más de 36 horas o si no hay un respaldo reciente
+#   alertar.sh aviso <clave> <asunto>   avisa con el texto que llega por la entrada estándar (lo usa el respaldo local)
 #   alertar.sh prueba           envía un correo de prueba para validar la configuración
 # Lee RESEND_API_KEY, ALERTA_DE y ALERTA_PARA de /opt/observatorio/alerta.conf (ver alerta.conf.ejemplo).
 # Para no llenar la bandeja, avisa una sola vez por problema cada 20 horas.
@@ -18,6 +19,7 @@ set +a
 api=${RESEND_API_URL:-https://api.resend.com/emails}
 sitio=${SITIO_URL:-https://legislaciongenero.cl}
 horas_max=${ALERTA_HORAS_MAX:-36}
+respaldo_horas=${ALERTA_RESPALDO_HORAS:-48}
 estado=${ALERTA_ESTADO:-/var/lib/observatorio-alertas}
 
 hora_chile() { TZ=America/Santiago date '+%d-%m-%Y %H:%M'; }
@@ -81,7 +83,7 @@ falla() {
   echo "Aviso enviado por la falla de $unidad."
 }
 
-atraso() {
+atraso_datos() {
   local motivo= respuesta consultado epoch horas
   if ! respuesta=$(curl -fsS --max-time 20 "$sitio/estado.json" 2>&1); then
     motivo="El sitio no respondió en $sitio/estado.json: $respuesta"
@@ -116,10 +118,48 @@ atraso() {
   echo 'Aviso enviado por el atraso.'
 }
 
+# Comprueba que el respaldo local siga llegando: el script de esa máquina toca esta marca tras cada respaldo bueno.
+atraso_respaldo() {
+  local marca="$estado/respaldo-ok"
+  if [[ ! -e $marca ]]; then echo 'Aún no hay respaldos registrados; no se comprueba.'; return 0; fi
+  if [[ -z $(find "$marca" -mmin +"$((respaldo_horas * 60))") ]]; then
+    rm -f "$estado/atraso-respaldo"
+    echo 'Respaldo reciente.'
+    return 0
+  fi
+  if reciente atraso-respaldo; then echo 'Ya se avisó de la falta de respaldo hace menos de 20 horas.'; return 0; fi
+  enviar 'Observatorio: hace más de 48 horas que no hay un respaldo de la base' "$(printf '%s\n' \
+    "El último respaldo bueno es de $(TZ=America/Santiago date -r "$marca" '+%d-%m-%Y %H:%M') (límite: $respaldo_horas horas)." \
+    "Hora en Chile: $(hora_chile)" \
+    '' \
+    'Puede ser que la máquina que respalda esté apagada, que no corra su temporizador o que falle el respaldo.' \
+    'En esa máquina:' \
+    '  systemctl --user list-timers observatorio-respaldo.timer' \
+    '  journalctl --user -u observatorio-respaldo.service -n 50 --no-pager')"
+  marcar atraso-respaldo
+  echo 'Aviso enviado por la falta de respaldo.'
+}
+
+atraso() {
+  local fallo=0
+  atraso_datos || fallo=1
+  atraso_respaldo || fallo=1
+  return "$fallo"
+}
+
+aviso() {
+  local clave="aviso-${1:?Indique la clave}" asunto=${2:?Indique el asunto}
+  if reciente "$clave"; then echo "Ya se avisó de $1 hace menos de 20 horas."; return 0; fi
+  enviar "$asunto" "$(cat)"
+  marcar "$clave"
+  echo "Aviso enviado: $1."
+}
+
 case "${1:-}" in
+  aviso) aviso "${2:-}" "${3:-}" ;;
   falla) falla "${2:-}" ;;
   atraso) atraso ;;
   prueba) enviar 'Observatorio: correo de prueba' "$(printf '%s\n' \
     'Si lees esto, los avisos del Observatorio llegan bien.' "Hora en Chile: $(hora_chile)")" && echo 'Correo de prueba enviado.' ;;
-  *) echo 'Uso: alertar.sh falla <unidad> | atraso | prueba' >&2; exit 2 ;;
+  *) echo 'Uso: alertar.sh falla <unidad> | atraso | aviso <clave> <asunto> | prueba' >&2; exit 2 ;;
 esac

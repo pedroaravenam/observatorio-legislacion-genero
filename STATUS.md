@@ -2,7 +2,7 @@
 
 ## Resumen
 
-Fecha: 2026-11-03. Último commit: alertas por correo instaladas (este avance). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí).
+Fecha: 2026-11-03. Último commit: respaldo de la base de ingesta (este avance). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí).
 
 El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género (lista v5, 2.155 boletines; 2.154 cruzan con la base), presentada como criterio propio del Observatorio. «Cómo funciona» explica el criterio, los cinco pasos de selección con conteos en vivo, los temas, las fuentes y la actualización. «Panorama» (/panorama) muestra estados, mensajes frente a mociones, temas, temas por período, tiempo hasta ser ley y los 15 parlamentarios con más proyectos. La portada filtra por tema, cámara de origen y autor, ordena de cuatro maneras y descarga los resultados en CSV o JSON (`/datos/proyectos.csv` y `.json`, con los mismos filtros). Las pruebas con navegador (Chromium, Firefox y WebKit), axe y consistencia están en `sitio/pruebas/` y su informe en [docs/pruebas](docs/pruebas/2026-11-03-pruebas-del-sitio.md); los temas se asignan por el título con el léxico de `sitio/src/lib/temas.ts`.
 
@@ -15,28 +15,28 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 - Base de ingesta: restaurada en el VPS desde la máquina local el 2 de noviembre (18.616 boletines, 18.627 respuestas originales).
 - Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. Instaladas en el VPS el 2 de noviembre; primera carga completa el 3 de noviembre a la 01:00 y primera diaria a las 09:00.
 - Dominio: `legislaciongenero.cl` (NIC Chile, vence el 03-11-2027), DNS en Cloudflare con proxy, SSL «Full (strict)», «Always Use HTTPS» y regla de caché que respeta el `max-age=300` del sitio. `www` y la dirección sslip.io redirigen con 301. Token de Cloudflare limitado a la zona en `~/.config/observatorio-genero/cloudflare.token` (estación local, no versionado).
+- Respaldo: `despliegue/respaldar-ingesta.sh` trae cada día un `pg_dump` del VPS a `~/respaldos/observatorio/` (7 diarios y 4 domingos). Primer respaldo y prueba de restauración el 3 de noviembre, con las cinco tablas comparadas iguales. Falta instalar el temporizador de usuario.
 - Alertas: correo por Resend desde `alertas@legislaciongenero.cl` (dominio verificado, DNS en Cloudflare). Configuración en `/opt/observatorio/alerta.conf` del VPS (600, fuera del repositorio). Unidades instaladas el 3 de noviembre: `OnFailure=` en la consulta diaria y la carga completa, y `observatorio-atraso.timer` (10:30, hora de Chile). Probadas con fallas provocadas.
 - Primeras ejecuciones en el VPS (03-11): carga completa a las 01:00 sin trabajo pendiente (menos de 15 días desde la anterior) y consulta diaria a las 09:00 con 6 boletines nuevos (18.622).
 
 ## Próximo paso exacto
 
-1. Respaldo periódico de la base de ingesta fuera del VPS.
+1. Instalar el temporizador de usuario del respaldo en la máquina de desarrollo (comando en [docs/alojamiento.md](docs/alojamiento.md)).
 2. Volver a aplicar el criterio de selección a los boletines nuevos.
 
 ## Pendientes priorizados
 
-1. Respaldo periódico de la base de ingesta fuera del VPS.
-2. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
-3. Volver a aplicar el criterio a los proyectos ingresados después del 22-10-2026 (hoy solo aparecen en «Todos») y validar casos dudosos.
-4. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
-5. CI del repositorio (pruebas del sitio y del exportador).
-6. Revisar los términos de reutilización de datos de las tres fuentes.
+1. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
+2. Volver a aplicar el criterio a los proyectos ingresados después del 22-10-2026 (hoy solo aparecen en «Todos») y validar casos dudosos.
+3. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
+4. CI del repositorio (pruebas del sitio y del exportador).
+5. Revisar los términos de reutilización de datos de las tres fuentes.
 
 ## Riesgos activos
 
 - VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados.
 - El Caddy es de la plataforma educativa: si esa plataforma recrea Caddy desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.
-- No hay respaldo de la base de ingesta fuera del VPS, salvo la copia local del 2 de noviembre.
+- El único respaldo de la base de ingesta está en la máquina de desarrollo, con el disco al 91 %. Si se pierden el VPS y esa máquina a la vez, hay que volver a cargar todo desde el Senado.
 - Si el propio VPS se cae, nadie avisa: las alertas corren en el VPS y no hay un monitor externo.
 - La selección de género es automática y no está validada; el sitio lo declara en la portada, la ficha y «Cómo funciona».
 - Los enlaces a documentos completos fallan cuando la fuente no responde; el sitio lo advierte en cada ficha.

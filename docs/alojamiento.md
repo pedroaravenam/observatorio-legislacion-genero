@@ -68,6 +68,30 @@ Instalación, que se hace en el VPS con `ssh atendia-development`:
 3. Instalar las unidades: `sudo cp /opt/observatorio/systemd/observatorio-{alerta@.service,atraso.service,atraso.timer,fecha.service,completa.service} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-atraso.timer`.
 4. Probar el aviso de falla sin romper nada: `sudo systemctl start observatorio-alerta@observatorio-fecha.service`. Si ya llegó uno en las últimas 20 horas, se omite; para repetirlo se borra `/var/lib/observatorio-alertas`.
 
+## Respaldo de la base de ingesta
+
+La base de ingesta (PostgreSQL del VPS: boletines, respuestas originales del Senado y su historial) se respalda cada día en la máquina de desarrollo. El VPS no guarda credenciales de esa máquina: ella se conecta por SSH, hace `pg_dump` en formato personalizado, trae el archivo y comprueba con SHA-256 que llegó completo. El sitio público no necesita respaldo porque se reconstruye desde esta base con el exportador.
+
+| Elemento | Detalle |
+|---|---|
+| Script | `despliegue/respaldar-ingesta.sh`, con temporizador de usuario `observatorio-respaldo` (06:00, hora de Chile) |
+| Destino | `~/respaldos/observatorio/ingesta-AAAAMMDD-HHMM.dump` (unos 28 MB), con su `.sha256` y permisos 600 |
+| Retención | Los últimos 7 días y los domingos de las últimas 4 semanas. Siempre se conserva el más reciente |
+| Falla | El VPS envía un correo con las últimas líneas del registro |
+| Respaldo que no llega | El VPS marca cada respaldo bueno y su comprobación diaria avisa si pasan 48 horas sin marca, lo que cubre que la máquina esté apagada o que el temporizador no corra |
+
+Instalación del temporizador, en la máquina de desarrollo:
+
+```
+mkdir -p ~/.config/systemd/user && cp ~/Desarrollo/observatorio-legislativo-abierto/despliegue/local/observatorio-respaldo.{service,timer} ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable --now observatorio-respaldo.timer && systemctl --user list-timers observatorio-respaldo.timer --no-pager
+```
+
+Prueba de restauración: `despliegue/probar-respaldo.sh` restaura el último respaldo en un contenedor PostgreSQL desechable y compara el número de filas de cinco tablas con las del VPS. El 3 de noviembre dio las cinco iguales. Se debe repetir después de cualquier cambio en el esquema y, como mínimo, una vez al mes.
+
+Recuperación ante una pérdida del VPS, que **no se ha ensayado sobre el servidor real**: levantar el servicio `db` del Compose, copiar el último `.dump` al VPS y restaurarlo con `pg_restore -U observatorio -d observatorio --no-owner --clean --if-exists`; después correr `trabajo.sh publicar` para regenerar la base pública del sitio.
+
+Límites: esta máquina es hoy el único destino. Si se pierden el VPS y esta máquina a la vez, quedaría solo volver a pedir todo al Senado, que son horas de carga y se pierde el historial de cambios. El disco de esta máquina está al 91 %, por lo que la retención es corta a propósito.
+
 ## Límites y riesgos
 
 - El VPS es compartido y su RAM está justa: 2,2 GB disponibles en reposo, con swap en uso. Una compilación de la plataforma educativa llevó la carga a 8.

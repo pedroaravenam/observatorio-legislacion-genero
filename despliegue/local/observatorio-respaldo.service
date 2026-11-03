@@ -1,0 +1,9 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Respaldo de la base de ingesta del VPS en esta máquina
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/Desarrollo/observatorio-legislativo-abierto/despliegue/respaldar-ingesta.sh
+TimeoutStartSec=30min
