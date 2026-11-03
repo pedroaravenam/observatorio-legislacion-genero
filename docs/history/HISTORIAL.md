@@ -1,5 +1,13 @@
 # Historial
 
+## 2026-11-03 — Clasificación automática de proyectos nuevos con un agente (commit de este avance)
+
+La selección dejó de ser un CSV dentro de la imagen del exportador: vive en `clasificacion_genero` (base de ingesta), sembrada con la lista v5 (18.513 decisiones, 2.154 incluidas), y el exportador la lee al publicar. Un agente (Claude en modo sin interfaz, sin herramientas, desde una carpeta vacía) aplica el criterio de «Cómo funciona» a cada proyecto sin decisión: recibe el título, las materias y, del documento del Senado, la densidad del léxico de género y hasta 12 fragmentos; devuelve grupo, confianza y un motivo, que la ficha muestra. Corre a diario a las 09:30 en la máquina de desarrollo y publica el sitio si hay cambios; avisa por correo si falla o si pasan 48 horas sin clasificar.
+
+Medición contra la v5 (51 proyectos desde 2018, el criterio definitivo `agente-d99fb5a3`): coincidencia en 39. No incluyó ninguno de los 21 que la v5 excluía; de los 30 que la v5 incluía, dejó fuera 12, casi todos falsos positivos de la v5 por palabras del léxico («Madre Tierra», «redes sociales para menores», un permiso por aniversario de matrimonio). Las mediciones sirvieron para corregir cuatro fallos: el lector solo entendía PDF y muchos documentos del Senado son Word (se agregaron `.docx` y `.doc`), el agente excluía la pensión de alimentos y la violencia intrafamiliar aunque el criterio las nombra, y dejaba fuera los delitos sexuales, que la v5 incluía; se agregaron esas tres reglas a `criterio.md`. También se quitó la opción «Todos»: el sitio solo muestra la selección y un boletín fuera de ella responde 404.
+
+Primera corrida real: de 109 pendientes se decidieron 97 (9 incluidos, 8 de ellos por la regla de delitos sexuales; 78 con confianza alta y 19 media) y 12 esperan, porque el Senado aún no publica su documento. La selección publicada pasó de 2.154 a 2.163. Límites: las decisiones no las revisa una persona, y no se vuelve a evaluar un proyecto cuando se convierte en ley.
+
 ## 2026-11-03 — La selección de género pasa a ser el único universo del sitio (commit de este avance)
 
 Se quitó la opción «Mostrar: Todos» del buscador. El sitio ya no muestra proyectos que no cumplen el criterio: la lista, la búsqueda por número de boletín, las descargas y las fichas parten de la selección, y la ficha de un boletín fuera de ella responde 404 con un mensaje que remite a «Cómo funciona». Los proyectos presentados después del 22 de octubre de 2026 quedan sin aparecer hasta que se evalúen. El guion de consistencia ahora comprueba también lo contrario: 10 boletines fuera de la selección, elegidos al azar, no tienen ficha ni aparecen en la búsqueda (246 comparaciones, todas coinciden).

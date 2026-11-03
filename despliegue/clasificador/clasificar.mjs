@@ -93,6 +93,7 @@ async function obtenerTexto(url) {
 		const archivo = join(dir, 'documento');
 		await ejecutar('curl', ['-sL', '-A', 'Mozilla/5.0', '--max-time', '90', '-o', archivo, url]);
 		const bytes = readFileSync(archivo);
+		if (bytes.length < 100) return { texto: null, motivo: 'el Senado aún no publica el documento' };
 		let texto;
 		if (bytes.subarray(0, 5).toString() === '%PDF-') {
 			await ejecutar('pdftotext', ['-layout', archivo, join(dir, 'd.txt')], { timeout: 120_000 });
