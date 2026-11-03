@@ -1,0 +1,8 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Aviso por correo de la falla de %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/observatorio/alertar.sh falla %i

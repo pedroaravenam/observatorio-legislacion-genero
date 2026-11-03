@@ -19,12 +19,13 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 
 ## Próximo paso exacto
 
-1. Respaldo periódico de la base de ingesta fuera del VPS.
-2. Volver a aplicar el criterio de selección a los boletines nuevos.
+1. Terminar las alertas: definir el remitente de Resend, crear la llave del proyecto y hacer las cuatro pruebas de instalación.
+2. Respaldo periódico de la base de ingesta fuera del VPS.
+3. Volver a aplicar el criterio de selección a los boletines nuevos.
 
 ## Pendientes priorizados
 
-1. Alerta cuando falle una ejecución programada.
+1. Alerta cuando falle una ejecución programada: el código y las unidades están en el repositorio y falta crear la llave de Resend en el VPS e instalar las unidades (ver [docs/alojamiento.md](docs/alojamiento.md)).
 2. Respaldo periódico de la base de ingesta fuera del VPS.
 3. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
 4. Volver a aplicar el criterio a los proyectos ingresados después del 22-10-2026 (hoy solo aparecen en «Todos») y validar casos dudosos.

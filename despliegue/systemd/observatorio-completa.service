@@ -2,6 +2,7 @@
 Description=Observatorio de Legislación de Género: Carga completa reanudable del Senado y publicación
 After=docker.service network-online.target
 Requires=docker.service
+OnFailure=observatorio-alerta@%n.service
 
 [Service]
 Type=oneshot

@@ -17,7 +17,7 @@ for imagen in sitio exportador ingesta; do
     "gunzip | docker load -q >/dev/null && docker tag localhost/observatorio-$imagen:$version observatorio-$imagen:$version && docker rmi localhost/observatorio-$imagen:$version >/dev/null"
 done
 
-tar -C despliegue -cf - compose.yaml trabajo.sh systemd | ssh -o BatchMode=yes "$vps" 'sudo tar -C /opt/observatorio -xf - --no-same-owner'
+tar -C despliegue -cf - compose.yaml trabajo.sh alertar.sh alerta.conf.ejemplo systemd | ssh -o BatchMode=yes "$vps" 'sudo tar -C /opt/observatorio -xf - --no-same-owner'
 tar -C db -cf - changelog | ssh -o BatchMode=yes "$vps" 'sudo tar -C /opt/observatorio -xf - --no-same-owner'
 ssh -o BatchMode=yes "$vps" "cd /opt/observatorio && sudo sed -i 's/^VERSION=.*/VERSION=$version/' .env && sudo docker compose -p observatorio up -d sitio && sudo docker compose -p observatorio ps --format '{{.Name}} {{.Image}} {{.Status}}'"
 echo "versión $version en $vps"

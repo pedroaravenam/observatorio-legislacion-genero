@@ -1,0 +1,10 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Comprobación diaria de datos al día (10:30, hora de Chile)
+
+[Timer]
+OnCalendar=*-*-* 10:30 America/Santiago
+Persistent=true
+RandomizedDelaySec=2min
+
+[Install]
+WantedBy=timers.target

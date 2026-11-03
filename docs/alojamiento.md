@@ -48,6 +48,26 @@ Caddy pertenece a la plataforma educativa (`/opt/plataforma-educativa/app/`). Pa
 
 Las imágenes se suben por separado porque `podman save` con varias imágenes generó un archivo en que las tres etiquetas apuntaban a la misma imagen.
 
+## Alertas por correo
+
+Qué avisa, y cuándo:
+
+| Aviso | Cuándo se envía |
+|---|---|
+| Falló la consulta diaria o la carga completa | Cuando la unidad termina con error. Incluye las últimas 30 líneas del registro |
+| Datos atrasados o sitio caído | Una comprobación diaria (10:30, hora de Chile) consulta `/estado.json` del sitio público. Avisa si no responde o si la última consulta exitosa al Senado tiene más de 36 horas, lo que también cubre un temporizador que no corrió |
+
+Se envía como máximo un aviso por problema cada 20 horas. Si el propio VPS se cae, no hay quien avise: para eso haría falta un monitor externo, que hoy no existe.
+
+Los correos salen por la API de Resend con una llave de solo envío, exclusiva de este proyecto. La llave y los correos van en `/opt/observatorio/alerta.conf` (permisos 600, fuera del repositorio; el modelo está en `despliegue/alerta.conf.ejemplo`).
+
+Instalación, que se hace en el VPS con `ssh atendia-development`:
+
+1. Crear el archivo y completarlo con un editor: `sudo cp /opt/observatorio/alerta.conf.ejemplo /opt/observatorio/alerta.conf && sudo chmod 600 /opt/observatorio/alerta.conf && sudo nano /opt/observatorio/alerta.conf`.
+2. Probar el envío: `sudo /opt/observatorio/alertar.sh prueba` debe dejar un correo en la bandeja.
+3. Instalar las unidades: `sudo cp /opt/observatorio/systemd/observatorio-{alerta@.service,atraso.service,atraso.timer,fecha.service,completa.service} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-atraso.timer`.
+4. Probar el aviso de falla sin romper nada: `sudo systemctl start observatorio-alerta@observatorio-fecha.service`. Si ya llegó uno en las últimas 20 horas, se omite; para repetirlo se borra `/var/lib/observatorio-alertas`.
+
 ## Límites y riesgos
 
 - El VPS es compartido y su RAM está justa: 2,2 GB disponibles en reposo, con swap en uso. Una compilación de la plataforma educativa llevó la carga a 8.

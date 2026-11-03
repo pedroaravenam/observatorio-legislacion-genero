@@ -9,3 +9,4 @@ tmp/
 *.db
 *.log
 __pycache__/
+despliegue/alerta.conf

@@ -1,0 +1,8 @@
+# Configuración de los avisos por correo. En el VPS se copia a /opt/observatorio/alerta.conf con permisos 600.
+# Ese archivo contiene un secreto: no se versiona ni se pega en ningún chat.
+RESEND_API_KEY=
+# Remitente: «onboarding@resend.dev» si no hay dominio verificado (Resend solo entrega entonces al correo de la
+# cuenta), o una dirección de un dominio verificado, por ejemplo alertas@legislaciongenero.cl.
+ALERTA_DE=
+# Quien recibe los avisos.
+ALERTA_PARA=
