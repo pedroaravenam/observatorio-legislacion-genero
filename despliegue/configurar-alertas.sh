@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Deja la configuración de los avisos en el VPS sin que la llave de Resend se imprima ni pase por un chat.
-# La llave se toma del portapapeles: se copia en el panel de Resend y se ejecuta, por ejemplo:
+# Debe correrse en una terminal propia, no con «!» desde el chat.
+# Pide la llave por pantalla, oculta: se copia en el panel de Resend y se pega al ejecutarlo, por ejemplo:
 #   ALERTA_PARA=tu@correo.com despliegue/configurar-alertas.sh
 # Variables: ALERTA_PARA (obligatoria), ALERTA_DE (por defecto alertas@legislaciongenero.cl),
 #            FORZAR=1 para reemplazar una configuración existente, VPS (por defecto atendia-development).
@@ -12,11 +13,13 @@ para=${ALERTA_PARA:?Indique ALERTA_PARA con el correo que recibirá los avisos}
 destino=/opt/observatorio/alerta.conf
 
 [[ $para =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] || { echo 'ALERTA_PARA no parece un correo.' >&2; exit 2; }
-command -v wl-paste >/dev/null || { echo 'Falta wl-paste (paquete wl-clipboard).' >&2; exit 2; }
-
-clave=$(wl-paste --no-newline 2>/dev/null | tr -d '[:space:]' || true)
+# La llave se pega en la terminal, con la escritura oculta; no se imprime ni se pasa como argumento.
+[[ -t 0 && -r /dev/tty ]] || { echo 'Ejecute el script en una terminal propia (no con «!» desde el chat): necesita pedir la llave.' >&2; exit 2; }
+read -rsp 'Pega la llave de Resend y pulsa Enter (no se verá lo que pegas): ' clave </dev/tty
+echo
+clave=$(printf '%s' "$clave" | tr -d '[:space:]')
 if [[ ! $clave =~ ^re_[A-Za-z0-9_]{16,}$ ]]; then
-  echo 'El portapapeles no tiene una llave de Resend (debe empezar con re_). Cópiala desde el panel y repite.' >&2
+  echo 'Eso no parece una llave de Resend (debe empezar con re_ y no tener espacios). No se guardó nada.' >&2
   exit 2
 fi
 
@@ -29,8 +32,7 @@ fi
 printf 'RESEND_API_KEY=%s\nALERTA_DE=%s\nALERTA_PARA=%s\n' "$clave" "$de" "$para" |
   ssh -o BatchMode=yes "$vps" "sudo sh -c 'umask 077 && cat > $destino' && sudo chmod 600 $destino && sudo chown root:root $destino"
 unset clave
-wl-copy --clear 2>/dev/null || true
-echo "Configuración guardada en $vps:$destino (permisos 600). Se vació el portapapeles."
+echo "Configuración guardada en $vps:$destino (permisos 600)."
 
 echo 'Enviando el correo de prueba...'
 ssh -o BatchMode=yes "$vps" 'sudo /opt/observatorio/alertar.sh prueba'
