@@ -15,14 +15,13 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 - Base de ingesta: restaurada en el VPS desde la máquina local el 2 de noviembre (18.616 boletines, 18.627 respuestas originales).
 - Programación: `observatorio-fecha` (09:00) y `observatorio-completa` (01:00), hora de Chile. Instaladas en el VPS el 2 de noviembre; primera carga completa el 3 de noviembre a la 01:00 y primera diaria a las 09:00.
 - Dominio: `legislaciongenero.cl` (NIC Chile, vence el 03-11-2027), DNS en Cloudflare con proxy, SSL «Full (strict)», «Always Use HTTPS» y regla de caché que respeta el `max-age=300` del sitio. `www` y la dirección sslip.io redirigen con 301. Token de Cloudflare limitado a la zona en `~/.config/observatorio-genero/cloudflare.token` (estación local, no versionado).
-- Respaldo: `despliegue/respaldar-ingesta.sh` trae cada día un `pg_dump` del VPS a `~/respaldos/observatorio/` (7 diarios y 4 domingos). Primer respaldo y prueba de restauración el 3 de noviembre, con las cinco tablas comparadas iguales. Falta instalar el temporizador de usuario.
+- Respaldo: `despliegue/respaldar-ingesta.sh` trae cada día un `pg_dump` del VPS a `~/respaldos/observatorio/` (7 diarios y 4 domingos). Primer respaldo y prueba de restauración el 3 de noviembre, con las cinco tablas comparadas iguales. Temporizador de usuario instalado el 3 de noviembre (próxima ejecución el 4 a las 06:01) y probado ejecutando el servicio por systemd.
 - Alertas: correo por Resend desde `alertas@legislaciongenero.cl` (dominio verificado, DNS en Cloudflare). Configuración en `/opt/observatorio/alerta.conf` del VPS (600, fuera del repositorio). Unidades instaladas el 3 de noviembre: `OnFailure=` en la consulta diaria y la carga completa, y `observatorio-atraso.timer` (10:30, hora de Chile). Probadas con fallas provocadas.
 - Primeras ejecuciones en el VPS (03-11): carga completa a las 01:00 sin trabajo pendiente (menos de 15 días desde la anterior) y consulta diaria a las 09:00 con 6 boletines nuevos (18.622).
 
 ## Próximo paso exacto
 
-1. Instalar el temporizador de usuario del respaldo en la máquina de desarrollo (comando en [docs/alojamiento.md](docs/alojamiento.md)).
-2. Volver a aplicar el criterio de selección a los boletines nuevos.
+1. Volver a aplicar el criterio de selección a los boletines nuevos.
 
 ## Pendientes priorizados
 
