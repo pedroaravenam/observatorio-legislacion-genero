@@ -90,7 +90,11 @@ export function etiquetaSenal(nivel: string): string {
 		T5_materias: 'Entró por las materias que le asignó el Senado',
 		L_texto_ley_fuera: 'Entró por el texto de la ley que resultó del proyecto',
 		V2_conteo_absoluto: 'Entró tras leer su texto completo, que trata el tema en varias partes',
-		V_validado_densidad_baja: 'Entró tras leer su texto, que trata el tema aunque lo menciona poco'
+		V_validado_densidad_baja: 'Entró tras leer su texto, que trata el tema aunque lo menciona poco',
+		A1_agente_tema_central:
+			'Lo leyó un agente que aplica nuestro criterio y concluyó que el género es el tema central',
+		A2_agente_componente:
+			'Lo leyó un agente que aplica nuestro criterio y concluyó que una parte del proyecto trata de género'
 	};
 	return etiquetas[nivel] ?? 'Cumple una de las reglas del criterio de selección';
 }

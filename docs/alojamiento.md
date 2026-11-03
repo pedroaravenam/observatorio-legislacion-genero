@@ -68,6 +68,30 @@ Instalación, que se hace en el VPS con `ssh atendia-development`:
 3. Instalar las unidades: `sudo cp /opt/observatorio/systemd/observatorio-{alerta@.service,atraso.service,atraso.timer,fecha.service,completa.service} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-atraso.timer`.
 4. Probar el aviso de falla sin romper nada: `sudo systemctl start observatorio-alerta@observatorio-fecha.service`. Si ya llegó uno en las últimas 20 horas, se omite; para repetirlo se borra `/var/lib/observatorio-alertas`.
 
+## Clasificación automática de proyectos nuevos
+
+La selección de género ya no es una lista fija dentro de la imagen del exportador: vive en la tabla `clasificacion_genero` de la base de ingesta (una fila por boletín, con la decisión, el grupo del criterio, la señal, quién decidió, la confianza y el motivo). La lista v5 se sembró una vez, con `clasificar.mjs sembrar`, y desde entonces cada proyecto nuevo lo decide un agente. El exportador lee esa tabla al publicar y el sitio solo muestra lo que está incluido.
+
+| Elemento | Detalle |
+|---|---|
+| Programa | `despliegue/clasificador/clasificar.mjs`, que corre en la máquina de desarrollo con el CLI de Claude en modo sin interfaz (sin herramientas, sin sesión guardada y desde una carpeta vacía) |
+| Criterio | `despliegue/clasificador/criterio.md`: el criterio de «Cómo funciona». Es la instrucción del agente y su versión (`agente-` más un resumen del texto) queda en cada decisión |
+| Evidencia que recibe | Título, iniciativa, materias del Senado y, del PDF del proyecto, el número de términos del léxico de género, su densidad y hasta 12 fragmentos. El léxico es el de `sitio/src/lib/temas.ts` |
+| Qué guarda | Decisión, grupo (`tema_central`, `componente` o `fuera`), confianza y un motivo de una o dos frases, que la ficha muestra |
+| Cuándo | Temporizador de usuario `observatorio-clasificar`, todos los días a las 09:30 (hora de Chile), después de la consulta diaria. Si hubo decisiones, publica el sitio con `trabajo.sh publicar` |
+| Sin texto | Si el PDF aún no se puede leer, el proyecto espera hasta 14 días; después se decide solo con el título, con confianza máxima media |
+| Falla o silencio | Correo por falla del programa, y la comprobación diaria del VPS avisa si pasan 48 horas sin una clasificación buena (marca `clasificacion-ok`) |
+
+Instalación del temporizador, en la máquina de desarrollo:
+
+```
+cp ~/Desarrollo/observatorio-legislativo-abierto/despliegue/local/observatorio-clasificar.{service,timer} ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable --now observatorio-clasificar.timer && systemctl --user list-timers observatorio-clasificar.timer --no-pager
+```
+
+Medir al agente: `node --disable-warning=ExperimentalWarning despliegue/clasificador/clasificar.mjs validar --n 60` lo compara contra la lista v5 en una muestra y no escribe nada en la base. Debe repetirse cada vez que cambie `criterio.md` o el modelo (`CLASIFICADOR_MODELO`).
+
+Límites: las decisiones son automáticas y ninguna persona las revisa antes de publicarse, tal como pidió el desarrollador; la ficha lo dice. El agente depende del CLI de Claude y de la sesión iniciada en la máquina de desarrollo. Si esa máquina está apagada, los proyectos nuevos no aparecen hasta que vuelva. Corregir una decisión es un `UPDATE` sobre `clasificacion_genero` seguido de `trabajo.sh publicar`; la próxima corrida no la pisa, porque solo clasifica lo que no tiene fila.
+
 ## Respaldo de la base de ingesta
 
 La base de ingesta (PostgreSQL del VPS: boletines, respuestas originales del Senado y su historial) se respalda cada día en la máquina de desarrollo. El VPS no guarda credenciales de esa máquina: ella se conecta por SSH, hace `pg_dump` en formato personalizado, trae el archivo y comprueba con SHA-256 que llegó completo. El sitio público no necesita respaldo porque se reconstruye desde esta base con el exportador.

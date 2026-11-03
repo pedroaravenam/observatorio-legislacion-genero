@@ -142,6 +142,16 @@
 				<section class="aviso" aria-labelledby="seleccion-titulo">
 					<h2 id="seleccion-titulo">Por qué está en la selección de género</h2>
 					<p>{etiquetaSenal(p.nivel_senal)}.</p>
+					{#if p.codificador === 'agente' && p.motivo}
+						<p>
+							<strong>Su razón:</strong>
+							{p.motivo}
+							<span class="suave">
+								(confianza {p.confianza ?? 'sin dato'}; la decisión es automática y no la revisó una
+								persona)
+							</span>
+						</p>
+					{/if}
 					{#if temas.length}
 						<p>
 							{temas.length === 1 ? 'Tema' : 'Temas'}:

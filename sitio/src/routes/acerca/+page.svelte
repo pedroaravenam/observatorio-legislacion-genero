@@ -171,6 +171,28 @@
 				género.
 			</p>
 		</li>
+		<li>
+			<h3>Proyectos nuevos</h3>
+			<p>
+				Desde la selección del 22 de octubre de 2026, los proyectos que ingresan se evalúan cada día
+				con un agente, es decir, un modelo de lenguaje al que le damos este mismo criterio. El
+				agente recibe el título, las materias del Senado y lo que dice el texto del proyecto
+				(cuántas veces aparecen los términos del léxico y los fragmentos donde aparecen), decide en
+				cuál de los tres grupos queda y deja una explicación breve con su nivel de confianza, que se
+				muestra en la ficha. Por esta vía se incluyeron
+				<strong>{n('A1_agente_tema_central', 'A2_agente_componente')}</strong> proyectos.
+			</p>
+			<p>
+				Estas decisiones son automáticas: ninguna persona las revisa antes de que se publiquen. Para
+				saber cuánto confiar en ellas, comparamos al agente con la selección anterior en una muestra
+				de 51 proyectos presentados desde 2018, y coincidieron en 39. El agente no incluyó ninguno
+				de los 21 proyectos que la selección anterior había dejado fuera. En los 12 casos distintos,
+				dejó fuera proyectos que la selección anterior había incluido por una palabra del léxico,
+				como «madre» en un proyecto sobre los derechos de la Madre Tierra, o «víctimas» en uno sobre
+				homenajes a violadores de derechos humanos. Esos casos nos llevan a revisar, más adelante,
+				si hay otros proyectos de la selección original que entraron por la misma razón.
+			</p>
+		</li>
 	</ol>
 	<p>
 		El resultado es una selección de <strong>{total}</strong> proyectos, que es lo único que muestra el
@@ -258,6 +280,15 @@
 				</td>
 			</tr>
 			<tr>
+				<td>Clasificación de proyectos nuevos</td>
+				<td>Todos los días, a las 9:30</td>
+				<td>
+					Un agente lee los proyectos que ingresaron desde la última consulta, decide si cumplen el
+					criterio y, si hay cambios, actualiza el sitio. Si el texto de un proyecto aún no se puede
+					leer, espera hasta dos semanas antes de decidir solo con el título.
+				</td>
+			</tr>
+			<tr>
 				<td>Revisión completa</td>
 				<td>Cada quince días, de madrugada</td>
 				<td>
@@ -282,8 +313,10 @@
 			sus materias, porque las reglas sobre el texto se aplican desde ese año.
 		</li>
 		<li>
-			La selección se calculó el 22 de octubre de 2026. Los proyectos presentados después aún no se
-			han evaluado y por eso todavía no aparecen.
+			Los proyectos presentados después del 22 de octubre de 2026 los decide el agente, que puede
+			equivocarse y no distingue los matices que una persona detectaría al leer el proyecto
+			completo. Tampoco los volvemos a evaluar cuando se convierten en ley, aunque el texto final
+			pueda incluir disposiciones de género que el proyecto no tenía.
 		</li>
 		<li>
 			Todavía no mostramos datos propios de la Cámara, como el sexo de quienes firman cada proyecto,

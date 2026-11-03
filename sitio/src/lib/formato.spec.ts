@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	aCsv,
+	etiquetaSenal,
 	celdaCsv,
 	ordenPorDefecto,
 	parametrosFiltros,
@@ -109,5 +110,15 @@ describe('parametrosFiltros', () => {
 		expect(p.get('autor')).toBe('Pérez Ana');
 		expect(p.get('camara')).toBe('Senado');
 		expect(p.get('pagina')).toBe('3');
+	});
+});
+
+describe('etiquetaSenal', () => {
+	it('explica las señales del agente y avisa de que lo leyó un agente', () => {
+		expect(etiquetaSenal('A1_agente_tema_central')).toMatch(/agente.*tema central/);
+		expect(etiquetaSenal('A2_agente_componente')).toMatch(/agente.*una parte/);
+	});
+	it('tiene un texto por defecto para señales desconocidas', () => {
+		expect(etiquetaSenal('X_nueva')).toMatch(/criterio de selección/);
 	});
 });

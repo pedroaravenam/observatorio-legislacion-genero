@@ -1,0 +1,9 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Clasificación con agente de los proyectos nuevos y publicación del sitio
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/Desarrollo/observatorio-legislativo-abierto/despliegue/clasificar-nuevos.sh
+TimeoutStartSec=2h

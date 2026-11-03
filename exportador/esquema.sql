@@ -29,12 +29,7 @@ CREATE INDEX IF NOT EXISTS proyecto_fecha ON proyecto (fecha_ingreso DESC, numer
 CREATE INDEX IF NOT EXISTS proyecto_anno ON proyecto (anno);
 CREATE INDEX IF NOT EXISTS proyecto_ultimo ON proyecto (ultimo_tramite DESC);
 
--- Selección temática preliminar: reglas sobre título, materias y texto; no es una clasificación validada.
-CREATE TABLE IF NOT EXISTS seleccion_genero (
-  boletin     TEXT PRIMARY KEY,
-  nivel_senal TEXT NOT NULL,
-  version     TEXT NOT NULL
-);
+-- La tabla seleccion_genero vive en esquema-seleccion.sql y se recrea en cada publicación.
 
 -- Búsqueda de texto completo sobre título, materias y autores.
 CREATE VIRTUAL TABLE IF NOT EXISTS proyecto_busqueda USING fts5 (

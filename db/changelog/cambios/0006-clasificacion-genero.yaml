@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0006-clasificacion-genero
+      author: observatorio
+      comment: >
+        Decision de seleccion de cada boletin segun el criterio del Observatorio. La lista v5 se siembra
+        una vez y los proyectos nuevos los clasifica un agente, que deja su motivo.
+      changes:
+        - createTable:
+            tableName: clasificacion_genero
+            columns:
+              - column: { name: boletin, type: VARCHAR(20), constraints: { primaryKey: true, primaryKeyName: pk_clasificacion_genero, nullable: false } }
+              - column: { name: incluye, type: BOOLEAN, constraints: { nullable: false } }
+              - column: { name: grupo, type: VARCHAR(20), remarks: "tema_central, componente o fuera" }
+              - column: { name: nivel_senal, type: VARCHAR(40), remarks: "senal que decidio; ver etiquetaSenal en el sitio" }
+              - column: { name: version, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: codificador, type: VARCHAR(20), constraints: { nullable: false }, remarks: "regla o claude (lectura de la v5), v5 (excluido por defecto) o agente" }
+              - column: { name: confianza, type: VARCHAR(10), remarks: "alta, media o baja (solo agente)" }
+              - column: { name: motivo, type: VARCHAR(600) }
+              - column: { name: clasificado, type: TIMESTAMP WITH TIME ZONE, defaultValueComputed: CURRENT_TIMESTAMP, constraints: { nullable: false } }
+        - createIndex:
+            tableName: clasificacion_genero
+            indexName: ix_clasificacion_incluye
+            columns:
+              - column: { name: incluye }

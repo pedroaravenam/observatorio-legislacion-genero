@@ -5,7 +5,6 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends sqlite3 \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY exportador/esquema.sql exportador/exportar-proyectos.sql exportador/publicar.sh ./
-COPY datos/seleccion/candidatos-genero-v5.csv ./candidatos-genero.csv
-RUN echo v5 > version-seleccion && chmod 0755 publicar.sh
+COPY exportador/esquema.sql exportador/esquema-seleccion.sql exportador/exportar-proyectos.sql exportador/publicar.sh ./
+RUN chmod 0755 publicar.sh
 ENTRYPOINT ["/app/publicar.sh"]

@@ -118,32 +118,43 @@ atraso_datos() {
   echo 'Aviso enviado por el atraso.'
 }
 
-# Comprueba que el respaldo local siga llegando: el script de esa máquina toca esta marca tras cada respaldo bueno.
-atraso_respaldo() {
-  local marca="$estado/respaldo-ok"
-  if [[ ! -e $marca ]]; then echo 'Aún no hay respaldos registrados; no se comprueba.'; return 0; fi
-  if [[ -z $(find "$marca" -mmin +"$((respaldo_horas * 60))") ]]; then
-    rm -f "$estado/atraso-respaldo"
-    echo 'Respaldo reciente.'
+# Comprueba que un trabajo de otra máquina siga reportándose: ese trabajo toca una marca tras cada ejecución buena.
+# Uso: atraso_marca <archivo de la marca> <clave del aviso> <horas> <qué es> <cómo revisarlo>
+atraso_marca() {
+  local marca="$estado/$1" clave=$2 horas=$3 que=$4 ayuda=$5
+  if [[ ! -e $marca ]]; then echo "Aún no hay registros de $que; no se comprueba."; return 0; fi
+  if [[ -z $(find "$marca" -mmin +"$((horas * 60))") ]]; then
+    rm -f "$estado/$clave"
+    echo "$que: reciente."
     return 0
   fi
-  if reciente atraso-respaldo; then echo 'Ya se avisó de la falta de respaldo hace menos de 20 horas.'; return 0; fi
-  enviar 'Observatorio: hace más de 48 horas que no hay un respaldo de la base' "$(printf '%s\n' \
-    "El último respaldo bueno es de $(TZ=America/Santiago date -r "$marca" '+%d-%m-%Y %H:%M') (límite: $respaldo_horas horas)." \
+  if reciente "$clave"; then echo "Ya se avisó de $que hace menos de 20 horas."; return 0; fi
+  enviar "Observatorio: hace más de $horas horas que no hay $que" "$(printf '%s\n' \
+    "La última vez fue el $(TZ=America/Santiago date -r "$marca" '+%d-%m-%Y %H:%M') (límite: $horas horas)." \
     "Hora en Chile: $(hora_chile)" \
     '' \
-    'Puede ser que la máquina que respalda esté apagada, que no corra su temporizador o que falle el respaldo.' \
+    'Puede ser que la máquina que lo ejecuta esté apagada, que no corra su temporizador o que el trabajo falle.' \
     'En esa máquina:' \
-    '  systemctl --user list-timers observatorio-respaldo.timer' \
-    '  journalctl --user -u observatorio-respaldo.service -n 50 --no-pager')"
-  marcar atraso-respaldo
-  echo 'Aviso enviado por la falta de respaldo.'
+    "$ayuda")"
+  marcar "$clave"
+  echo "Aviso enviado por la falta de $que."
+}
+
+atraso_respaldo() {
+  atraso_marca respaldo-ok atraso-respaldo "$respaldo_horas" 'un respaldo de la base' \
+    "$(printf '%s\n' '  systemctl --user list-timers observatorio-respaldo.timer' '  journalctl --user -u observatorio-respaldo.service -n 50 --no-pager')"
+}
+
+atraso_clasificacion() {
+  atraso_marca clasificacion-ok atraso-clasificacion "$respaldo_horas" 'una clasificación de proyectos nuevos' \
+    "$(printf '%s\n' '  systemctl --user list-timers observatorio-clasificar.timer' '  journalctl --user -u observatorio-clasificar.service -n 50 --no-pager')"
 }
 
 atraso() {
   local fallo=0
   atraso_datos || fallo=1
   atraso_respaldo || fallo=1
+  atraso_clasificacion || fallo=1
   return "$fallo"
 }
 

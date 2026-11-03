@@ -58,6 +58,11 @@ export interface Ficha extends FilaLista {
 	fuente: string;
 	nivel_senal: string | null;
 	version_seleccion: string | null;
+	/** Solo para los proyectos que clasificó el agente; null en los de la lista v5. */
+	grupo: string | null;
+	codificador: string | null;
+	confianza: string | null;
+	motivo: string | null;
 }
 
 /** Lee y acota los filtros de la URL; los valores fuera de lista se ignoran. */
@@ -228,10 +233,22 @@ export async function listaAutores(db: Base): Promise<string[]> {
 	return r.map((x) => x.nombre).sort((a, b) => a.localeCompare(b, 'es'));
 }
 
+/** Columnas de la selección que pueden faltar mientras no se publique la base con el esquema nuevo. */
+function columnasSeleccion(db: Base): string {
+	const tiene = new Set(
+		(db.prepare('PRAGMA table_info(seleccion_genero)').all() as { name: string }[]).map(
+			(c) => c.name
+		)
+	);
+	return ['grupo', 'codificador', 'confianza', 'motivo']
+		.map((c) => (tiene.has(c) ? `g.${c}` : `NULL AS ${c}`))
+		.join(', ');
+}
+
 export async function ficha(db: Base, boletin: string): Promise<Ficha | null> {
 	const fila = db
 		.prepare(
-			`SELECT p.*, g.nivel_senal, g.version AS version_seleccion
+			`SELECT p.*, g.nivel_senal, g.version AS version_seleccion, ${columnasSeleccion(db)}
 			 FROM proyecto p JOIN seleccion_genero g ON g.boletin = p.boletin
 			 WHERE p.boletin = ?`
 		)
