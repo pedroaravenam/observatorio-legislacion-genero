@@ -61,7 +61,7 @@
 			<p class="pie-titulo">Datos</p>
 			<p>
 				{#if consultado}
-					La tramitación se consultó al Senado por última vez el {consultado}.
+					La tramitación se consultó al Senado por última vez el {consultado}
 				{:else}
 					No está disponible la fecha de la última consulta al Senado.
 				{/if}

@@ -1,13 +1,22 @@
 <script lang="ts">
 	import GraficoAnual from '../lib/GraficoAnual.svelte';
-	import { claseEstado, fechaCorta } from '#lib/formato';
+	import { claseEstado, fechaCorta, parametrosFiltros } from '#lib/formato';
 	import { TEMAS } from '#lib/temas';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const f = $derived(data.filtros);
 	const hayFiltros = $derived(
-		Boolean(f.texto || f.anno || f.estado || f.iniciativa || f.tema || !f.soloGenero)
+		Boolean(
+			f.texto ||
+			f.anno ||
+			f.estado ||
+			f.iniciativa ||
+			f.tema ||
+			f.camara ||
+			f.autor ||
+			!f.soloGenero
+		)
 	);
 	const totales = $derived(
 		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
@@ -18,17 +27,23 @@
 	const desde = $derived(data.resumen[0]?.anno ?? 1990);
 
 	function enlacePagina(n: number, todos = !f.soloGenero): string {
-		const p = new URLSearchParams();
-		if (f.texto) p.set('q', f.texto);
-		if (f.anno) p.set('anno', String(f.anno));
-		if (f.estado) p.set('estado', f.estado);
-		if (f.iniciativa) p.set('iniciativa', f.iniciativa);
-		if (f.tema) p.set('tema', f.tema);
-		if (todos) p.set('alcance', 'todos');
-		if (n > 1) p.set('pagina', String(n));
-		const s = p.toString();
+		const s = parametrosFiltros(f, { pagina: n, todos }).toString();
 		return s ? `/?${s}` : '/';
 	}
+
+	const enlaceSinAutor = $derived.by(() => {
+		const q = parametrosFiltros({ ...f, autor: null }, { pagina: 1 }).toString();
+		return q ? `/?${q}` : '/';
+	});
+
+	/** Enlace de descarga con los filtros vigentes, sin página: se baja todo lo que cumple. */
+	function enlaceDatos(formato: 'csv' | 'json'): string {
+		const s = parametrosFiltros(f, { pagina: 1 }).toString();
+		return `/datos/proyectos.${formato}${s ? `?${s}` : ''}`;
+	}
+
+	// La pertinencia solo existe cuando hay palabras que buscar.
+	const ordenMostrado = $derived(f.orden === 'pertinencia' && !f.texto ? 'recientes' : f.orden);
 
 	const numero = new Intl.NumberFormat('es-CL');
 </script>
@@ -54,7 +69,14 @@
 </section>
 
 <div class="contenedor">
-	<form method="GET" action="/" class="filtros" role="search" aria-label="Buscar proyectos">
+	<form
+		id="filtros"
+		method="GET"
+		action="/"
+		class="filtros"
+		role="search"
+		aria-label="Buscar proyectos"
+	>
 		<div class="busqueda">
 			<label for="q">Buscar <span class="opcional">(opcional)</span></label>
 			<div class="busqueda-fila">
@@ -115,6 +137,41 @@
 					{/each}
 				</select>
 			</div>
+			<div class="campo">
+				<label for="camara">Cámara de origen</label>
+				<select id="camara" name="camara">
+					<option value="">Todas</option>
+					{#each data.opciones.camaras as c (c)}
+						<option value={c} selected={f.camara === c}>{c}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo campo-autor">
+				<label for="autor">Autor o autora <span class="opcional">(opcional)</span></label>
+				<input
+					id="autor"
+					name="autor"
+					type="text"
+					list="autores"
+					value={f.autor ?? ''}
+					maxlength="120"
+					autocomplete="off"
+					placeholder="Empieza a escribir un apellido"
+					aria-describedby="autor-ayuda"
+					aria-invalid={data.autorDesconocido ? 'true' : undefined}
+				/>
+				<datalist id="autores">
+					{#each data.opciones.autores as a (a)}<option value={a}></option>{/each}
+				</datalist>
+				<p id="autor-ayuda" class="ayuda" class:error={data.autorDesconocido}>
+					{#if data.autorDesconocido}
+						No hay una persona con ese nombre. Elígelo de la lista que aparece al escribir; los
+						nombres están escritos como «Apellidos, Nombre».
+					{:else}
+						Elige un nombre de la lista; están escritos como «Apellidos, Nombre».
+					{/if}
+				</p>
+			</div>
 			<fieldset class="alcance">
 				<legend>Mostrar</legend>
 				<div class="segmentos">
@@ -153,6 +210,42 @@
 		{/if}
 	</div>
 
+	{#if data.total > 0}
+		<div class="herramientas">
+			<div class="campo-orden">
+				<label for="orden">Ordenar por</label>
+				<select
+					id="orden"
+					name="orden"
+					form="filtros"
+					onchange={(e) => e.currentTarget.form?.requestSubmit()}
+				>
+					{#if f.texto}
+						<option value="pertinencia" selected={ordenMostrado === 'pertinencia'}>
+							Más pertinentes
+						</option>
+					{/if}
+					<option value="recientes" selected={ordenMostrado === 'recientes'}>Más recientes</option>
+					<option value="antiguos" selected={ordenMostrado === 'antiguos'}>Más antiguos</option>
+					<option value="movimiento" selected={ordenMostrado === 'movimiento'}>
+						Con movimiento reciente
+					</option>
+				</select>
+				<noscript
+					><button class="boton secundario" type="submit" form="filtros">Ordenar</button></noscript
+				>
+			</div>
+			<p class="descarga">
+				<span
+					>Descargar {numero.format(data.total)}
+					{data.total === 1 ? 'proyecto' : 'proyectos'}:</span
+				>
+				<a href={enlaceDatos('csv')} download>CSV</a>
+				<a href={enlaceDatos('json')} download>JSON</a>
+			</p>
+		</div>
+	{/if}
+
 	{#if data.total === 0}
 		<div class="vacio">
 			<h3>No hay proyectos con esos criterios</h3>
@@ -161,6 +254,12 @@
 					<li>
 						La búsqueda se limitó a la selección de género.
 						<a href={enlacePagina(1, true)}>Buscar en todos los proyectos</a>.
+					</li>
+				{/if}
+				{#if f.autor}
+					<li>
+						Revisa que el nombre del autor sea uno de la lista del campo «Autor o autora».
+						<a href={enlaceSinAutor}>Quitar el autor</a>.
 					</li>
 				{/if}
 				<li>Prueba con menos palabras; no hace falta escribir los acentos.</li>
@@ -284,6 +383,62 @@
 	input[type='search']:hover,
 	select:hover {
 		border-color: var(--violeta-medio);
+	}
+	.ayuda.error {
+		color: var(--aviso);
+		font-weight: 500;
+	}
+	.herramientas {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
+		justify-content: space-between;
+		gap: 0.75rem 1.5rem;
+		padding: 0.9rem 0;
+		border-bottom: 1px solid var(--borde);
+	}
+	.campo-orden {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem 0.6rem;
+	}
+	.campo-orden select {
+		width: auto;
+		min-width: 13rem;
+	}
+	.descarga {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.25rem 0.9rem;
+		margin: 0;
+		font-size: 0.95rem;
+	}
+	.descarga a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		padding: 0 0.4rem;
+		font-weight: 600;
+	}
+	input[type='text'] {
+		font: inherit;
+		min-height: 48px;
+		padding: 0.5rem 0.8rem;
+		border: 1px solid var(--borde-fuerte);
+		border-radius: var(--radio);
+		background: var(--papel);
+		color: var(--tinta);
+		width: 100%;
+		min-width: 0;
+	}
+	input[type='text']:hover {
+		border-color: var(--violeta-medio);
+	}
+	.campo-autor {
+		grid-column: 1 / -1;
+		max-width: 34rem;
 	}
 	.selectores {
 		display: grid;

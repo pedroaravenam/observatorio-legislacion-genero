@@ -36,6 +36,7 @@
 			<li><a href="#datos">De dónde vienen los datos</a></li>
 			<li><a href="#actualizacion">Cómo se actualizan</a></li>
 			<li><a href="#limites">Lo que todavía no cubre</a></li>
+			<li><a href="#descarga">Descargar los datos</a></li>
 		</ol>
 	</nav>
 
@@ -290,6 +291,24 @@
 			así que los autores aparecen tal como los registra el Senado.
 		</li>
 	</ul>
+
+	<h2 id="descarga">Descargar los datos</h2>
+	<p>
+		Cada búsqueda de la portada se puede bajar como tabla. Debajo del número de resultados aparecen
+		los enlaces <strong>CSV</strong>, que se abre en Excel o en cualquier planilla, y
+		<strong>JSON</strong>, pensado para quien quiera usar los datos desde un programa. Ambos
+		respetan los filtros que tengas aplicados y entregan todos los proyectos que cumplen, no solo
+		los de la página que estás viendo. Si no filtras nada, bajas la selección completa.
+	</p>
+	<p>
+		Cada fila es un proyecto, con su boletín, título, fecha de ingreso, tipo de iniciativa, cámara
+		de origen, estado, etapa, número de ley, fecha de publicación en el Diario Oficial, fecha del
+		último trámite, autores y temas, además de un enlace a su ficha. Los autores y los temas vienen
+		separados por punto y coma. La columna <code>seleccion_genero</code> indica si el proyecto está en
+		la selección, algo útil cuando buscas entre todos los proyectos. Los datos provienen de fuentes públicas
+		oficiales y se actualizan con la frecuencia descrita arriba; la fecha de la última consulta aparece
+		al pie de cada página.
+	</p>
 
 	<h2>Código, datos y correcciones</h2>
 	<p>

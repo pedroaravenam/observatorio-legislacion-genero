@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+	aCsv,
+	celdaCsv,
+	ordenPorDefecto,
+	parametrosFiltros,
 	consultaBusqueda,
 	esBoletin,
 	fechaCorta,
@@ -58,5 +62,54 @@ describe('pasoTramitacion', () => {
 		).toBe(2);
 		expect(pasoTramitacion('En tramitación', 'Discusión veto en Cámara Revisora (Senado)')).toBe(3);
 		expect(pasoTramitacion('Archivado', 'Archivado')).toBeNull();
+	});
+});
+
+describe('CSV', () => {
+	it('entrecomilla lo que trae coma, comillas o salto de línea', () => {
+		expect(celdaCsv('a,b')).toBe('"a,b"');
+		expect(celdaCsv('dijo "hola"')).toBe('"dijo ""hola"""');
+		expect(celdaCsv('uno\ndos')).toBe('"uno\ndos"');
+		expect(celdaCsv(null)).toBe('');
+		expect(celdaCsv(0)).toBe('0');
+	});
+	it('arma encabezado y filas con BOM y CRLF', () => {
+		const t = aCsv([{ a: 'x', b: 'y,z' }], ['a', 'b']);
+		expect(t).toBe('﻿a,b\r\nx,"y,z"\r\n');
+	});
+});
+
+describe('parametrosFiltros', () => {
+	const base = {
+		texto: '',
+		anno: null,
+		estado: null,
+		iniciativa: null,
+		tema: null,
+		camara: null,
+		autor: null,
+		orden: 'recientes' as const,
+		soloGenero: true,
+		pagina: 1
+	};
+	it('no escribe valores por defecto', () => {
+		expect(parametrosFiltros(base).toString()).toBe('');
+	});
+	it('escribe el orden solo si difiere del que corresponde', () => {
+		expect(ordenPorDefecto('sala cuna')).toBe('pertinencia');
+		expect(
+			parametrosFiltros({ ...base, texto: 'sala cuna', orden: 'pertinencia' }).toString()
+		).toBe('q=sala+cuna');
+		expect(parametrosFiltros({ ...base, orden: 'antiguos' }).get('orden')).toBe('antiguos');
+	});
+	it('arrastra autor, cámara y alcance, y cambia de página', () => {
+		const p = parametrosFiltros(
+			{ ...base, autor: 'Pérez Ana', camara: 'Senado', soloGenero: false, pagina: 2 },
+			{ pagina: 3 }
+		);
+		expect(p.get('autor')).toBe('Pérez Ana');
+		expect(p.get('camara')).toBe('Senado');
+		expect(p.get('alcance')).toBe('todos');
+		expect(p.get('pagina')).toBe('3');
 	});
 });

@@ -1,6 +1,13 @@
 // Consultas a la base pública SQLite. Todos los valores van como parámetros enlazados; nunca se concatenan en el SQL.
-import { consultaBusqueda, esBoletin } from '#lib/formato';
-import { TEMAS } from '#lib/temas';
+import {
+	CAMARAS,
+	consultaBusqueda,
+	esBoletin,
+	ORDENES,
+	ordenPorDefecto,
+	type Orden
+} from '#lib/formato';
+import { TEMAS, temasDe } from '#lib/temas';
 import type { Base } from '#lib/server/db';
 
 export const ESTADOS = [
@@ -21,6 +28,9 @@ export interface Filtros {
 	estado: string | null;
 	iniciativa: string | null;
 	tema: string | null;
+	camara: string | null;
+	autor: string | null;
+	orden: Orden;
 	soloGenero: boolean;
 	pagina: number;
 }
@@ -60,24 +70,40 @@ export function leerFiltros(url: URL): Filtros {
 	const estado = p.get('estado');
 	const iniciativa = p.get('iniciativa');
 	const tema = p.get('tema');
+	const camara = p.get('camara');
+	const orden = p.get('orden');
+	const texto = (p.get('q') ?? '').trim().slice(0, 200);
 	return {
-		texto: (p.get('q') ?? '').trim().slice(0, 200),
+		texto,
 		anno: Number.isInteger(anno) && anno >= 1990 && anno <= 2100 ? anno : null,
 		estado: estado && (ESTADOS as readonly string[]).includes(estado) ? estado : null,
 		iniciativa:
 			iniciativa && (INICIATIVAS as readonly string[]).includes(iniciativa) ? iniciativa : null,
 		tema: tema && TEMAS.some((t) => t.clave === tema) ? tema : null,
+		camara: camara && (CAMARAS as readonly string[]).includes(camara) ? camara : null,
+		autor: (p.get('autor') ?? '').trim().slice(0, 120) || null,
+		orden:
+			orden && (ORDENES as readonly string[]).includes(orden)
+				? (orden as Orden)
+				: ordenPorDefecto(texto),
 		// Por defecto se muestra la selección temática; «todos» la desactiva.
 		soloGenero: p.get('alcance') !== 'todos',
 		pagina: Number.isInteger(pagina) && pagina >= 1 && pagina <= 1000 ? pagina : 1
 	};
 }
 
-export async function listar(db: Base, f: Filtros) {
+const ORDEN_SQL: Record<Exclude<Orden, 'pertinencia'>, string> = {
+	recientes: 'p.fecha_ingreso DESC, p.numero DESC',
+	antiguos: 'p.fecha_ingreso ASC, p.numero ASC',
+	movimiento: 'p.ultimo_tramite IS NULL, p.ultimo_tramite DESC, p.numero DESC'
+};
+
+/** Condiciones, valores y orden de una búsqueda. La usan la lista y la descarga, para que coincidan siempre. */
+function construirConsulta(f: Filtros) {
 	const condiciones: string[] = [];
 	const valores: (string | number)[] = [];
 	let desde = 'proyecto p';
-	let orden = 'p.fecha_ingreso DESC, p.numero DESC';
+	let pertinencia = false;
 
 	const texto = f.texto.replace(/\s+/g, '');
 	// Una búsqueda por número de boletín muestra el proyecto aunque no esté en la selección temática.
@@ -95,7 +121,7 @@ export async function listar(db: Base, f: Filtros) {
 			desde = 'proyecto_busqueda b JOIN proyecto p ON p.rowid = b.rowid';
 			condiciones.push('proyecto_busqueda MATCH ?');
 			valores.push(consulta);
-			orden = 'b.rank, p.fecha_ingreso DESC';
+			pertinencia = true;
 		}
 	}
 	if (f.anno !== null) {
@@ -110,14 +136,38 @@ export async function listar(db: Base, f: Filtros) {
 		condiciones.push('p.iniciativa = ?');
 		valores.push(f.iniciativa);
 	}
+	if (f.camara) {
+		condiciones.push('p.camara_origen = ?');
+		valores.push(f.camara);
+	}
+	if (f.autor) {
+		condiciones.push('EXISTS (SELECT 1 FROM json_each(p.autores) WHERE value = ?)');
+		valores.push(f.autor);
+	}
 	if (f.tema) {
 		condiciones.push('tiene_tema(p.titulo, ?) = 1');
 		valores.push(f.tema);
 	}
 	if (f.soloGenero && !porNumero) condiciones.push('g.boletin IS NOT NULL');
 
+	// La pertinencia solo existe cuando hay palabras que buscar; si no, se ordena por fecha.
+	const orden =
+		f.orden === 'pertinencia'
+			? pertinencia
+				? 'b.rank, p.fecha_ingreso DESC'
+				: ORDEN_SQL.recientes
+			: ORDEN_SQL[f.orden];
 	const donde = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '';
-	const base = `FROM ${desde} LEFT JOIN seleccion_genero g ON g.boletin = p.boletin ${donde}`;
+	return {
+		porNumero,
+		valores,
+		orden,
+		base: `FROM ${desde} LEFT JOIN seleccion_genero g ON g.boletin = p.boletin ${donde}`
+	};
+}
+
+export async function listar(db: Base, f: Filtros) {
+	const { porNumero, valores, orden, base } = construirConsulta(f);
 	const desplazamiento = (f.pagina - 1) * POR_PAGINA;
 
 	const total = db.prepare(`SELECT count(*) AS n ${base}`).get(...valores) as { n: number };
@@ -134,6 +184,64 @@ export async function listar(db: Base, f: Filtros) {
 		// node:sqlite entrega objetos sin prototipo; se copian para serializarlos sin sorpresas.
 		filas: filas.map((f) => ({ ...f }) as unknown as FilaLista)
 	};
+}
+
+export interface FilaExportada {
+	boletin: string;
+	titulo: string;
+	fecha_ingreso: string | null;
+	iniciativa: string | null;
+	camara_origen: string | null;
+	estado: string | null;
+	etapa: string | null;
+	ley_numero: string | null;
+	diario_oficial: string | null;
+	ultimo_tramite: string | null;
+	autores: string[];
+	temas: string[];
+	seleccion_genero: boolean;
+}
+
+/** Todos los proyectos que cumplen los filtros, sin paginar, con los datos que se descargan. */
+export async function exportar(db: Base, f: Filtros): Promise<FilaExportada[]> {
+	const { valores, orden, base } = construirConsulta(f);
+	const filas = db
+		.prepare(
+			`SELECT p.boletin, p.titulo, p.fecha_ingreso, p.iniciativa, p.camara_origen, p.estado, p.etapa,
+			        p.ley_numero, p.diario_oficial, p.ultimo_tramite, p.autores,
+			        g.boletin IS NOT NULL AS genero
+			 ${base} ORDER BY ${orden}`
+		)
+		.all(...valores) as unknown as (Omit<
+		FilaExportada,
+		'autores' | 'temas' | 'seleccion_genero'
+	> & {
+		autores: string;
+		genero: number;
+	})[];
+	return filas.map((r) => ({
+		boletin: r.boletin,
+		titulo: r.titulo,
+		fecha_ingreso: r.fecha_ingreso,
+		iniciativa: r.iniciativa,
+		camara_origen: r.camara_origen,
+		estado: r.estado,
+		etapa: r.etapa,
+		ley_numero: r.ley_numero,
+		diario_oficial: r.diario_oficial,
+		ultimo_tramite: r.ultimo_tramite,
+		autores: JSON.parse(r.autores) as string[],
+		temas: temasDe(r.titulo),
+		seleccion_genero: r.genero === 1
+	}));
+}
+
+/** Nombres de autores de todos los proyectos, sin repetir y en orden alfabético del español. */
+export async function listaAutores(db: Base): Promise<string[]> {
+	const r = db
+		.prepare('SELECT DISTINCT j.value AS nombre FROM proyecto p, json_each(p.autores) j')
+		.all() as { nombre: string }[];
+	return r.map((x) => x.nombre).sort((a, b) => a.localeCompare(b, 'es'));
 }
 
 export async function ficha(db: Base, boletin: string): Promise<Ficha | null> {

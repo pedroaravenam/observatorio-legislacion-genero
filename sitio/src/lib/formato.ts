@@ -123,3 +123,63 @@ export function claseEstado(estado: string | null): string {
 	if (estado === 'En tramitación') return 'tramitacion';
 	return 'cerrado';
 }
+
+export const ORDENES = ['pertinencia', 'recientes', 'antiguos', 'movimiento'] as const;
+export type Orden = (typeof ORDENES)[number];
+
+export const CAMARAS = ['Cámara de Diputados', 'Senado'] as const;
+
+/** Orden que se aplica cuando la persona no elige uno: por pertinencia si buscó palabras, si no por fecha. */
+export function ordenPorDefecto(texto: string): Orden {
+	return texto.trim() ? 'pertinencia' : 'recientes';
+}
+
+/** Lo mínimo de los filtros que viaja en la URL. */
+export interface FiltrosUrl {
+	texto: string;
+	anno: number | null;
+	estado: string | null;
+	iniciativa: string | null;
+	tema: string | null;
+	camara: string | null;
+	autor: string | null;
+	orden: Orden;
+	soloGenero: boolean;
+	pagina: number;
+}
+
+/** Parámetros de URL de unos filtros; omite los que tienen su valor por defecto. */
+export function parametrosFiltros(
+	f: FiltrosUrl,
+	cambios: { pagina?: number; todos?: boolean } = {}
+): URLSearchParams {
+	const p = new URLSearchParams();
+	if (f.texto) p.set('q', f.texto);
+	if (f.anno) p.set('anno', String(f.anno));
+	if (f.estado) p.set('estado', f.estado);
+	if (f.iniciativa) p.set('iniciativa', f.iniciativa);
+	if (f.tema) p.set('tema', f.tema);
+	if (f.camara) p.set('camara', f.camara);
+	if (f.autor) p.set('autor', f.autor);
+	if (f.orden !== ordenPorDefecto(f.texto)) p.set('orden', f.orden);
+	if (cambios.todos ?? !f.soloGenero) p.set('alcance', 'todos');
+	const pagina = cambios.pagina ?? f.pagina;
+	if (pagina > 1) p.set('pagina', String(pagina));
+	return p;
+}
+
+/** Una celda de CSV según RFC 4180: se entrecomilla si trae coma, comillas o saltos de línea. */
+export function celdaCsv(valor: string | number | null | undefined): string {
+	const t = valor === null || valor === undefined ? '' : String(valor);
+	return /[",\r\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+}
+
+/** Tabla CSV con BOM para que Excel reconozca UTF-8 y terminadores CRLF. */
+export function aCsv<T extends Record<string, string | number | null | undefined>>(
+	filas: T[],
+	columnas: (keyof T & string)[]
+): string {
+	const lineas = [columnas.map(celdaCsv).join(',')];
+	for (const fila of filas) lineas.push(columnas.map((c) => celdaCsv(fila[c])).join(','));
+	return '﻿' + lineas.join('\r\n') + '\r\n';
+}

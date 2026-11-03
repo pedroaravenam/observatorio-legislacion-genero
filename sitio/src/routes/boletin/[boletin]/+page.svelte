@@ -161,7 +161,9 @@
 						{p.autores.length === 1 ? 'Autor o autora' : `Autores (${p.autores.length})`}
 					</h2>
 					<ul class="nombres">
-						{#each p.autores as a (a)}<li>{a}</li>{/each}
+						{#each p.autores as a (a)}<li>
+								<a href="/?autor={encodeURIComponent(a)}">{a}</a>
+							</li>{/each}
 					</ul>
 				</section>
 			{/if}

@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { fechaLarga } from '#lib/formato';
 	import { TEMAS } from '#lib/temas';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const d = $derived(data.panorama);
+	const actualizado = $derived(fechaLarga(data.senadoConsultado));
 	const numero = new Intl.NumberFormat('es-CL');
 	const n = (x: number) => numero.format(x);
 	const pct = (parte: number, total: number) => (total ? Math.round((parte / total) * 100) : 0);
@@ -40,6 +42,13 @@
 		return nombre ? `${nombre} ${apellidos}` : x;
 	};
 </script>
+
+{#snippet pie()}
+	<p class="pie-datos">
+		Fuente: servicio de tramitación del Senado de Chile.{#if actualizado}
+			Datos al {actualizado}.{/if}
+	</p>
+{/snippet}
 
 <svelte:head>
 	<title>Panorama · Observatorio de Legislación de Género</title>
@@ -114,6 +123,7 @@
 			{#each d.camaras as c, i (c.camara)}{i > 0 ? ' y ' : ''}{n(c.total)} proyectos ingresaron por
 				{c.camara === 'Senado' ? 'el Senado' : 'la Cámara de Diputadas y Diputados'}{/each}.
 		</p>
+		{@render pie()}
 	</section>
 
 	<section aria-labelledby="temas-titulo" class="bloque">
@@ -143,6 +153,7 @@
 			{/each}
 		</ul>
 		<p class="nota">Cada tema enlaza a la lista de sus proyectos.</p>
+		{@render pie()}
 	</section>
 
 	<section aria-labelledby="periodos-titulo" class="bloque">
@@ -180,6 +191,7 @@
 				</tbody>
 			</table>
 		</div>
+		{@render pie()}
 	</section>
 
 	<section aria-labelledby="tiempo-titulo" class="bloque">
@@ -201,6 +213,7 @@
 				</div>
 			{/each}
 		</dl>
+		{@render pie()}
 	</section>
 
 	<section aria-labelledby="autores-titulo" class="bloque">
@@ -215,7 +228,7 @@
 			{#each d.autores as a, i (a.nombre)}
 				<li>
 					<span class="a-pos" aria-hidden="true">{i + 1}</span>
-					<a class="a-nombre" href="/?q={encodeURIComponent(a.nombre.replace(',', ''))}"
+					<a class="a-nombre" href="/?autor={encodeURIComponent(a.nombre)}"
 						>{nombrePersona(a.nombre)}</a
 					>
 					<span class="b-pista" aria-hidden="true">
@@ -234,6 +247,7 @@
 			Los nombres aparecen tal como los registra el Senado, y cada uno enlaza a la lista de sus
 			proyectos.
 		</p>
+		{@render pie()}
 	</section>
 
 	<p class="metodo">
@@ -243,6 +257,11 @@
 </div>
 
 <style>
+	.pie-datos {
+		margin: 1rem 0 0;
+		font-size: 0.85rem;
+		color: var(--tinta-suave);
+	}
 	.franja {
 		background: var(--franja);
 		color: var(--franja-texto);
