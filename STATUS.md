@@ -2,9 +2,9 @@
 
 ## Resumen
 
-Fecha: 2026-11-02. Último commit: rediseño del sitio (este avance). **Publicado:** https://observatorio.116-203-181-6.sslip.io (dirección provisoria, sin dominio propio).
+Fecha: 2026-11-02. Último commit: metodología, textos y panel «Panorama» (este avance). **Publicado:** https://observatorio.116-203-181-6.sslip.io (dirección provisoria, sin dominio propio).
 
-El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género preliminar (lista v5, 2.155 boletines; 2.154 cruzan con la base), con aviso explícito de que no está validada.
+El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género (lista v5, 2.155 boletines; 2.154 cruzan con la base), presentada como criterio propio del Observatorio. «Cómo funciona» explica el criterio, los cinco pasos de selección con conteos en vivo, los temas, las fuentes y la actualización. «Panorama» (/panorama) muestra estados, mensajes frente a mociones, temas, temas por período, tiempo hasta ser ley y los 15 parlamentarios con más proyectos. La portada filtra por tema (`?tema=`); los temas se asignan por el título con el léxico de `sitio/src/lib/temas.ts`.
 
 Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compose `observatorio`. PostgreSQL de ingesta, ingesta .NET del Senado, exportador a SQLite (una transacción, ~2,5 min) y sitio SvelteKit con Node detrás del Caddy compartido. Detalle en [docs/alojamiento.md](docs/alojamiento.md).
 
@@ -27,7 +27,8 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 2. Dominio propio.
 3. Respaldo periódico de la base de ingesta fuera del VPS.
 4. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
-5. Validar manualmente la selección de género y publicar sus reglas en detalle.
+5. Volver a aplicar el criterio a los proyectos ingresados después del 22-10-2026 (hoy solo aparecen en «Todos») y validar casos dudosos.
+6. Panorama: agregar sexo de autores con datos de la Cámara.
 6. Incorporar datos de la Cámara (autores con identificador, votaciones) y textos de la BCN.
 7. CI del repositorio (pruebas del sitio y del exportador).
 8. Revisar los términos de reutilización de datos de las tres fuentes.

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import GraficoAnual from '../lib/GraficoAnual.svelte';
 	import { claseEstado, fechaCorta } from '#lib/formato';
+	import { TEMAS } from '#lib/temas';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const f = $derived(data.filtros);
 	const hayFiltros = $derived(
-		Boolean(f.texto || f.anno || f.estado || f.iniciativa || !f.soloGenero)
+		Boolean(f.texto || f.anno || f.estado || f.iniciativa || f.tema || !f.soloGenero)
 	);
 	const totales = $derived(
 		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
@@ -22,6 +23,7 @@
 		if (f.anno) p.set('anno', String(f.anno));
 		if (f.estado) p.set('estado', f.estado);
 		if (f.iniciativa) p.set('iniciativa', f.iniciativa);
+		if (f.tema) p.set('tema', f.tema);
 		if (todos) p.set('alcance', 'todos');
 		if (n > 1) p.set('pagina', String(n));
 		const s = p.toString();
@@ -43,9 +45,9 @@
 	<div class="contenedor">
 		<h1 id="titulo">Proyectos de ley sobre género en Chile, desde {desde}</h1>
 		<p class="bajada">
-			{numero.format(totales.total)} proyectos en la selección preliminar; {numero.format(
-				totales.leyes
-			)} ya son ley. Cada ficha muestra su tramitación y enlaza al Senado y a la Biblioteca del Congreso.
+			Desde {desde} se han presentado {numero.format(totales.total)} proyectos de ley que tratan temas
+			de género, y {numero.format(totales.leyes)} ya son ley. Aquí puedes buscarlos, ver en qué etapa
+			está cada uno y abrir sus documentos en el Senado y en la Biblioteca del Congreso.
 		</p>
 		<GraficoAnual resumen={data.resumen} seleccionado={f.anno} />
 	</div>
@@ -69,12 +71,21 @@
 				<button class="boton" type="submit">Buscar</button>
 			</div>
 			<p id="q-ayuda" class="ayuda">
-				Por ejemplo: violencia contra la mujer, sala cuna, 11077-07. Busca en títulos, materias y
-				autores.
+				Escribe palabras, como «sala cuna», o un número de boletín, como 11077-07. La búsqueda
+				revisa títulos, materias y autores.
 			</p>
 		</div>
 
 		<div class="selectores">
+			<div class="campo">
+				<label for="tema">Tema</label>
+				<select id="tema" name="tema">
+					<option value="">Todos</option>
+					{#each TEMAS as t (t.clave)}
+						<option value={t.clave} selected={f.tema === t.clave}>{t.nombre}</option>
+					{/each}
+				</select>
+			</div>
 			<div class="campo">
 				<label for="anno">Año de ingreso</label>
 				<select id="anno" name="anno">
@@ -152,7 +163,7 @@
 						<a href={enlacePagina(1, true)}>Buscar en todos los proyectos</a>.
 					</li>
 				{/if}
-				<li>Prueba con menos palabras. Los acentos no son necesarios.</li>
+				<li>Prueba con menos palabras; no hace falta escribir los acentos.</li>
 				<li>Si buscas un boletín, escríbelo con su guion, por ejemplo 11077-07.</li>
 			</ul>
 		</div>

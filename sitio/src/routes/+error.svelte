@@ -10,11 +10,18 @@
 
 <section class="contenedor error" role="alert">
 	<h1>{page.status === 404 ? 'No encontramos esta página' : 'No pudimos cargar esta página'}</h1>
-	<p>{page.error?.message ?? 'Ocurrió un error inesperado.'}</p>
+	<p>
+		{#if page.status === 404 && (!page.error?.message || page.error.message === 'Not Found')}
+			La dirección no corresponde a ninguna página del Observatorio. Puede que el enlace esté
+			incompleto o que la página haya cambiado de lugar.
+		{:else}
+			{page.error?.message ?? 'Ocurrió un error inesperado al preparar la página.'}
+		{/if}
+	</p>
 	{#if page.status !== 404}
 		<p>
-			Intenta de nuevo en unos minutos. Si el problema continúa, es probable que el servicio esté en
-			mantención.
+			Vuelve a intentarlo en unos minutos. Si el problema continúa, lo más probable es que el sitio
+			esté en mantención.
 		</p>
 	{/if}
 	<p><a class="boton" href="/">Ir a los proyectos</a></p>

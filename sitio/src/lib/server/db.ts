@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { DatabaseSync } from 'node:sqlite';
+import { TEMAS, normalizar } from '#lib/temas';
 
 export type Base = DatabaseSync;
 
@@ -16,6 +17,13 @@ export function baseDatos(): DatabaseSync {
 	try {
 		const db = new DatabaseSync(ruta, { readOnly: true });
 		db.exec('PRAGMA busy_timeout = 5000');
+		// tiene_tema(titulo, clave): 1 si el título contiene algún término del tema (ver #lib/temas).
+		db.function('tiene_tema', { deterministic: true }, (titulo, clave) => {
+			const tema = TEMAS.find((t) => t.clave === clave);
+			if (!tema || typeof titulo !== 'string') return 0;
+			const t = normalizar(titulo);
+			return tema.patrones.some((p) => p.test(t)) ? 1 : 0;
+		});
 		base = db;
 		return db;
 	} catch {

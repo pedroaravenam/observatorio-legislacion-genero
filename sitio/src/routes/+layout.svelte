@@ -29,6 +29,9 @@
 		</a>
 		<nav aria-label="Principal">
 			<a href="/" aria-current={page.url.pathname === '/' ? 'page' : undefined}>Proyectos</a>
+			<a href="/panorama" aria-current={page.url.pathname === '/panorama' ? 'page' : undefined}
+				>Panorama</a
+			>
 			<a href="/acerca" aria-current={page.url.pathname === '/acerca' ? 'page' : undefined}
 				>Cómo funciona</a
 			>
@@ -48,7 +51,7 @@
 		<div>
 			<p class="pie-titulo">Observatorio de Legislación de Género</p>
 			<p>
-				Proyecto independiente y sin fines de lucro. El
+				Es un proyecto independiente y sin fines de lucro, y su
 				<a href="https://github.com/pedroaravenam/observatorio-legislacion-genero"
 					>código es abierto</a
 				>, con licencia AGPL-3.0.
@@ -58,12 +61,12 @@
 			<p class="pie-titulo">Datos</p>
 			<p>
 				{#if consultado}
-					Tramitación consultada al Senado el {consultado}.
+					La tramitación se consultó al Senado por última vez el {consultado}.
 				{:else}
-					Fecha de la última consulta a las fuentes no disponible.
+					No está disponible la fecha de la última consulta al Senado.
 				{/if}
-				Fuentes: Senado de la República, Cámara de Diputadas y Diputados y Biblioteca del Congreso Nacional.
-				Estas instituciones no patrocinan ni operan este sitio.
+				Los datos provienen del Senado de la República y de la Biblioteca del Congreso Nacional, instituciones
+				que no patrocinan ni operan este sitio.
 			</p>
 		</div>
 	</div>
@@ -142,6 +145,16 @@
 		color: var(--franja-texto);
 		text-decoration: none;
 		font-weight: 500;
+		white-space: nowrap;
+	}
+	@media (max-width: 30rem) {
+		nav a {
+			padding: 0 0.6rem;
+			font-size: 0.95rem;
+		}
+		nav {
+			margin-left: -0.6rem;
+		}
 	}
 	nav a:hover {
 		background: rgb(255 255 255 / 0.08);

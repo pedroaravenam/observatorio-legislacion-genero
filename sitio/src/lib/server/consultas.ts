@@ -1,5 +1,6 @@
 // Consultas a la base pública SQLite. Todos los valores van como parámetros enlazados; nunca se concatenan en el SQL.
 import { consultaBusqueda, esBoletin } from '#lib/formato';
+import { TEMAS } from '#lib/temas';
 import type { Base } from '#lib/server/db';
 
 export const ESTADOS = [
@@ -19,6 +20,7 @@ export interface Filtros {
 	anno: number | null;
 	estado: string | null;
 	iniciativa: string | null;
+	tema: string | null;
 	soloGenero: boolean;
 	pagina: number;
 }
@@ -57,12 +59,14 @@ export function leerFiltros(url: URL): Filtros {
 	const pagina = Number(p.get('pagina'));
 	const estado = p.get('estado');
 	const iniciativa = p.get('iniciativa');
+	const tema = p.get('tema');
 	return {
 		texto: (p.get('q') ?? '').trim().slice(0, 200),
 		anno: Number.isInteger(anno) && anno >= 1990 && anno <= 2100 ? anno : null,
 		estado: estado && (ESTADOS as readonly string[]).includes(estado) ? estado : null,
 		iniciativa:
 			iniciativa && (INICIATIVAS as readonly string[]).includes(iniciativa) ? iniciativa : null,
+		tema: tema && TEMAS.some((t) => t.clave === tema) ? tema : null,
 		// Por defecto se muestra la selección temática; «todos» la desactiva.
 		soloGenero: p.get('alcance') !== 'todos',
 		pagina: Number.isInteger(pagina) && pagina >= 1 && pagina <= 1000 ? pagina : 1
@@ -105,6 +109,10 @@ export async function listar(db: Base, f: Filtros) {
 	if (f.iniciativa) {
 		condiciones.push('p.iniciativa = ?');
 		valores.push(f.iniciativa);
+	}
+	if (f.tema) {
+		condiciones.push('tiene_tema(p.titulo, ?) = 1');
+		valores.push(f.tema);
 	}
 	if (f.soloGenero && !porNumero) condiciones.push('g.boletin IS NOT NULL');
 
@@ -176,4 +184,15 @@ export async function resumenGenero(db: Base): Promise<ResumenAnno[]> {
 		)
 		.all() as unknown as ResumenAnno[];
 	return filas.map((f) => ({ anno: f.anno, total: f.total, leyes: f.leyes }));
+}
+
+/** Proyectos de la selección según la señal que los incluyó. */
+export async function conteoSenales(db: Base): Promise<Record<string, number>> {
+	const filas = db
+		.prepare(
+			`SELECT g.nivel_senal AS senal, count(*) AS n
+			 FROM seleccion_genero g JOIN proyecto p ON p.boletin = g.boletin GROUP BY g.nivel_senal`
+		)
+		.all() as { senal: string; n: number }[];
+	return Object.fromEntries(filas.map((f) => [f.senal, f.n]));
 }

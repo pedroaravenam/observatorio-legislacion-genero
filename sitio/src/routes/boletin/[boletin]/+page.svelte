@@ -11,12 +11,14 @@
 		urlFichaSenado,
 		urlLeyBcn
 	} from '#lib/formato';
+	import { TEMAS, temasDe } from '#lib/temas';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const p = $derived(data.proyecto);
 	const ley = $derived(numeroLey(p.ley_numero));
 	const paso = $derived(pasoTramitacion(p.estado, p.etapa));
+	const temas = $derived(TEMAS.filter((t) => temasDe(p.titulo).includes(t.clave)));
 
 	// Trámites del más reciente al más antiguo, agrupados por año.
 	const porAnno = $derived.by(() => {
@@ -43,7 +45,7 @@
 		<p class="meta">
 			<span class="boletin">Boletín {p.boletin}</span>
 			{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
-			{#if p.genero}<span class="marca-genero">Selección de género (preliminar)</span>{/if}
+			{#if p.genero}<span class="marca-genero">Selección de género</span>{/if}
 		</p>
 		<h1>{p.titulo}</h1>
 
@@ -90,8 +92,8 @@
 			{/if}
 		</div>
 		<p class="nota">
-			Los documentos se abren en el sitio oficial. Si no cargan, la fuente puede estar fuera de
-			servicio por unos minutos.
+			Los documentos se abren en el sitio oficial de cada institución, así que, si alguno no carga,
+			lo más probable es que esa fuente esté fuera de servicio por un momento.
 		</p>
 	</header>
 
@@ -140,10 +142,16 @@
 			{#if p.genero && p.nivel_senal}
 				<section class="aviso" aria-labelledby="seleccion-titulo">
 					<h2 id="seleccion-titulo">Por qué está en la selección de género</h2>
-					<p>
-						{etiquetaSenal(p.nivel_senal)}. Es una selección automática preliminar ({p.version_seleccion}),
-						no una clasificación validada. <a href="/acerca#seleccion">Cómo se selecciona</a>.
-					</p>
+					<p>{etiquetaSenal(p.nivel_senal)}.</p>
+					{#if temas.length}
+						<p>
+							{temas.length === 1 ? 'Tema' : 'Temas'}:
+							{#each temas as t, i (t.clave)}{i > 0 ? ', ' : ''}<a href="/?tema={t.clave}"
+									>{t.nombre.toLocaleLowerCase('es-CL')}</a
+								>{/each}.
+						</p>
+					{/if}
+					<p><a href="/acerca#seleccion">Cómo seleccionamos los proyectos</a></p>
 				</section>
 			{/if}
 
@@ -171,11 +179,12 @@
 		<section class="principal" aria-labelledby="tramites-titulo">
 			<h2 id="tramites-titulo">Tramitación</h2>
 			<p class="suave">
-				{p.tramites.length}
-				{p.tramites.length === 1 ? 'trámite' : 'trámites'}, del más reciente al más antiguo.
+				{p.tramites.length === 1
+					? 'Se muestra el único trámite registrado.'
+					: `Se muestran los ${p.tramites.length} trámites registrados, del más reciente al más antiguo.`}
 			</p>
 			{#if p.tramites.length === 0}
-				<p>El Senado no informa trámites para este boletín.</p>
+				<p>El Senado todavía no registra trámites para este proyecto.</p>
 			{:else}
 				{#each porAnno as grupo (grupo.anno)}
 					<h3 class="anno">{grupo.anno}</h3>
@@ -198,8 +207,10 @@
 	</div>
 
 	<p class="procedencia">
-		Fuente: servicio de tramitación del Senado de la República. Último cambio registrado en esta
-		ficha: {fechaHoraChile(p.actualizado) ?? 'sin dato'}.
+		Los datos de esta ficha provienen del servicio de tramitación del Senado.
+		{#if fechaHoraChile(p.actualizado)}Su último cambio se registró el {fechaHoraChile(
+				p.actualizado
+			)}.{/if}
 	</p>
 </article>
 

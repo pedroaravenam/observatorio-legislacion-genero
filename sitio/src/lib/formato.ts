@@ -80,19 +80,19 @@ export function consultaBusqueda(texto: string): string | null {
 	return palabras.map((p) => `"${p}"*`).join(' ');
 }
 
-/** Etiqueta legible del nivel de señal de la selección preliminar. */
+/** Razón legible por la que un proyecto entró a la selección de género. */
 export function etiquetaSenal(nivel: string): string {
 	const etiquetas: Record<string, string> = {
-		T1_titulo_estricto: 'El título menciona el tema de forma directa',
-		T2_titulo_medio: 'El título menciona términos relacionados',
-		T3_cuerpo_firme: 'El texto del proyecto trata el tema de forma reiterada',
-		T4_cuerpo_amplio: 'El texto del proyecto menciona el tema',
-		T5_materias: 'Las materias asignadas por el Senado se relacionan con el tema',
-		L_texto_ley_fuera: 'El texto de la ley resultante trata el tema',
-		V2_conteo_absoluto: 'El texto menciona el tema muchas veces',
-		V_validado_densidad_baja: 'Revisado: trata el tema pese a pocas menciones'
+		T1_titulo_estricto: 'Entró por su título, que nombra un tema de género de forma directa',
+		T2_titulo_medio: 'Entró por su título, que contiene un término relacionado con el género',
+		T3_cuerpo_firme: 'Entró por el texto del proyecto, que trata temas de género con frecuencia',
+		T4_cuerpo_amplio: 'Entró por el texto del proyecto, que se refiere al género en varias partes',
+		T5_materias: 'Entró por las materias que le asignó el Senado',
+		L_texto_ley_fuera: 'Entró por el texto de la ley que resultó del proyecto',
+		V2_conteo_absoluto: 'Entró tras leer su texto completo, que trata el tema en varias partes',
+		V_validado_densidad_baja: 'Entró tras leer su texto, que trata el tema aunque lo menciona poco'
 	};
-	return etiquetas[nivel] ?? 'Señal automática';
+	return etiquetas[nivel] ?? 'Cumple una de las reglas del criterio de selección';
 }
 
 export const PASOS_TRAMITACION = [
