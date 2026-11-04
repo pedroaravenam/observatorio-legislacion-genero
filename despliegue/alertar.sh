@@ -147,7 +147,7 @@ atraso_respaldo() {
 
 atraso_clasificacion() {
   atraso_marca clasificacion-ok atraso-clasificacion "$respaldo_horas" 'una clasificación de proyectos nuevos' \
-    "$(printf '%s\n' '  systemctl --user list-timers observatorio-clasificar.timer' '  journalctl --user -u observatorio-clasificar.service -n 50 --no-pager')"
+    "$(printf '%s\n' '  systemctl --user list-timers observatorio-noche.timer' '  journalctl --user -u observatorio-noche.service -n 50 --no-pager')"
 }
 
 atraso() {

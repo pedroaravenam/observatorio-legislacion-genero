@@ -5,6 +5,7 @@
 		fechaCorta,
 		fechaHoraChile,
 		fechaLarga,
+		nivelRelacion,
 		numeroLey,
 		PASOS_TRAMITACION,
 		pasoTramitacion,
@@ -18,6 +19,7 @@
 	const p = $derived(data.proyecto);
 	const ley = $derived(numeroLey(p.ley_numero));
 	const paso = $derived(pasoTramitacion(p.estado, p.etapa));
+	const nivel = $derived(nivelRelacion(p.grupo));
 	const temas = $derived(TEMAS.filter((t) => temasDe(p.titulo).includes(t.clave)));
 
 	// Trámites del más reciente al más antiguo, agrupados por año.
@@ -142,7 +144,15 @@
 				<section class="aviso" aria-labelledby="seleccion-titulo">
 					<h2 id="seleccion-titulo">Por qué está en la selección de género</h2>
 					<p>{etiquetaSenal(p.nivel_senal)}.</p>
-					{#if p.codificador === 'agente' && p.motivo}
+					{#if nivel}
+						<p>
+							<strong>Relación con el género: {nivel.nombre}.</strong>
+							{nivel.explicacion}
+						</p>
+					{/if}
+					{#if p.codificador === 'desarrollador' && p.motivo}
+						<p><strong>Su razón:</strong> {p.motivo}</p>
+					{:else if p.codificador === 'agente' && p.motivo}
 						<p>
 							<strong>Su razón:</strong>
 							{p.motivo}
@@ -381,6 +391,9 @@
 	.aviso p {
 		margin: 0;
 		font-size: 0.95rem;
+	}
+	.aviso p + p {
+		margin-top: 0.6rem;
 	}
 	.nombres {
 		margin: 0;

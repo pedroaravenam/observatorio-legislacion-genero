@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Clasifica los proyectos nuevos con el agente y publica el sitio. Lo ejecuta el temporizador de usuario
-# observatorio-clasificar (09:30, hora de Chile, después de la consulta diaria del VPS); también se puede correr a mano.
+# Clasifica a mano los proyectos nuevos con el agente y publica el sitio. En la operación normal lo hace
+# tareas-de-noche.sh a las 03:00; este script sirve para correrlo a mano.
 # Si falla, el VPS envía un correo con las últimas líneas del registro.
 set -euo pipefail
 # Bajo systemd el PATH es mínimo; claude y node pueden estar en ~/.local/bin.

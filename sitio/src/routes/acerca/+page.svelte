@@ -44,7 +44,9 @@
 	<p>
 		No basta con que un proyecto mencione a las mujeres para considerarlo de género. Lo que miramos
 		es su contenido, es decir, qué regula y a quién afecta. Con esa idea ordenamos los proyectos en
-		tres grupos: los dos primeros forman parte de la selección y el tercero queda fuera.
+		cuatro niveles de relación con el género: los tres primeros forman parte de la selección y el
+		cuarto queda fuera. Ante una duda razonable, el proyecto entra, pero queda marcado como relación
+		débil.
 	</p>
 	<table>
 		<caption class="visualmente-oculto">Grupos del criterio de selección</caption>
@@ -77,6 +79,18 @@
 				<td>
 					Postnatal parental, sala cuna, pensión de alimentos, acuerdos comerciales con un capítulo
 					de género.
+				</td>
+			</tr>
+			<tr>
+				<td>Relación débil o dudosa</td>
+				<td>
+					El proyecto toca el género de forma lateral, o hay una duda razonable sobre si cumple el
+					criterio: una disposición aislada, un efecto que solo se deduce del contexto o una materia
+					vecina. Entra a la selección, marcado como relación débil.
+				</td>
+				<td>
+					Ley general contra la discriminación, un monumento a las mujeres de la Guerra del
+					Pacífico, cláusulas que discriminan a personas con VIH.
 				</td>
 			</tr>
 			<tr>
@@ -178,8 +192,8 @@
 				con un agente, es decir, un modelo de lenguaje al que le damos este mismo criterio. El
 				agente recibe el título, las materias del Senado y lo que dice el texto del proyecto
 				(cuántas veces aparecen los términos del léxico y los fragmentos donde aparecen), decide en
-				cuál de los tres grupos queda y deja una explicación breve con su nivel de confianza, que se
-				muestra en la ficha. Por esta vía se incluyeron
+				cuál de los cuatro niveles queda y deja una explicación breve con su nivel de confianza, que
+				se muestra en la ficha. Por esta vía se incluyeron
 				<strong>{n('A1_agente_tema_central', 'A2_agente_componente')}</strong> proyectos.
 			</p>
 			<p>

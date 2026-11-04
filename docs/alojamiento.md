@@ -78,15 +78,27 @@ La selección de género ya no es una lista fija dentro de la imagen del exporta
 | Criterio | `despliegue/clasificador/criterio.md`: el criterio de «Cómo funciona». Es la instrucción del agente y su versión (`agente-` más un resumen del texto) queda en cada decisión |
 | Evidencia que recibe | Título, iniciativa, materias del Senado y, del PDF del proyecto, el número de términos del léxico de género, su densidad y hasta 12 fragmentos. El léxico es el de `sitio/src/lib/temas.ts` |
 | Qué guarda | Decisión, grupo (`tema_central`, `componente` o `fuera`), confianza y un motivo de una o dos frases, que la ficha muestra |
-| Cuándo | Temporizador de usuario `observatorio-clasificar`, todos los días a las 09:30 (hora de Chile), después de la consulta diaria. Si hubo decisiones, publica el sitio con `trabajo.sh publicar` |
+| Cuándo | Dentro de las tareas de la noche (`observatorio-noche`, 03:00 hora de Chile, ver más abajo). Si hubo decisiones, publica el sitio con `trabajo.sh publicar` |
 | Sin texto | Si el PDF aún no se puede leer, el proyecto espera hasta 14 días; después se decide solo con el título, con confianza máxima media |
 | Falla o silencio | Correo por falla del programa, y la comprobación diaria del VPS avisa si pasan 48 horas sin una clasificación buena (marca `clasificacion-ok`) |
 
-Instalación del temporizador, en la máquina de desarrollo:
+### Tareas de la noche
 
-```
-cp ~/Desarrollo/observatorio-legislativo-abierto/despliegue/local/observatorio-clasificar.{service,timer} ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable --now observatorio-clasificar.timer && systemctl --user list-timers observatorio-clasificar.timer --no-pager
-```
+`despliegue/tareas-de-noche.sh` corre todos los días a las 03:00 (hora de Chile) con el temporizador de usuario `observatorio-noche`, para gastar los créditos de los agentes cuando nadie trabaja. Se instala copiando las unidades de `despliegue/local/` a `~/.config/systemd/user/` y activando `observatorio-noche.timer`. En orden:
+
+| Paso | Qué hace |
+|---|---|
+| 1. Casos de control | Cada versión del criterio se prueba una sola vez por trabajador. Si uno acierta menos del 90 % no corre esa noche y llega un aviso |
+| 2. Proyectos nuevos | Claude clasifica lo que ingresó y reclasifica lo que decidió con un criterio anterior |
+| 3. Pasada sobre la lista original | **Claude (sonnet) y Codex (gpt-6-luna, razonamiento alto) en paralelo.** Cada uno sigue hasta terminar o hasta agotar su límite de uso, y lo hecho queda guardado para la noche siguiente |
+| 4. Niveles y publicación | Los proyectos de la lista original que el agente mantiene reciben su nivel de relación con el género; si hubo cambios, se publica el sitio |
+| 5. Resumen | Un correo con lo hecho, solo si hubo novedades |
+
+Los dos trabajadores no se pisan: cada uno **reclama una tanda de 30 proyectos en la base** (tabla `revision_v5_reclamo`, con `FOR UPDATE SKIP LOCKED` y un reclamo que expira a los 30 minutos), así que nunca reciben el mismo proyecto y, si uno se detiene, lo que tenía reclamado vuelve a quedar disponible para el otro. Cada revisión guarda quién la hizo y con qué modelo (`revisor` y `modelo` en `revision_v5`).
+
+Codex se lanza con `--ignore-user-config --ignore-rules`: la configuración personal de Codex tiene un hook que fallaba con un modelo no admitido por la cuenta ChatGPT. El modelo se fija en el script porque el rol `ligero` de OMP alterna entre modelos de distintos proveedores en cada consulta; se cambia con `CODEX_MODELO=openai-codex/<modelo>:<esfuerzo>`.
+
+La pasada **no cambia quién está en la selección**: deja su opinión en `revision_v5`, y `clasificar.mjs progreso` muestra cuánto se lleva y cuántos sacaría el agente. Aplicar esas salidas es una decisión pendiente. Para ensayar la lógica sin gastar créditos: `SOLO=ninguno despliegue/tareas-de-noche.sh`. Para pararlo: `systemctl --user disable --now observatorio-noche.timer`.
 
 Casos de control: `clasificar.mjs probar` prueba al agente contra `despliegue/clasificador/casos-control.json` (cada caso con la respuesta que decidió el desarrollador) y debe repetirse cada vez que cambie `criterio.md`. `clasificar.mjs pendientes --reclasificar` repasa las decisiones que el propio agente tomó con una versión anterior del criterio.
 

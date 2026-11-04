@@ -17,6 +17,7 @@ const COLUMNAS = [
 	'ultimo_tramite',
 	'autores',
 	'temas',
+	'relacion_con_genero',
 	'ficha'
 ] as const;
 

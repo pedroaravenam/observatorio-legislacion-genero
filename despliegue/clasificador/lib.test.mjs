@@ -40,6 +40,13 @@ test('valida la decisión y rechaza incoherencias', () => {
 	assert.equal(validarDecision({ decision: 'excluye', grupo: 'fuera', confianza: 'alta', motivo: 'Menciona a las mujeres -- solo de paso en una lista.' }).motivo.includes('--'), false);
 });
 
+test('el grupo débil entra con su propia señal', () => {
+	const d = validarDecision({ decision: 'incluye', grupo: 'debil', confianza: 'media', motivo: 'Relación débil: ley general de no discriminación.' });
+	assert.equal(d.incluye, true);
+	assert.equal(nivelSenal(d), 'A3_agente_debil');
+	assert.throws(() => validarDecision({ decision: 'excluye', grupo: 'debil', confianza: 'alta', motivo: 'Motivo largo suficiente.' }));
+});
+
 test('la señal depende del grupo y los excluidos no tienen señal', () => {
 	assert.equal(nivelSenal({ incluye: true, grupo: 'tema_central' }), 'A1_agente_tema_central');
 	assert.equal(nivelSenal({ incluye: true, grupo: 'componente' }), 'A2_agente_componente');

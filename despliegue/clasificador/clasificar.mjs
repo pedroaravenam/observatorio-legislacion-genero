@@ -20,17 +20,21 @@ const ejecutar = promisify(execFile);
 const aqui = dirname(fileURLToPath(import.meta.url));
 const raiz = join(aqui, '..', '..');
 const vps = process.env.VPS || 'atendia-development';
-const modelo = process.env.CLASIFICADOR_MODELO || 'sonnet';
+// Quién responde: claude (CLI de Claude) o codex (CLI de Codex). Cada trabajador usa su propio cupo de uso.
+const revisor = process.env.REVISOR || 'claude';
+const modeloClaude = process.env.CLASIFICADOR_MODELO || 'sonnet';
 const concurrencia = Number(process.env.CONCURRENCIA || 3);
 const salida = process.env.SALIDA || './clasificador-salida';
 const criterio = readFileSync(join(aqui, 'criterio.md'), 'utf8');
 const version = versionAgente(criterio);
 const DIAS_ESPERA_TEXTO = 14;
+// Código de salida cuando se agota el límite de uso: el trabajo nocturno lo distingue de un error.
+const CODIGO_LIMITE = 4;
 const esquema = {
 	type: 'object',
 	properties: {
 		decision: { type: 'string', enum: ['incluye', 'excluye'] },
-		grupo: { type: 'string', enum: ['tema_central', 'componente', 'fuera'] },
+		grupo: { type: 'string', enum: ['tema_central', 'componente', 'debil', 'fuera'] },
 		confianza: { type: 'string', enum: ['alta', 'media', 'baja'] },
 		motivo: { type: 'string' }
 	},
@@ -124,14 +128,69 @@ function analizar(texto) {
 	return { largo: r.largo, apariciones: r.apariciones, densidad: r.densidad, inicio: texto.replace(/\s+/g, ' ').trim().slice(0, 1500), fragmentos: fragmentos(texto, r.posiciones) };
 }
 
+/**
+ * Modelo de Codex: gpt-6-luna con razonamiento alto, que fijó el desarrollador. No se usa el rol «ligero» de OMP porque
+ * alterna entre modelos de distintos proveedores en cada consulta y a veces devuelve uno que Codex no admite.
+ * Se puede cambiar con CODEX_MODELO=openai-codex/<modelo>:<esfuerzo>.
+ */
+function modeloCodex() {
+	const rol = process.env.CODEX_MODELO || 'openai-codex/gpt-6-luna:high';
+	const [proveedor, resto] = rol.includes('/') ? rol.split('/') : ['openai-codex', rol];
+	if (proveedor !== 'openai-codex') throw new Error(`CODEX_MODELO debe ser de openai-codex, no «${proveedor}»`);
+	const [modelo, esfuerzo] = resto.split(':');
+	return { modelo, esfuerzo: esfuerzo || 'high', etiqueta: `${proveedor}/${modelo}:${esfuerzo || 'high'}` };
+}
+const modelo = revisor === 'codex' ? modeloCodex().etiqueta : modeloClaude;
+
+/** Pregunta a Codex con el mismo criterio. Ignora la configuración de usuario (un hook de inicio fallaba con un modelo no admitido), no guarda sesión y corre desde una carpeta vacía; la respuesta sale como JSON de un esquema. */
+async function preguntarCodex(evidencia) {
+	const vacio = mkdtempSync(join(tmpdir(), 'clasificador-codex-'));
+	try {
+		const { modelo: m, esfuerzo } = modeloCodex();
+		writeFileSync(join(vacio, 'esquema.json'), JSON.stringify({ ...esquema, additionalProperties: false }));
+		const prompt = `${criterio}\n\n---\n\nClasifica este proyecto de ley.\n\n${evidencia}`;
+		// Para depurar: GUARDAR_PROMPT=<carpeta> deja el mensaje exacto que recibe Codex.
+		if (process.env.GUARDAR_PROMPT) writeFileSync(join(process.env.GUARDAR_PROMPT, `prompt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.txt`), prompt);
+		for (let intento = 1; ; intento++) {
+			try {
+				await new Promise((resolve, reject) => {
+					const p = spawn('codex', ['exec', '-m', m, '-c', `model_reasoning_effort=${esfuerzo}`, '--ignore-user-config', '--ignore-rules', '--ephemeral', '--skip-git-repo-check',
+						'--color', 'never', '-C', vacio, '--output-schema', join(vacio, 'esquema.json'), '-o', join(vacio, 'salida.json'), '-']);
+					let o = '';
+					const reloj = setTimeout(() => p.kill('SIGKILL'), 300_000);
+					p.stdout.on('data', (d) => (o += d));
+					p.stderr.on('data', (d) => (o += d));
+					p.on('close', (c) => {
+						clearTimeout(reloj);
+						if (c !== 0 && process.env.GUARDAR_PROMPT) writeFileSync(join(process.env.GUARDAR_PROMPT, `error-codex-${Date.now()}.txt`), o);
+						c === 0 ? resolve() : reject(new Error(`codex terminó con ${c}: ${o.slice(-300)}`));
+					});
+					p.stdin.end(prompt);
+				});
+				return validarDecision(JSON.parse(readFileSync(join(vacio, 'salida.json'), 'utf8')));
+			} catch (e) {
+				if (esLimiteDeUso(e.message)) {
+					limiteAlcanzado = true;
+					throw Object.assign(new Error(`Se agotó el límite de uso de Codex: ${e.message}`), { limite: true });
+				}
+				if (intento >= 2) throw e;
+				await new Promise((r) => setTimeout(r, 5_000));
+			}
+		}
+	} finally {
+		rmSync(vacio, { recursive: true, force: true });
+	}
+}
+
 /** Pregunta al agente. Sin herramientas, sin sesión guardada y desde una carpeta vacía, para que solo vea la evidencia. */
 async function preguntar(evidencia) {
+	if (revisor === 'codex') return preguntarCodex(evidencia);
 	const vacio = mkdtempSync(join(tmpdir(), 'clasificador-agente-'));
 	try {
 		for (let intento = 1; ; intento++) {
 			try {
 				const salidaAgente = await new Promise((resolve, reject) => {
-					const p = spawn('claude', ['-p', '--model', modelo, '--output-format', 'json', '--tools', '', '--disable-slash-commands',
+					const p = spawn('claude', ['-p', '--model', modeloClaude, '--output-format', 'json', '--tools', '', '--disable-slash-commands',
 						'--strict-mcp-config', '--no-session-persistence', '--setting-sources', 'user', '--system-prompt', criterio,
 						'--json-schema', JSON.stringify(esquema)], { cwd: vacio });
 					let o = '';
@@ -240,7 +299,8 @@ async function pendientes() {
 		console.log('Publicando la base del sitio...');
 		await ssh('sudo /opt/observatorio/trabajo.sh publicar');
 	}
-	if (fallos.length) process.exitCode = 1;
+	if (limiteAlcanzado) process.exitCode = CODIGO_LIMITE;
+	else if (fallos.length) process.exitCode = 1;
 }
 
 const ssh = (cmd) => ejecutar('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=20', vps, cmd], { timeout: 1_200_000 });
@@ -307,47 +367,73 @@ async function validar() {
 
 /** Segunda opinión del agente sobre los proyectos que incluyó la lista v5. No cambia la selección: guarda en revision_v5. */
 async function revisarV5() {
-	const maximo = Number(opcion('max', 450));
+	const maximo = Number(opcion('max', 1e9));
 	const lote = 30;
-	const lista = leerCsv(await psql(`
-SELECT c.boletin, c.nivel_senal FROM clasificacion_genero c
-WHERE c.incluye AND c.codificador IN ('regla', 'claude')
-  AND NOT EXISTS (SELECT 1 FROM revision_v5 r WHERE r.boletin = c.boletin AND r.version = '${version}')
-ORDER BY md5(c.boletin) LIMIT ${maximo};`));
-	const [{ total }] = leerCsv(await psql("SELECT count(*) AS total FROM clasificacion_genero WHERE incluye AND codificador IN ('regla', 'claude');"));
-	console.log(`Revisión de la lista v5 con el criterio ${version}: ${lista.length} por revisar en esta corrida (${total} en total).`);
+	// Varios agentes pueden correr a la vez: cada uno reclama una tanda en la base y nadie más la toma mientras el reclamo no expire.
+	const reclamar = (n) => `
+WITH candidatos AS (
+  SELECT c.boletin FROM clasificacion_genero c
+  WHERE c.incluye AND c.codificador IN ('regla', 'claude')
+    AND NOT EXISTS (SELECT 1 FROM revision_v5 r WHERE r.boletin = c.boletin AND r.version = '${version}')
+    AND NOT EXISTS (SELECT 1 FROM revision_v5_reclamo k WHERE k.boletin = c.boletin AND k.reclamado > now() - interval '30 minutes')
+  ORDER BY EXISTS (SELECT 1 FROM revision_v5 r WHERE r.boletin = c.boletin), md5(c.boletin)
+  LIMIT ${n}
+  FOR UPDATE OF c SKIP LOCKED)
+INSERT INTO revision_v5_reclamo (boletin, revisor, reclamado)
+SELECT boletin, '${revisor}', now() FROM candidatos
+ON CONFLICT (boletin) DO UPDATE SET revisor = EXCLUDED.revisor, reclamado = now()
+  WHERE revision_v5_reclamo.reclamado < now() - interval '30 minutes'
+RETURNING boletin;`;
+	const liberar = () => psql(`
+DELETE FROM revision_v5_reclamo k WHERE k.revisor = '${revisor}'
+  AND NOT EXISTS (SELECT 1 FROM revision_v5 r WHERE r.boletin = k.boletin AND r.version = '${version}');`);
+	const [{ total, hechas }] = leerCsv(await psql(`
+SELECT (SELECT count(*) FROM clasificacion_genero WHERE incluye AND codificador IN ('regla', 'claude')) AS total,
+       (SELECT count(*) FROM revision_v5 WHERE version = '${version}') AS hechas;`));
+	console.log(`[${revisor}] Revisión de la lista v5 con el criterio ${version} y ${modelo}: ${hechas} de ${total} ya revisadas.`);
 	let hechos = 0;
 	let fallos = 0;
-	for (let i = 0; i < lista.length && !limiteAlcanzado; i += lote) {
-		const tanda = lista.slice(i, i + lote);
-		const datos = await obtenerProyectos(tanda.map((t) => t.boletin));
-		const res = await enParalelo(datos, async (p) => {
-			try {
-				return await clasificarUno(p, { esperarTexto: false });
-			} catch (e) {
-				console.error(`${p.boletin} FALLÓ: ${e.message}`);
-				fallos++;
-				return null;
+	try {
+		while (hechos < maximo && !limiteAlcanzado) {
+			const reclamados = leerCsv(await psql(reclamar(Math.min(lote, maximo - hechos))));
+			if (reclamados.length === 0) {
+				console.log(`[${revisor}] No quedan proyectos por reclamar.`);
+				break;
 			}
-		});
-		const ok = res.filter(Boolean);
-		if (ok.length) {
-			const filas = ok.map((r) => fila([r.boletin, version, r.incluye, r.grupo, r.confianza, r.motivo, r.sin_texto, r.apariciones, r.densidad === null ? '' : r.densidad.toFixed(1)]));
-			await psql(`
-CREATE TEMP TABLE rev (boletin text, version text, incluye boolean, grupo text, confianza text, motivo text, sin_texto text, apariciones int, densidad numeric);
+			const datos = await obtenerProyectos(reclamados.map((t) => t.boletin));
+			const res = await enParalelo(datos, async (p) => {
+				try {
+					return await clasificarUno(p, { esperarTexto: false });
+				} catch (e) {
+					console.error(`[${revisor}] ${p.boletin} FALLÓ: ${e.message}`);
+					fallos++;
+					return null;
+				}
+			});
+			const ok = res.filter(Boolean);
+			if (ok.length) {
+				const filas = ok.map((r) => fila([r.boletin, version, r.incluye, r.grupo, r.confianza, r.motivo, r.sin_texto, r.apariciones, r.densidad === null ? '' : r.densidad.toFixed(1), revisor, modelo]));
+				await psql(`
+CREATE TEMP TABLE rev (boletin text, version text, incluye boolean, grupo text, confianza text, motivo text, sin_texto text, apariciones int, densidad numeric, revisor text, modelo text);
 \\copy rev FROM STDIN WITH (FORMAT csv)
 ${filas.join('\n')}
 \\.
-INSERT INTO revision_v5 (boletin, version, incluye, grupo, confianza, motivo, sin_texto, apariciones, densidad)
-SELECT boletin, version, incluye, grupo, confianza, motivo, sin_texto, apariciones, densidad FROM rev
+INSERT INTO revision_v5 (boletin, version, incluye, grupo, confianza, motivo, sin_texto, apariciones, densidad, revisor, modelo)
+SELECT boletin, version, incluye, grupo, confianza, motivo, sin_texto, apariciones, densidad, revisor, modelo FROM rev
 ON CONFLICT (boletin) DO UPDATE SET version = EXCLUDED.version, incluye = EXCLUDED.incluye, grupo = EXCLUDED.grupo, confianza = EXCLUDED.confianza,
-  motivo = EXCLUDED.motivo, sin_texto = EXCLUDED.sin_texto, apariciones = EXCLUDED.apariciones, densidad = EXCLUDED.densidad, revisado = now();`);
+  motivo = EXCLUDED.motivo, sin_texto = EXCLUDED.sin_texto, apariciones = EXCLUDED.apariciones, densidad = EXCLUDED.densidad,
+  revisor = EXCLUDED.revisor, modelo = EXCLUDED.modelo, revisado = now();`);
+			}
+			hechos += ok.length;
+			console.log(`[${revisor}] ${hechos} revisados en esta corrida; ${ok.filter((r) => !r.incluye).length} de la última tanda salen según el agente. Fallos: ${fallos}.`);
 		}
-		hechos += ok.length;
-		console.log(`[${hechos}/${lista.length}] revisados; ${ok.filter((r) => !r.incluye).length} de esta tanda salen según el agente. Fallos: ${fallos}.`);
+	} finally {
+		// Lo que quedó reclamado sin revisar (por ejemplo, al agotarse el límite) vuelve a estar disponible para el otro agente.
+		await liberar().catch(() => {});
 	}
-	if (limiteAlcanzado) console.error('Se detuvo la revisión porque se agotó el límite de uso. Lo hecho quedó guardado; se reanuda al volver a ejecutarla.');
-	if (fallos || limiteAlcanzado) process.exitCode = 1;
+	if (limiteAlcanzado) console.error(`[${revisor}] Se detuvo la revisión porque se agotó el límite de uso. Lo hecho quedó guardado; se reanuda al volver a ejecutarla.`);
+	if (limiteAlcanzado) process.exitCode = CODIGO_LIMITE;
+	else if (fallos) process.exitCode = 1;
 }
 
 /** Prueba al agente contra casos de control con una respuesta esperada (casos-control.json). No escribe en la base. */
@@ -361,7 +447,7 @@ async function probar() {
 		try {
 			const r = await clasificarUno(datos.get(b), { esperarTexto: false });
 			console.log(`[${++n}/${boletines.length}] ${b} ${r.incluye ? 'incluye' : 'excluye'} (${r.confianza})`);
-			return { boletin: b, titulo: datos.get(b).titulo, agente: r.incluye ? 'incluye' : 'excluye', confianza: r.confianza, motivo: r.motivo, ...casos[b] };
+			return { boletin: b, titulo: datos.get(b).titulo, agente: r.incluye ? 'incluye' : 'excluye', grupoAgente: r.grupo, confianza: r.confianza, motivo: r.motivo, ...casos[b] };
 		} catch (e) {
 			console.error(`${b} FALLÓ: ${e.message}`);
 			return null;
@@ -370,14 +456,48 @@ async function probar() {
 	const r = res.filter(Boolean);
 	const con = r.filter((x) => x.esperado);
 	const bien = con.filter((x) => x.agente === x.esperado);
-	console.log(`\nAciertos: ${bien.length} de ${con.length} con respuesta esperada (${r.length - con.length} sin decisión).`);
+	const gruposMal = con.filter((x) => x.agente === x.esperado && x.grupo && x.grupoAgente !== x.grupo);
+	console.log(`\nAciertos: ${bien.length} de ${con.length} con respuesta esperada (${r.length - con.length} sin decisión). Nivel distinto del esperado en ${gruposMal.length}.`);
+	for (const x of gruposMal) console.log(`  nivel ${x.boletin}: esperado ${x.grupo}, agente ${x.grupoAgente}`);
+	// Si acierta menos del umbral, el criterio no sirve: se avisa con un código de salida distinto.
+	if (con.length && bien.length / con.length < Number(process.env.UMBRAL_CONTROL || 0.9)) process.exitCode = 3;
+	if (limiteAlcanzado) process.exitCode = CODIGO_LIMITE;
 	for (const x of con.filter((y) => y.agente !== y.esperado)) console.log(`\nNO COINCIDE ${x.boletin} esperado=${x.esperado} agente=${x.agente} (${x.confianza})\n  ${x.titulo.slice(0, 140)}\n  ${x.motivo}`);
 	console.log('\nSin decisión del desarrollador (solo informativo):');
 	for (const x of r.filter((y) => !y.esperado)) console.log(`  ${x.boletin} agente=${x.agente} (${x.confianza}) ${x.titulo.slice(0, 80)}`);
 }
 
+
+/** Los proyectos de la lista v5 que el agente mantiene en la selección reciben su nivel de relación con el género. No cambia quién entra ni quién sale. */
+async function aplicarNiveles() {
+	const salidaSql = await psql(`
+WITH a AS (
+  UPDATE clasificacion_genero c SET grupo = r.grupo
+  FROM revision_v5 r
+  WHERE r.boletin = c.boletin AND r.version = '${version}' AND r.incluye AND c.incluye AND c.codificador IN ('regla', 'claude')
+    AND c.grupo IS DISTINCT FROM r.grupo
+  RETURNING 1)
+SELECT count(*) AS actualizados FROM a;`);
+	const [{ actualizados }] = leerCsv(salidaSql);
+	console.log(`Niveles asignados a proyectos de la lista original: ${actualizados}.`);
+	return Number(actualizados);
+}
+
+/** Avance de la pasada de revisión sobre la lista v5 con la versión actual del criterio. */
+async function progreso() {
+	const [r] = leerCsv(await psql(`
+SELECT (SELECT count(*) FROM clasificacion_genero WHERE incluye AND codificador IN ('regla', 'claude')) AS total,
+       (SELECT count(*) FROM revision_v5 WHERE version = '${version}') AS hechas,
+       (SELECT count(*) FROM revision_v5 WHERE version = '${version}' AND NOT incluye) AS salen,
+       (SELECT count(*) FROM revision_v5 WHERE version = '${version}' AND NOT incluye AND confianza = 'alta') AS salen_alta;`));
+	console.log(`Revisión de la lista v5 con el criterio ${version}: ${r.hechas} de ${r.total}. El agente sacaría ${r.salen} (${r.salen_alta} con confianza alta).`);
+}
+
 try {
-	if (orden === 'probar') await probar();
+	if (orden === 'progreso') await progreso();
+	else if (orden === 'version') console.log(version);
+	else if (orden === 'aplicar-niveles') await aplicarNiveles();
+	else if (orden === 'probar') await probar();
 	else if (orden === 'revisar-v5') await revisarV5();
 	else if (orden === 'pendientes') await pendientes();
 	else if (orden === 'validar') await validar();

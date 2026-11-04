@@ -1,0 +1,9 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Tareas de la noche (agentes Claude y Codex en paralelo) y publicación del sitio
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/Desarrollo/observatorio-legislativo-abierto/despliegue/tareas-de-noche.sh
+TimeoutStartSec=9h

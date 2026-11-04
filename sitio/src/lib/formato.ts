@@ -94,9 +94,41 @@ export function etiquetaSenal(nivel: string): string {
 		A1_agente_tema_central:
 			'Lo leyó un agente que aplica nuestro criterio y concluyó que el género es el tema central',
 		A2_agente_componente:
-			'Lo leyó un agente que aplica nuestro criterio y concluyó que una parte del proyecto trata de género'
+			'Lo leyó un agente que aplica nuestro criterio y concluyó que una parte del proyecto trata de género',
+		A3_agente_debil:
+			'Lo leyó un agente que aplica nuestro criterio y, ante una duda razonable, lo incluyó con relación débil',
+		M_decision_manual:
+			'El equipo del Observatorio lo incluyó por decisión expresa, con relación débil'
 	};
 	return etiquetas[nivel] ?? 'Cumple una de las reglas del criterio de selección';
+}
+
+/** Niveles de relación con el género. La clave es la de los datos descargables; el nombre, el del sitio. */
+export const NIVELES_RELACION: Record<
+	string,
+	{ clave: string; nombre: string; explicacion: string }
+> = {
+	tema_central: {
+		clave: 'alta',
+		nombre: 'alta',
+		explicacion: 'El género es el tema central del proyecto.'
+	},
+	componente: {
+		clave: 'media',
+		nombre: 'media',
+		explicacion: 'Una parte del proyecto trata de género.'
+	},
+	debil: {
+		clave: 'debil',
+		nombre: 'débil',
+		explicacion:
+			'La relación es lateral o dudosa: entra porque, ante una duda razonable, el Observatorio incluye.'
+	}
+};
+
+/** Nivel de relación con el género de un proyecto, o null si aún no se le asignó (los de la lista original). */
+export function nivelRelacion(grupo: string | null | undefined) {
+	return grupo ? (NIVELES_RELACION[grupo] ?? null) : null;
 }
 
 export const PASOS_TRAMITACION = [

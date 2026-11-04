@@ -1,5 +1,6 @@
 // Consultas a la base pública SQLite. Todos los valores van como parámetros enlazados; nunca se concatenan en el SQL.
 import {
+	nivelRelacion,
 	CAMARAS,
 	consultaBusqueda,
 	esBoletin,
@@ -44,6 +45,8 @@ export interface FilaLista {
 	etapa: string | null;
 	ley_numero: string | null;
 	ultimo_tramite: string | null;
+	/** Nivel de relación con el género: tema_central, componente o debil; null si aún no se asignó. */
+	grupo: string | null;
 }
 
 export interface Ficha extends FilaLista {
@@ -170,7 +173,7 @@ export async function listar(db: Base, f: Filtros) {
 	const filas = db
 		.prepare(
 			`SELECT p.boletin, p.titulo, p.fecha_ingreso, p.iniciativa, p.camara_origen, p.estado, p.etapa,
-			        p.ley_numero, p.ultimo_tramite
+			        p.ley_numero, p.ultimo_tramite, g.grupo
 			 ${base} ORDER BY ${orden} LIMIT ? OFFSET ?`
 		)
 		.all(...valores, POR_PAGINA, desplazamiento);
@@ -194,6 +197,7 @@ export interface FilaExportada {
 	ultimo_tramite: string | null;
 	autores: string[];
 	temas: string[];
+	relacion_con_genero: string | null;
 }
 
 /** Todos los proyectos que cumplen los filtros, sin paginar, con los datos que se descargan. */
@@ -202,12 +206,15 @@ export async function exportar(db: Base, f: Filtros): Promise<FilaExportada[]> {
 	const filas = db
 		.prepare(
 			`SELECT p.boletin, p.titulo, p.fecha_ingreso, p.iniciativa, p.camara_origen, p.estado, p.etapa,
-			        p.ley_numero, p.diario_oficial, p.ultimo_tramite, p.autores,
-			        g.boletin IS NOT NULL AS genero
+			        p.ley_numero, p.diario_oficial, p.ultimo_tramite, p.autores, g.grupo
 			 ${base} ORDER BY ${orden}`
 		)
-		.all(...valores) as unknown as (Omit<FilaExportada, 'autores' | 'temas'> & {
+		.all(...valores) as unknown as (Omit<
+		FilaExportada,
+		'autores' | 'temas' | 'relacion_con_genero'
+	> & {
 		autores: string;
+		grupo: string | null;
 	})[];
 	return filas.map((r) => ({
 		boletin: r.boletin,
@@ -221,7 +228,8 @@ export async function exportar(db: Base, f: Filtros): Promise<FilaExportada[]> {
 		diario_oficial: r.diario_oficial,
 		ultimo_tramite: r.ultimo_tramite,
 		autores: JSON.parse(r.autores) as string[],
-		temas: temasDe(r.titulo)
+		temas: temasDe(r.titulo),
+		relacion_con_genero: nivelRelacion(r.grupo)?.clave ?? null
 	}));
 }
 

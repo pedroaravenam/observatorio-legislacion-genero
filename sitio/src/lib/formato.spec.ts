@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	aCsv,
 	etiquetaSenal,
+	nivelRelacion,
 	celdaCsv,
 	ordenPorDefecto,
 	parametrosFiltros,
@@ -120,5 +121,23 @@ describe('etiquetaSenal', () => {
 	});
 	it('tiene un texto por defecto para señales desconocidas', () => {
 		expect(etiquetaSenal('X_nueva')).toMatch(/criterio de selección/);
+	});
+});
+
+describe('nivelRelacion', () => {
+	it('traduce el grupo del criterio al nivel que muestra el sitio', () => {
+		expect(nivelRelacion('tema_central')?.nombre).toBe('alta');
+		expect(nivelRelacion('componente')?.nombre).toBe('media');
+		expect(nivelRelacion('debil')?.nombre).toBe('débil');
+		expect(nivelRelacion('debil')?.clave).toBe('debil');
+	});
+	it('devuelve null si aún no hay nivel (proyectos de la lista original)', () => {
+		expect(nivelRelacion(null)).toBeNull();
+		expect(nivelRelacion(undefined)).toBeNull();
+		expect(nivelRelacion('otro')).toBeNull();
+	});
+	it('tiene etiqueta para el nivel débil y la decisión manual', () => {
+		expect(etiquetaSenal('A3_agente_debil')).toMatch(/duda razonable/);
+		expect(etiquetaSenal('M_decision_manual')).toMatch(/equipo del Observatorio/);
 	});
 });

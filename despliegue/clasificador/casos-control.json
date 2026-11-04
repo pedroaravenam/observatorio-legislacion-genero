@@ -156,23 +156,28 @@
   "nota": "decisión del desarrollador 2026-11-04: infanticidio queda fuera"
  },
  "7000-24": {
-  "esperado": null,
-  "nota": "sin decisión: no cuenta en la prueba"
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "decisión del desarrollador 2026-11-04: entra como relación débil"
  },
  "6647-07": {
-  "esperado": null,
-  "nota": "sin decisión: no cuenta en la prueba"
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "decisión del desarrollador 2026-11-04: entra como relación débil"
  },
  "12748-17": {
-  "esperado": null,
-  "nota": "sin decisión: no cuenta en la prueba"
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "decisión del desarrollador 2026-11-04: entra como relación débil"
  },
  "13146-14": {
-  "esperado": null,
-  "nota": "sin decisión: no cuenta en la prueba"
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "decisión del desarrollador 2026-11-04: entra como relación débil"
  },
  "12081-03": {
-  "esperado": null,
-  "nota": "sin decisión: no cuenta en la prueba"
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "decisión del desarrollador 2026-11-04: entra como relación débil"
  }
 }

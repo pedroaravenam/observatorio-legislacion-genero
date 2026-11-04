@@ -77,7 +77,7 @@ export function construirEvidencia(p, analisis) {
 
 /** Valida y normaliza la respuesta del agente; lanza si no cumple el esquema. */
 export function validarDecision(o) {
-	const grupos = ['tema_central', 'componente', 'fuera'];
+	const grupos = ['tema_central', 'componente', 'debil', 'fuera'];
 	const confianzas = ['alta', 'media', 'baja'];
 	if (!o || typeof o !== 'object') throw new Error('La respuesta no es un objeto');
 	if (!grupos.includes(o.grupo)) throw new Error(`grupo inválido: ${o.grupo}`);
@@ -158,7 +158,8 @@ export function textoRtf(rtf) {
 /** Señal registrada para una decisión del agente. */
 export function nivelSenal(d) {
 	if (!d.incluye) return null;
-	return d.grupo === 'tema_central' ? 'A1_agente_tema_central' : 'A2_agente_componente';
+	if (d.grupo === 'tema_central') return 'A1_agente_tema_central';
+	return d.grupo === 'componente' ? 'A2_agente_componente' : 'A3_agente_debil';
 }
 
 /** Versión del agente: cambia cuando cambia el texto del criterio. */

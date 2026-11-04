@@ -18,6 +18,9 @@ export const RUTAS = {
 	panorama: { ruta: '/panorama', espera: '[data-cifra="tema"]' },
 	acerca: { ruta: '/acerca', espera: 'h1' },
 	ficha: { ruta: '/boletin/11077-07', espera: 'h1' },
+	// Un proyecto con relación débil (decisión manual del desarrollador): la lista lo marca y la ficha explica el nivel.
+	nivelDebil: { ruta: '/?q=monumento+Arica', espera: '.relacion-debil' },
+	fichaDebil: { ruta: '/boletin/7000-24', espera: 'h1' },
 	error: { ruta: '/nada', espera: 'h1', estado: 404 }
 };
 

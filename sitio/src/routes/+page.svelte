@@ -1,6 +1,6 @@
 <script lang="ts">
 	import GraficoAnual from '../lib/GraficoAnual.svelte';
-	import { claseEstado, fechaCorta, parametrosFiltros } from '#lib/formato';
+	import { claseEstado, fechaCorta, NIVELES_RELACION, parametrosFiltros } from '#lib/formato';
 	import { TEMAS } from '#lib/temas';
 	import type { PageProps } from './$types';
 
@@ -251,6 +251,10 @@
 					<div class="fila-meta">
 						<span class="boletin">Boletín {p.boletin}</span>
 						{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
+						{#if p.grupo === 'debil'}<span
+								class="relacion-debil"
+								title={NIVELES_RELACION.debil.explicacion}>Relación débil</span
+							>{/if}
 					</div>
 					<h3 class="titulo"><a href="/boletin/{p.boletin}">{p.titulo}</a></h3>
 					<p class="datos">
@@ -489,6 +493,17 @@
 	.fila.tramitacion::before {
 		background: var(--violeta-medio);
 		opacity: 1;
+	}
+	.relacion-debil {
+		display: inline-block;
+		padding: 0.05rem 0.55rem;
+		border: 1px solid var(--aviso);
+		border-radius: 999px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--aviso);
+		background: var(--aviso-suave);
+		white-space: nowrap;
 	}
 	.fila-meta {
 		display: flex;

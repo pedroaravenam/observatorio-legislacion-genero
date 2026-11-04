@@ -1,0 +1,10 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Tareas de la noche (03:00, hora de Chile)
+
+[Timer]
+OnCalendar=*-*-* 03:00 America/Santiago
+Persistent=true
+RandomizedDelaySec=2min
+
+[Install]
+WantedBy=timers.target
