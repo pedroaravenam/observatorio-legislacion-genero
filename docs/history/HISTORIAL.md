@@ -1,5 +1,11 @@
 # Historial
 
+## 2026-11-04 — Revisión de la lista v5 con el agente, interrumpida por el límite de uso (commit de este avance)
+
+Se lanzó la segunda opinión del agente sobre las 2.154 inclusiones de la lista v5 (modo `revisar-v5`, tabla `revision_v5`, sin tocar la selección publicada). El volumen agotó el límite de uso de la cuenta del desarrollador, dos veces, y la revisión quedó en **849 de 2.154** proyectos; el resto falló. Falla propia: el script siguió lanzando llamadas con el límite ya agotado y no se avisó antes del consumo que implicaba. Ahora el clasificador se detiene en el primer mensaje de límite de uso y deja lo hecho guardado para reanudar.
+
+Lo revisado es una muestra aleatoria (el orden era por huella del boletín). El agente dejaría fuera: 16 % de lo que entró por título estricto (T1), 48 % por título medio (T2), 69 % por densidad firme de texto (T3), 90 % por densidad amplia (T4), 75 % por materias (T5) y 80 % por el texto de la ley (L, que el agente no ve). En total, 420 de 849 (49 %); con confianza alta, 250 (29 %). No se aplicó ningún cambio: queda pendiente decidir si se aplican y cuáles.
+
 ## 2026-11-03 — Clasificación automática de proyectos nuevos con un agente (commit de este avance)
 
 La selección dejó de ser un CSV dentro de la imagen del exportador: vive en `clasificacion_genero` (base de ingesta), sembrada con la lista v5 (18.513 decisiones, 2.154 incluidas), y el exportador la lee al publicar. Un agente (Claude en modo sin interfaz, sin herramientas, desde una carpeta vacía) aplica el criterio de «Cómo funciona» a cada proyecto sin decisión: recibe el título, las materias y, del documento del Senado, la densidad del léxico de género y hasta 12 fragmentos; devuelve grupo, confianza y un motivo, que la ficha muestra. Corre a diario a las 09:30 en la máquina de desarrollo y publica el sitio si hay cambios; avisa por correo si falla o si pasan 48 horas sin clasificar.

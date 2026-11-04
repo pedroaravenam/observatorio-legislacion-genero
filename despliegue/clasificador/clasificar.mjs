@@ -4,6 +4,7 @@
 //   node clasificar.mjs pendientes [--max N] [--simulacro]   clasifica lo que no tiene decisión y publica
 //   node clasificar.mjs validar [--n 60]                      mide al agente contra la lista v5 (no escribe en la base)
 //   node clasificar.mjs sembrar                               carga una vez las decisiones de la lista v5
+//   node clasificar.mjs revisar-v5 [--max 450]                segunda opinión del agente sobre la lista v5 (no cambia la selección)
 // Variables: VPS (atendia-development), CLASIFICADOR_MODELO (sonnet), CONCURRENCIA (3), SALIDA (./clasificador-salida).
 import { execFile, spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -11,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { construirEvidencia, contarLexico, fila, fragmentos, leerCsv, nivelSenal, validarDecision, versionAgente } from './lib.mjs';
+import { construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, leerCsv, nivelSenal, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -35,6 +36,8 @@ const esquema = {
 	required: ['decision', 'grupo', 'confianza', 'motivo']
 };
 
+// Al primer límite de uso se detiene todo: seguir llamando no sirve y gasta el cupo que se renueve.
+let limiteAlcanzado = false;
 const args = process.argv.slice(2);
 const orden = args[0];
 const opcion = (n, d) => (args.includes(`--${n}`) ? args[args.indexOf(`--${n}`) + 1] : d);
@@ -133,14 +136,19 @@ async function preguntar(evidencia) {
 					const reloj = setTimeout(() => p.kill('SIGKILL'), 240_000);
 					p.stdout.on('data', (d) => (o += d));
 					p.stderr.on('data', (d) => (e += d));
-					p.on('close', (c) => (clearTimeout(reloj), c === 0 ? resolve(o) : reject(new Error(`claude terminó con ${c}: ${e.slice(0, 300)}`))));
+					p.on('close', (c) => (clearTimeout(reloj), c === 0 ? resolve(o) : reject(new Error(`claude terminó con ${c}: ${(e || o).slice(0, 300)}`))));
 					p.stdin.end(`Clasifica este proyecto de ley.\n\n${evidencia}`);
 				});
 				const j = JSON.parse(salidaAgente);
 				if (j.is_error) throw new Error(`error del agente: ${String(j.result).slice(0, 200)}`);
 				return validarDecision(j.structured_output ?? JSON.parse(j.result));
 			} catch (e) {
+				if (esLimiteDeUso(e.message)) {
+					limiteAlcanzado = true;
+					throw Object.assign(new Error(`Se agotó el límite de uso: ${e.message}`), { limite: true });
+				}
 				if (intento >= 2) throw e;
+				await new Promise((r) => setTimeout(r, 5_000));
 			}
 		}
 	} finally {
@@ -152,7 +160,7 @@ async function enParalelo(items, trabajo) {
 	const resultados = new Array(items.length);
 	let i = 0;
 	await Promise.all(Array.from({ length: Math.min(concurrencia, items.length) }, async () => {
-		while (i < items.length) {
+		while (i < items.length && !limiteAlcanzado) {
 			const k = i++;
 			resultados[k] = await trabajo(items[k], k);
 		}
@@ -281,11 +289,57 @@ async function validar() {
 	for (const x of r.filter((y) => y.v5 !== y.agente)) console.log(`\nDIFIERE ${x.boletin} v5=${x.v5} (${x.senal}) agente=${x.agente}/${x.grupo}/${x.confianza} [${x.apariciones ?? `sin texto: ${x.sin_texto}`} ap.]\n  ${x.titulo.slice(0, 140)}\n  ${x.motivo}`);
 }
 
+/** Segunda opinión del agente sobre los proyectos que incluyó la lista v5. No cambia la selección: guarda en revision_v5. */
+async function revisarV5() {
+	const maximo = Number(opcion('max', 450));
+	const lote = 30;
+	const lista = leerCsv(await psql(`
+SELECT c.boletin, c.nivel_senal FROM clasificacion_genero c
+WHERE c.incluye AND c.codificador IN ('regla', 'claude')
+  AND NOT EXISTS (SELECT 1 FROM revision_v5 r WHERE r.boletin = c.boletin AND r.version = '${version}')
+ORDER BY md5(c.boletin) LIMIT ${maximo};`));
+	const [{ total }] = leerCsv(await psql("SELECT count(*) AS total FROM clasificacion_genero WHERE incluye AND codificador IN ('regla', 'claude');"));
+	console.log(`Revisión de la lista v5 con el criterio ${version}: ${lista.length} por revisar en esta corrida (${total} en total).`);
+	let hechos = 0;
+	let fallos = 0;
+	for (let i = 0; i < lista.length && !limiteAlcanzado; i += lote) {
+		const tanda = lista.slice(i, i + lote);
+		const datos = await obtenerProyectos(tanda.map((t) => t.boletin));
+		const res = await enParalelo(datos, async (p) => {
+			try {
+				return await clasificarUno(p, { esperarTexto: false });
+			} catch (e) {
+				console.error(`${p.boletin} FALLÓ: ${e.message}`);
+				fallos++;
+				return null;
+			}
+		});
+		const ok = res.filter(Boolean);
+		if (ok.length) {
+			const filas = ok.map((r) => fila([r.boletin, version, r.incluye, r.grupo, r.confianza, r.motivo, r.sin_texto, r.apariciones, r.densidad === null ? '' : r.densidad.toFixed(1)]));
+			await psql(`
+CREATE TEMP TABLE rev (boletin text, version text, incluye boolean, grupo text, confianza text, motivo text, sin_texto text, apariciones int, densidad numeric);
+\\copy rev FROM STDIN WITH (FORMAT csv)
+${filas.join('\n')}
+\\.
+INSERT INTO revision_v5 (boletin, version, incluye, grupo, confianza, motivo, sin_texto, apariciones, densidad)
+SELECT boletin, version, incluye, grupo, confianza, motivo, sin_texto, apariciones, densidad FROM rev
+ON CONFLICT (boletin) DO UPDATE SET version = EXCLUDED.version, incluye = EXCLUDED.incluye, grupo = EXCLUDED.grupo, confianza = EXCLUDED.confianza,
+  motivo = EXCLUDED.motivo, sin_texto = EXCLUDED.sin_texto, apariciones = EXCLUDED.apariciones, densidad = EXCLUDED.densidad, revisado = now();`);
+		}
+		hechos += ok.length;
+		console.log(`[${hechos}/${lista.length}] revisados; ${ok.filter((r) => !r.incluye).length} de esta tanda salen según el agente. Fallos: ${fallos}.`);
+	}
+	if (limiteAlcanzado) console.error('Se detuvo la revisión porque se agotó el límite de uso. Lo hecho quedó guardado; se reanuda al volver a ejecutarla.');
+	if (fallos || limiteAlcanzado) process.exitCode = 1;
+}
+
 try {
-	if (orden === 'pendientes') await pendientes();
+	if (orden === 'revisar-v5') await revisarV5();
+	else if (orden === 'pendientes') await pendientes();
 	else if (orden === 'validar') await validar();
 	else if (orden === 'sembrar') await sembrar();
-	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] | validar [--n 60] | sembrar'), (process.exitCode = 2));
+	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] | validar [--n 60] | sembrar | revisar-v5 [--max 450]'), (process.exitCode = 2));
 } catch (e) {
 	console.error(`Error: ${e.message}`);
 	process.exitCode = 1;

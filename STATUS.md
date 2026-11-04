@@ -27,7 +27,7 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 ## Pendientes priorizados
 
 1. Corregir en la ingesta que la fecha de cada ficha solo avanza cuando cambia su contenido; hoy el sitio muestra la fecha global de la última consulta exitosa.
-2. Revisar con el agente los falsos positivos de la lista v5 (la medición encontró casos como «Madre Tierra» y «redes sociales para menores») y volver a evaluar un proyecto cuando se convierte en ley, porque el texto final puede traer disposiciones de género.
+2. Decidir qué hacer con los falsos positivos de la lista v5. El agente revisó 849 de las 2.154 inclusiones (muestra aleatoria, tabla `revision_v5`) y dejaría fuera el 49 %; faltan 1.305 por revisar y no se ha aplicado ningún cambio. Además, volver a evaluar un proyecto cuando se convierte en ley.
 3. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
 4. CI del repositorio (pruebas del sitio y del exportador).
 5. Revisar los términos de reutilización de datos de las tres fuentes.

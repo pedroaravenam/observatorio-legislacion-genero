@@ -89,6 +89,11 @@ export function validarDecision(o) {
 	return { incluye: o.decision === 'incluye', grupo: o.grupo, confianza: o.confianza, motivo };
 }
 
+/** ¿El mensaje de error del CLI indica que se agotó el límite de uso de la cuenta? */
+export function esLimiteDeUso(mensaje) {
+	return /hit your limit|usage limit|rate.?limit|quota|\b429\b|overloaded|too many requests/i.test(String(mensaje));
+}
+
 /** Señal registrada para una decisión del agente. */
 export function nivelSenal(d) {
 	if (!d.incluye) return null;

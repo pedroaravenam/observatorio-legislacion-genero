@@ -1,7 +1,7 @@
 // Pruebas de las funciones puras del clasificador. Uso: node --test despliegue/clasificador/
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { construirEvidencia, contarLexico, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
+import { construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
 
 test('normalizar conserva el largo y quita tildes', () => {
 	const t = 'Violación y Género: ¿Año nuevo?';
@@ -44,6 +44,12 @@ test('la señal depende del grupo y los excluidos no tienen señal', () => {
 	assert.equal(nivelSenal({ incluye: true, grupo: 'tema_central' }), 'A1_agente_tema_central');
 	assert.equal(nivelSenal({ incluye: true, grupo: 'componente' }), 'A2_agente_componente');
 	assert.equal(nivelSenal({ incluye: false, grupo: 'fuera' }), null);
+});
+
+test('reconoce los mensajes de límite de uso', () => {
+	assert.ok(esLimiteDeUso("You've hit your limit · resets 3pm"));
+	assert.ok(esLimiteDeUso('API Error: 429 rate_limit_error'));
+	assert.ok(!esLimiteDeUso('El motivo es demasiado corto'));
 });
 
 test('la versión cambia con el criterio', () => {
