@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-04 — Integración continua en GitHub Actions (commit de este avance)
+
+Se agregó `.github/workflows/ci.yml` con tres trabajos en ejecutores de GitHub (el repositorio es público): .NET (migraciones Liquibase sobre PostgreSQL 17 desde una base vacía, comprobación de que reaplicarlas no cambia nada, compilación y pruebas con `OBSERVATORIO_PRUEBAS_EXIGIR_BD=1`), sitio (`npm run check`, 15 pruebas y compilación con Node 22, igual que el Dockerfile) y exportador (los esquemas de SQLite se aplican a una base vacía). Local: el sitio pasó las tres verificaciones; .NET no se ejecutó en esta máquina, así que su resultado es el de la primera corrida en GitHub.
+
 ## 2026-11-04 — El servicio de tramitación del Senado deja de responder (sin commit de código)
 
 La consulta diaria de las 09:02 falló con «El Senado rechazó todas las fechas de la ventana mínima de 14 días». Se comprobó que el servicio `wspublico/tramitacion.php` devuelve «No existe el número de boletín solicitado» (una caja de 244 bytes, con HTTP 200) para cualquier boletín, también desde el VPS, mientras los documentos (`getDocto`) y la ficha web siguen funcionando: es una falla del Senado, no de la ingesta. El sistema de alertas se comportó como se diseñó: `OnFailure=` envió el correo de la falla y el sitio siguió publicado con los datos del 3 de noviembre. Pendiente: confirmar mañana que el servicio volvió y, si no, decidir cómo cubrir el hueco.

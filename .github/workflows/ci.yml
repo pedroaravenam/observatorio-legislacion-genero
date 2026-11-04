@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  LIQUIBASE_IMAGEN: liquibase/liquibase:4.33.0
+
+jobs:
+  dotnet:
+    name: .NET - migraciones, compilación y pruebas
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      db:
+        image: postgres:17
+        env: { POSTGRES_DB: observatorio, POSTGRES_USER: observatorio, POSTGRES_PASSWORD: ci }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U observatorio" --health-interval 2s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { global-json-file: global.json }
+      - name: Aplicar migraciones desde una base vacía
+        run: |
+          lb() { docker run --rm --network host -v "$PWD/db/changelog:/liquibase/changelog:ro" "$LIQUIBASE_IMAGEN" \
+                   --changelog-file=changelog/raiz.yaml --url=jdbc:postgresql://localhost:5432/observatorio \
+                   --username=observatorio --password=ci "$@"; }
+          lb update
+          lb status --verbose | tee estado.txt
+          grep -q "is up to date" estado.txt
+      - name: Reaplicar las migraciones no cambia nada
+        run: |
+          docker run --rm --network host -v "$PWD/db/changelog:/liquibase/changelog:ro" "$LIQUIBASE_IMAGEN" \
+            --changelog-file=changelog/raiz.yaml --url=jdbc:postgresql://localhost:5432/observatorio \
+            --username=observatorio --password=ci update | tee salida.txt
+          grep -q "Run:  *0" salida.txt
+      - run: dotnet restore
+      - run: dotnet build --no-restore -c Release
+      - name: Pruebas
+        env:
+          OBSERVATORIO_PRUEBAS_BD: Host=localhost;Port=5432;Database=observatorio;Username=observatorio;Password=ci
+          OBSERVATORIO_PRUEBAS_EXIGIR_BD: "1"
+        run: dotnet test --no-build -c Release --logger "console;verbosity=normal"
+
+  sitio:
+    name: Sitio - verificación de tipos, pruebas y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run: { working-directory: sitio }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sitio/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+
+  exportador:
+    name: Exportador - el esquema de SQLite es válido
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aplicar los esquemas a una base vacía
+        run: |
+          cat exportador/esquema.sql exportador/esquema-seleccion.sql | sqlite3 -bail "$RUNNER_TEMP/prueba.db"
+          sqlite3 "$RUNNER_TEMP/prueba.db" "select count(*) from sqlite_master where type = 'table'"
