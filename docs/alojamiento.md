@@ -88,6 +88,8 @@ Instalación del temporizador, en la máquina de desarrollo:
 cp ~/Desarrollo/observatorio-legislativo-abierto/despliegue/local/observatorio-clasificar.{service,timer} ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable --now observatorio-clasificar.timer && systemctl --user list-timers observatorio-clasificar.timer --no-pager
 ```
 
+Casos de control: `clasificar.mjs probar` prueba al agente contra `despliegue/clasificador/casos-control.json` (cada caso con la respuesta que decidió el desarrollador) y debe repetirse cada vez que cambie `criterio.md`. `clasificar.mjs pendientes --reclasificar` repasa las decisiones que el propio agente tomó con una versión anterior del criterio.
+
 Medir al agente: `node --disable-warning=ExperimentalWarning despliegue/clasificador/clasificar.mjs validar --n 60` lo compara contra la lista v5 en una muestra y no escribe nada en la base. Debe repetirse cada vez que cambie `criterio.md` o el modelo (`CLASIFICADOR_MODELO`).
 
 Límites: las decisiones son automáticas y ninguna persona las revisa antes de publicarse, tal como pidió el desarrollador; la ficha lo dice. El agente depende del CLI de Claude y de la sesión iniciada en la máquina de desarrollo. Si esa máquina está apagada, los proyectos nuevos no aparecen hasta que vuelva. Corregir una decisión es un `UPDATE` sobre `clasificacion_genero` seguido de `trabajo.sh publicar`; la próxima corrida no la pisa, porque solo clasifica lo que no tiene fila.

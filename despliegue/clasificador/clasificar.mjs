@@ -4,6 +4,7 @@
 //   node clasificar.mjs pendientes [--max N] [--simulacro]   clasifica lo que no tiene decisión y publica
 //   node clasificar.mjs validar [--n 60]                      mide al agente contra la lista v5 (no escribe en la base)
 //   node clasificar.mjs sembrar                               carga una vez las decisiones de la lista v5
+//   node clasificar.mjs probar [--casos ruta]                 prueba al agente con casos de control (casos-control.json)
 //   node clasificar.mjs revisar-v5 [--max 450]                segunda opinión del agente sobre la lista v5 (no cambia la selección)
 // Variables: VPS (atendia-development), CLASIFICADOR_MODELO (sonnet), CONCURRENCIA (3), SALIDA (./clasificador-salida).
 import { execFile, spawn } from 'node:child_process';
@@ -197,8 +198,16 @@ ON CONFLICT (boletin) DO UPDATE SET incluye = EXCLUDED.incluye, grupo = EXCLUDED
 async function pendientes() {
 	const simulacro = args.includes('--simulacro');
 	const maximo = Number(opcion('max', 1e9));
-	const lista = (await obtenerProyectos()).slice(0, maximo);
-	console.log(`Proyectos sin decisión: ${lista.length}. Agente ${modelo}, criterio ${version}.`);
+	// Con --reclasificar se repasan las decisiones del propio agente tomadas con una versión anterior del criterio.
+	const reclasificar = args.includes('--reclasificar');
+	let antes = new Map();
+	let lista;
+	if (reclasificar) {
+		const viejas = leerCsv(await psql(`SELECT boletin, incluye FROM clasificacion_genero WHERE codificador = 'agente' AND version <> '${version}' ORDER BY boletin LIMIT ${maximo};`));
+		antes = new Map(viejas.map((v) => [v.boletin, v.incluye === 't']));
+		lista = viejas.length ? await obtenerProyectos(viejas.map((v) => v.boletin)) : [];
+	} else lista = (await obtenerProyectos()).slice(0, maximo);
+	console.log(`${reclasificar ? 'Decisiones del agente con un criterio anterior' : 'Proyectos sin decisión'}: ${lista.length}. Agente ${modelo}, criterio ${version}.`);
 	let n = 0;
 	const resultados = await enParalelo(lista, async (p) => {
 		try {
@@ -217,6 +226,11 @@ async function pendientes() {
 	writeFileSync(join(salida, `pendientes-${new Date().toISOString().slice(0, 10)}.json`), JSON.stringify(resultados, null, 1));
 	if (!simulacro) await guardar(decididos);
 	console.log(`\nDecididos: ${decididos.length} (incluye ${decididos.filter((d) => d.incluye).length}). Esperan texto: ${esperan.length}. Fallos: ${fallos.length}.`);
+	if (reclasificar) {
+		const cambios = decididos.filter((d) => antes.get(d.boletin) !== d.incluye);
+		console.log(`\nCambian respecto de la decisión anterior: ${cambios.length}.`);
+		for (const d of cambios) console.log(`  ${d.boletin} ${antes.get(d.boletin) ? 'incluía → ahora excluye' : 'excluía → ahora INCLUYE'} [${d.grupo}, ${d.confianza}] ${d.titulo.slice(0, 90)}\n      ${d.motivo}`);
+	}
 	for (const d of decididos.filter((x) => x.incluye)) console.log(`  + ${d.boletin} [${d.grupo}, ${d.confianza}] ${d.titulo.slice(0, 90)}\n      ${d.motivo}`);
 	if (simulacro) return console.log('\nSimulacro: no se guardó nada.');
 	if (fallos.length === 0) await ssh('sudo mkdir -p /var/lib/observatorio-alertas && sudo touch /var/lib/observatorio-alertas/clasificacion-ok');
@@ -334,12 +348,39 @@ ON CONFLICT (boletin) DO UPDATE SET version = EXCLUDED.version, incluye = EXCLUD
 	if (fallos || limiteAlcanzado) process.exitCode = 1;
 }
 
+/** Prueba al agente contra casos de control con una respuesta esperada (casos-control.json). No escribe en la base. */
+async function probar() {
+	const casos = JSON.parse(readFileSync(opcion('casos', join(aqui, 'casos-control.json')), 'utf8'));
+	const boletines = Object.keys(casos);
+	console.log(`Prueba con ${boletines.length} casos de control. Agente ${modelo}, criterio ${version}.`);
+	const datos = new Map((await obtenerProyectos(boletines)).map((p) => [p.boletin, p]));
+	let n = 0;
+	const res = await enParalelo(boletines.filter((b) => datos.has(b)), async (b) => {
+		try {
+			const r = await clasificarUno(datos.get(b), { esperarTexto: false });
+			console.log(`[${++n}/${boletines.length}] ${b} ${r.incluye ? 'incluye' : 'excluye'} (${r.confianza})`);
+			return { boletin: b, titulo: datos.get(b).titulo, agente: r.incluye ? 'incluye' : 'excluye', confianza: r.confianza, motivo: r.motivo, ...casos[b] };
+		} catch (e) {
+			console.error(`${b} FALLÓ: ${e.message}`);
+			return null;
+		}
+	});
+	const r = res.filter(Boolean);
+	const con = r.filter((x) => x.esperado);
+	const bien = con.filter((x) => x.agente === x.esperado);
+	console.log(`\nAciertos: ${bien.length} de ${con.length} con respuesta esperada (${r.length - con.length} sin decisión).`);
+	for (const x of con.filter((y) => y.agente !== y.esperado)) console.log(`\nNO COINCIDE ${x.boletin} esperado=${x.esperado} agente=${x.agente} (${x.confianza})\n  ${x.titulo.slice(0, 140)}\n  ${x.motivo}`);
+	console.log('\nSin decisión del desarrollador (solo informativo):');
+	for (const x of r.filter((y) => !y.esperado)) console.log(`  ${x.boletin} agente=${x.agente} (${x.confianza}) ${x.titulo.slice(0, 80)}`);
+}
+
 try {
-	if (orden === 'revisar-v5') await revisarV5();
+	if (orden === 'probar') await probar();
+	else if (orden === 'revisar-v5') await revisarV5();
 	else if (orden === 'pendientes') await pendientes();
 	else if (orden === 'validar') await validar();
 	else if (orden === 'sembrar') await sembrar();
-	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] | validar [--n 60] | sembrar | revisar-v5 [--max 450]'), (process.exitCode = 2));
+	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar] | validar [--n 60] | sembrar | revisar-v5 [--max 450] | probar [--casos ruta]'), (process.exitCode = 2));
 } catch (e) {
 	console.error(`Error: ${e.message}`);
 	process.exitCode = 1;

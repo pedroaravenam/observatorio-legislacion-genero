@@ -1,0 +1,178 @@
+{
+ "10750-04": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "11507-11": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "13229-07": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "13230-13": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "13433-07": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "14242-03": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "15024-07": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "15136-11": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "17732-11": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "17821-07": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "3114-15": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "3781-04": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "4171-10": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "4786-13": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "7977-13": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "9179-07": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "1611-10": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "5087-07": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "5915-11": {
+  "esperado": "excluye",
+  "nota": "el título trae una palabra que engaña"
+ },
+ "18472-04": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "5310-13": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "13372-13": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "4514-04": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "12994-04": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "13781-07": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "2382-11": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "14048-13": {
+  "esperado": "incluye",
+  "nota": "tema de género real (decisión del desarrollador/lectura)"
+ },
+ "16863-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "4450-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "4793-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "5215-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "9998-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "12061-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "12062-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "18416-07": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "12204-11": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "675-11": {
+  "esperado": "incluye",
+  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+ },
+ "11533-07": {
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-04: infanticidio queda fuera"
+ },
+ "8987-07": {
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-04: infanticidio queda fuera"
+ },
+ "7000-24": {
+  "esperado": null,
+  "nota": "sin decisión: no cuenta en la prueba"
+ },
+ "6647-07": {
+  "esperado": null,
+  "nota": "sin decisión: no cuenta en la prueba"
+ },
+ "12748-17": {
+  "esperado": null,
+  "nota": "sin decisión: no cuenta en la prueba"
+ },
+ "13146-14": {
+  "esperado": null,
+  "nota": "sin decisión: no cuenta en la prueba"
+ },
+ "12081-03": {
+  "esperado": null,
+  "nota": "sin decisión: no cuenta en la prueba"
+ }
+}
