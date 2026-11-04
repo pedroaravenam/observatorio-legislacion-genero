@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-04 — El servicio de tramitación del Senado deja de responder (sin commit de código)
+
+La consulta diaria de las 09:02 falló con «El Senado rechazó todas las fechas de la ventana mínima de 14 días». Se comprobó que el servicio `wspublico/tramitacion.php` devuelve «No existe el número de boletín solicitado» (una caja de 244 bytes, con HTTP 200) para cualquier boletín, también desde el VPS, mientras los documentos (`getDocto`) y la ficha web siguen funcionando: es una falla del Senado, no de la ingesta. El sistema de alertas se comportó como se diseñó: `OnFailure=` envió el correo de la falla y el sitio siguió publicado con los datos del 3 de noviembre. Pendiente: confirmar mañana que el servicio volvió y, si no, decidir cómo cubrir el hueco.
+
 ## 2026-11-04 — Niveles de relación con el género y tareas nocturnas con Claude y Codex en paralelo (commit de este avance)
 
 Por decisión del desarrollador, lo dudoso entra, pero marcado: el criterio del agente ahora tiene cuatro grupos (relación alta, media, débil y fuera) y la regla «en la duda, entra con relación débil». El sitio muestra la marca «Relación débil» en la lista y, en la ficha, el nivel con su explicación y la razón; las descargas traen la columna `relacion_con_genero`. Los cinco casos que estaban sin decisión (consumidores y VIH, ley antidiscriminación, copropiedad y nanas, comercio sexual, monumento a las mujeres de la Guerra del Pacífico) se registraron como decisiones manuales del desarrollador con nivel débil (`codificador` = desarrollador): ya estaban en la selección y se mantienen.

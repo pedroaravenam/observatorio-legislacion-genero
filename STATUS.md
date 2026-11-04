@@ -33,6 +33,7 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 5. Revisar los términos de reutilización de datos de las tres fuentes.
 
 ## Riesgos activos
+- **Caída del servicio del Senado (4 de noviembre de 2026).** El servicio `wspublico/tramitacion.php` responde «No existe el número de boletín solicitado» a cualquier consulta, incluso de boletines que existen; los documentos y la ficha web del Senado siguen funcionando. La consulta diaria de las 09:02 falló (el aviso por correo llegó) y el sitio conserva los datos del 3 de noviembre. La ventana de la consulta diaria recupera hasta 14 días de atraso: si dura más, hará falta la carga completa. Si la caída continúa, la comprobación de datos al día avisará pasadas 36 horas.
 
 - VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados.
 - El Caddy es de la plataforma educativa: si esa plataforma recrea Caddy desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.
