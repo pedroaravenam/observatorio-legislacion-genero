@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-04 — Corrección del lector de documentos: Word antiguo con la codificación equivocada y RTF (commit de este avance)
+
+Al leer los documentos de cinco proyectos para dar un resumen al desarrollador apareció un fallo del lector del clasificador: los Word antiguos (`.doc`) se convertían con una codificación de origen equivocada y cada vocal con tilde llegaba como una letra cirílica («Protecciуn»), y los documentos RTF no se leían. Se corrigió (`catdoc -s cp1252` y un convertidor de RTF con pruebas). Efecto: en los proyectos antiguos con `.doc`, el conteo de términos del léxico salía más bajo y el agente veía texto con letras raras, lo que pudo inclinarlo a excluir; afecta las mediciones previas (casos de control, validación contra la v5 y la revisión parcial de la lista v5), no a lo publicado, porque no se aplicó ningún cambio a la lista v5. Los proyectos nuevos de 2026 son sobre todo `.docx` y PDF. Queda pendiente repetir los casos de control con el lector corregido.
+
 ## 2026-11-04 — Se enseñan al agente las reglas del desarrollador sobre explotación sexual, trata y ETS (commit de este avance)
 
 La muestra de los proyectos que la v5 incluyó por título estricto y el agente sacaba (44 de 269) mostró dos cosas. En 20 casos la regla de palabras de la v5 había captado una palabra fuera de contexto («matrón» como profesión, «esterilización» de mascotas, «comités paritarios», «8 de marzo» como fecha de un tratado, «trabajadores y trabajadoras» como lenguaje inclusivo, «tres causales» en un proyecto de eutanasia): ahí el agente tenía razón. En otros casos faltaban reglas en el criterio del agente, que solo sabe lo que está escrito en `criterio.md`.

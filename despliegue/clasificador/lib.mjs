@@ -94,6 +94,67 @@ export function esLimiteDeUso(mensaje) {
 	return /hit your limit|usage limit|rate.?limit|quota|\b429\b|overloaded|too many requests/i.test(String(mensaje));
 }
 
+/** Texto plano de un RTF (la codificación ANSI de los documentos del Senado es windows-1252). */
+export function textoRtf(rtf) {
+	const ignorar = new Set(['fonttbl', 'colortbl', 'stylesheet', 'info', 'pict', 'header', 'footer', 'footnote', 'themedata', 'datastore', 'latentstyles', 'listtable', 'listoverridetable', 'rsidtbl', 'generator', 'fldinst']);
+	const cp1252 = new TextDecoder('windows-1252');
+	let salida = '';
+	const pila = [];
+	let omitir = 0;
+	let saltar = 1;
+	for (let i = 0; i < rtf.length; ) {
+		const c = rtf[i];
+		if (c === '{') {
+			i++;
+			// Solo el grupo que inicia la omisión la termina al cerrarse; los anidados no tocan el estado.
+			let inicia = false;
+			if (omitir === 0) {
+				if (rtf[i] === '\\' && rtf[i + 1] === '*') inicia = true;
+				else if (rtf[i] === '\\') {
+					const m = /^\\([a-z]+)/i.exec(rtf.slice(i, i + 24));
+					inicia = Boolean(m && ignorar.has(m[1]));
+				}
+			}
+			if (inicia) omitir = 1;
+			pila.push(inicia);
+		} else if (c === '}') {
+			if (pila.pop()) omitir = 0;
+			i++;
+		} else if (c === '\\') {
+			const sig = rtf[i + 1];
+			if (sig === "'") {
+				const byte = parseInt(rtf.slice(i + 2, i + 4), 16);
+				if (!omitir && !Number.isNaN(byte)) salida += cp1252.decode(Uint8Array.of(byte));
+				i += 4;
+			} else if (/[a-z]/i.test(sig ?? '')) {
+				const m = /^\\([a-z]+)(-?\d+)? ?/i.exec(rtf.slice(i, i + 40));
+				const [todo, palabra, n] = m;
+				if (!omitir) {
+					if (palabra === 'par' || palabra === 'line') salida += '\n';
+					else if (palabra === 'tab') salida += '\t';
+					else if (palabra === 'u' && n !== undefined) {
+						const v = Number(n);
+						salida += String.fromCodePoint(v < 0 ? v + 65536 : v);
+						saltar = 1;
+						i += todo.length;
+						if (rtf[i] === '\\' && rtf[i + 1] === "'") i += 4;
+						else i += saltar;
+						continue;
+					}
+				}
+				i += todo.length;
+			} else {
+				if (!omitir && (sig === '\\' || sig === '{' || sig === '}')) salida += sig;
+				i += 2;
+			}
+		} else {
+			if (!omitir && c !== '\r' && c !== '\n') salida += c;
+			i++;
+		}
+	}
+	return salida;
+}
+
 /** Señal registrada para una decisión del agente. */
 export function nivelSenal(d) {
 	if (!d.incluye) return null;

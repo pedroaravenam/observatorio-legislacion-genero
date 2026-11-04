@@ -1,7 +1,7 @@
 // Pruebas de las funciones puras del clasificador. Uso: node --test despliegue/clasificador/
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
+import { construirEvidencia, contarLexico, esLimiteDeUso, textoRtf, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
 
 test('normalizar conserva el largo y quita tildes', () => {
 	const t = 'Violación y Género: ¿Año nuevo?';
@@ -50,6 +50,11 @@ test('reconoce los mensajes de límite de uso', () => {
 	assert.ok(esLimiteDeUso("You've hit your limit · resets 3pm"));
 	assert.ok(esLimiteDeUso('API Error: 429 rate_limit_error'));
 	assert.ok(!esLimiteDeUso('El motivo es demasiado corto'));
+});
+
+test('RTF: decodifica tildes, saltos de línea y omite tablas de fuentes', () => {
+	const rtf = "{\\rtf1\\ansi{\\fonttbl{\\f0 Arial;}}{\\*\\generator x;}\\pard Protecci\\'f3n de la mujer\\par Art\\'edculo \\u241?o\\par}";
+	assert.equal(textoRtf(rtf).trim(), 'Protección de la mujer\nArtículo ño');
 });
 
 test('la versión cambia con el criterio', () => {

@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, leerCsv, nivelSenal, validarDecision, versionAgente } from './lib.mjs';
+import { construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, leerCsv, nivelSenal, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -106,9 +106,11 @@ async function obtenerTexto(url) {
 			const { stdout } = await ejecutar('unzip', ['-p', archivo, 'word/document.xml'], { maxBuffer: 200 * 1024 * 1024 });
 			texto = textoDocx(stdout);
 		} else if (bytes.subarray(0, 4).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0]))) {
-			const { stdout } = await ejecutar('catdoc', ['-w', '-d', 'utf-8', archivo], { maxBuffer: 200 * 1024 * 1024, timeout: 120_000 });
+			const { stdout } = await ejecutar('catdoc', ['-w', '-s', 'cp1252', '-d', 'utf-8', archivo], { maxBuffer: 200 * 1024 * 1024, timeout: 120_000 });
 			texto = stdout;
-		} else return { texto: null, motivo: 'el documento no es PDF ni Word' };
+		} else if (bytes.subarray(0, 5).toString() === '{\\rtf') {
+			texto = textoRtf(bytes.toString('latin1'));
+		} else return { texto: null, motivo: 'el documento no es PDF, Word ni RTF' };
 		return texto.replace(/\s/g, '').length < 500 ? { texto: null, motivo: 'el documento no tiene texto legible' } : { texto };
 	} catch (e) {
 		return { texto: null, motivo: `no se pudo descargar o leer el documento (${String(e.message).split('\n')[0].slice(0, 80)})` };
