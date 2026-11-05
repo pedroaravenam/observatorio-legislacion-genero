@@ -198,3 +198,64 @@ export function leerCsv(texto) {
 	const [enc, ...datos] = filas;
 	return datos.filter((f) => f.length > 1 || f[0] !== '').map((f) => Object.fromEntries(enc.map((k, i) => [k, f[i] ?? ''])));
 }
+
+/**
+ * Decisiones del agente que hay que volver a tomar: las hechas con una versión anterior del criterio y las de proyectos
+ * que se publicaron como ley después de decidirse (`fecha_consulta_senado` es la última vez que cambió el estado, así que
+ * una decisión posterior a ese cambio ya vio el proyecto publicado). Las del desarrollador y las de la lista v5 no se tocan.
+ */
+export function sqlReclasificar(version, maximo) {
+	if (!/^[\w.-]+$/.test(version)) throw new Error('Versión de criterio no válida.');
+	if (!Number.isInteger(maximo) && maximo !== 1e9) throw new Error('El máximo debe ser un entero.');
+	return `SELECT c.boletin, c.incluye FROM clasificacion_genero c JOIN proyecto_ley p ON p.boletin = c.boletin
+WHERE c.codificador = 'agente'
+  AND (c.version <> '${version}' OR (p.estado_senado = 'Publicado' AND c.clasificado < p.fecha_consulta_senado))
+ORDER BY c.boletin LIMIT ${maximo};`;
+}
+
+/** Consulta del informe de la lista v5: por señal que decidió cada inclusión, cuánto revisó el agente y cuánto sacaría. */
+export const SQL_INFORME_V5 = `
+SELECT c.codificador || '/' || coalesce(c.nivel_senal, '-') AS senal, count(*) AS en_v5, count(r.boletin) AS revisados,
+  count(*) FILTER (WHERE r.boletin IS NOT NULL AND NOT r.incluye) AS saldria,
+  count(*) FILTER (WHERE NOT r.incluye AND r.confianza = 'alta') AS saldria_alta,
+  count(*) FILTER (WHERE NOT r.incluye AND r.confianza = 'media') AS saldria_media,
+  count(*) FILTER (WHERE NOT r.incluye AND r.confianza = 'baja') AS saldria_baja,
+  count(*) FILTER (WHERE r.sin_texto IS NOT NULL) AS sin_texto
+FROM clasificacion_genero c LEFT JOIN revision_v5 r ON r.boletin = c.boletin
+WHERE c.incluye AND c.codificador IN ('regla', 'claude') GROUP BY 1 ORDER BY 2 DESC, 1;`;
+
+/** Versiones del criterio con que se hicieron las revisiones guardadas (una fila por proyecto, con la versión que la hizo). */
+export const SQL_VERSIONES_V5 = 'SELECT version, count(*) AS n FROM revision_v5 GROUP BY 1 ORDER BY 2 DESC, 1;';
+
+/** Hasta tres ejemplos por señal de lo que el agente sacaría con confianza alta, siempre los mismos (orden por huella). */
+export const SQL_EJEMPLOS_V5 = `
+SELECT senal, boletin, titulo, motivo FROM (
+  SELECT c.codificador || '/' || coalesce(c.nivel_senal, '-') AS senal, c.boletin, p.titulo, r.motivo,
+         row_number() OVER (PARTITION BY c.codificador, c.nivel_senal ORDER BY md5(c.boletin)) AS n
+  FROM clasificacion_genero c JOIN revision_v5 r ON r.boletin = c.boletin
+  JOIN proyecto_ley p ON p.boletin = c.boletin
+  WHERE c.incluye AND c.codificador IN ('regla', 'claude') AND NOT r.incluye AND r.confianza = 'alta') x
+WHERE n <= 3 ORDER BY senal, n;`;
+
+/** Arma el informe en Markdown a partir de las filas de las dos consultas anteriores. */
+export function informeV5Markdown({ version, fecha, filas, ejemplos, versiones = [] }) {
+	const n = (x) => Number(x);
+	const pct = (a, b) => (n(b) ? `${Math.round((100 * n(a)) / n(b))} %` : '—');
+	const tot = filas.reduce((s, f) => ({ en: s.en + n(f.en_v5), rev: s.rev + n(f.revisados), sale: s.sale + n(f.saldria), alta: s.alta + n(f.saldria_alta) }), { en: 0, rev: 0, sale: 0, alta: 0 });
+	const l = [`# Revisión de la lista v5 con el agente — ${fecha}`, '',
+		`Criterio vigente del agente: \`${version}\`. Revisiones guardadas por versión del criterio: ${versiones.length ? versiones.map((v) => `\`${v.version}\` (${v.n})`).join(', ') : 'ninguna'}${versiones.some((v) => v.version !== version) ? '. **Parte de las revisiones se hizo con una versión anterior del criterio**, de modo que puede no reflejar las reglas vigentes' : ''}. ${versiones.reduce((s, v) => s + n(v.n), 0) > tot.rev ? `Hay ${versiones.reduce((s, v) => s + n(v.n), 0)} revisiones guardadas, pero ${versiones.reduce((s, v) => s + n(v.n), 0) - tot.rev} corresponden a proyectos que ya no son inclusiones automáticas de la lista (por ejemplo, con decisión manual del desarrollador) y no se cuentan abajo. ` : ''}El agente revisó ${tot.rev} de las ${tot.en} inclusiones de la lista v5 (${pct(tot.rev, tot.en)}), en orden aleatorio, y sacaría ${tot.sale} (${pct(tot.sale, tot.rev)} de lo revisado), ${tot.alta} de ellas con confianza alta. No se aplicó ningún cambio a la selección: cada fila es una decisión pendiente del desarrollador.`, '',
+		'## Qué sacaría el agente, según la señal que incluyó cada proyecto', '',
+		'La señal es la regla de la lista v5 que decidió la inclusión: título estricto (T1), título medio (T2), cuerpo firme (T3), cuerpo amplio (T4), materias del Senado (T5), lectura del texto de una ley por Claude (L) y conteo absoluto (V2). Decidir por señal evita revisar proyecto por proyecto.', '',
+		'| Señal | En la lista v5 | Revisados | Sacaría | Parte de lo revisado | Con confianza alta | Media | Baja | Sin texto |', '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
+		...filas.map((f) => `| ${f.senal} | ${f.en_v5} | ${f.revisados} | ${f.saldria} | ${pct(f.saldria, f.revisados)} | ${f.saldria_alta} | ${f.saldria_media} | ${f.saldria_baja} | ${f.sin_texto} |`), '',
+		'Una proporción alta de salidas con confianza alta indica que la regla de esa señal incluye lo que el criterio actual deja fuera; una proporción alta con confianza media o baja indica dudas que el agente no resuelve solo. La muestra revisada es aleatoria, así que los porcentajes se estabilizan a medida que avanza la revisión.', '',
+		'## Ejemplos de salidas con confianza alta', '',
+		'Hasta tres por señal, siempre los mismos mientras no cambie la revisión. El motivo es texto del agente.', ''];
+	let actual = null;
+	for (const e of ejemplos) {
+		if (e.senal !== actual) (l.push(`### ${e.senal}`, ''), (actual = e.senal));
+		l.push(`- **${e.boletin}** — ${e.titulo.slice(0, 140)}  \n  ${e.motivo}`);
+	}
+	l.push('', '## Decisión del desarrollador', '', 'Por cada señal: mantener, sacar o revisar caso a caso. Lo que se decida se aplica como una sola operación por señal, con su motivo registrado.', '', '| Señal | Decisión |', '|---|---|', ...filas.map((f) => `| ${f.senal} | |`), '');
+	return l.join('\n');
+}

@@ -79,3 +79,28 @@ test('CSV: ida y vuelta con comas, comillas y saltos de línea', () => {
 	const texto = `a,b\r\n${fila(['x,y', 'dijo "hola"'])}\r\n${fila(['uno\ndos', ''])}\r\n`;
 	assert.deepEqual(leerCsv(texto), [{ a: 'x,y', b: 'dijo "hola"' }, { a: 'uno\ndos', b: '' }]);
 });
+
+test('la reevaluación incluye versiones anteriores y proyectos publicados después de decidirse, solo del agente', async () => {
+	const { sqlReclasificar } = await import('./lib.mjs');
+	const sql = sqlReclasificar('agente-abc123', 50);
+	assert.match(sql, /c\.codificador = 'agente'/);
+	assert.match(sql, /c\.version <> 'agente-abc123'/);
+	assert.match(sql, /p\.estado_senado = 'Publicado' AND c\.clasificado < p\.fecha_consulta_senado/);
+	assert.throws(() => sqlReclasificar("x'; DROP TABLE y;--", 5));
+	assert.throws(() => sqlReclasificar('agente-abc123', '5; DROP'));
+});
+
+test('el informe de la lista v5 calcula porcentajes y deja una fila de decisión por señal', async () => {
+	const { informeV5Markdown } = await import('./lib.mjs');
+	const md = informeV5Markdown({
+		version: 'agente-abc123', fecha: '2026-11-04',
+		filas: [{ senal: 'regla/T4_cuerpo_amplio', en_v5: '200', revisados: '100', saldria: '90', saldria_alta: '60', saldria_media: '25', saldria_baja: '5', sin_texto: '8' }],
+		ejemplos: [{ senal: 'regla/T4_cuerpo_amplio', boletin: '123-07', titulo: 'Título', motivo: 'Motivo' }],
+		versiones: [{ version: 'agente-vieja', n: '100' }]
+	});
+	assert.match(md, /Parte de las revisiones se hizo con una versión anterior del criterio/);
+	assert.match(md, /revisó 100 de las 200 inclusiones de la lista v5 \(50 %\)/);
+	assert.match(md, /\| regla\/T4_cuerpo_amplio \| 200 \| 100 \| 90 \| 90 % \| 60 \| 25 \| 5 \| 8 \|/);
+	assert.match(md, /\| regla\/T4_cuerpo_amplio \| \|/);
+	assert.match(md, /\*\*123-07\*\* — Título/);
+});

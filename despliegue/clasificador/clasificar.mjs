@@ -6,6 +6,7 @@
 //   node clasificar.mjs sembrar                               carga una vez las decisiones de la lista v5
 //   node clasificar.mjs probar [--casos ruta]                 prueba al agente con casos de control (casos-control.json)
 //   node clasificar.mjs revisar-v5 [--max 450]                segunda opinión del agente sobre la lista v5 (no cambia la selección)
+//   node clasificar.mjs informe-v5 [--archivo ruta.md]        resume esa segunda opinión por señal de la lista v5 (solo lee)
 // Variables: VPS (atendia-development), CLASIFICADOR_MODELO (sonnet), CONCURRENCIA (3), SALIDA (./clasificador-salida).
 import { execFile, spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -13,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, leerCsv, nivelSenal, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { SQL_EJEMPLOS_V5, SQL_INFORME_V5, SQL_VERSIONES_V5, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -264,11 +265,11 @@ async function pendientes() {
 	let antes = new Map();
 	let lista;
 	if (reclasificar) {
-		const viejas = leerCsv(await psql(`SELECT boletin, incluye FROM clasificacion_genero WHERE codificador = 'agente' AND version <> '${version}' ORDER BY boletin LIMIT ${maximo};`));
+		const viejas = leerCsv(await psql(sqlReclasificar(version, maximo)));
 		antes = new Map(viejas.map((v) => [v.boletin, v.incluye === 't']));
 		lista = viejas.length ? await obtenerProyectos(viejas.map((v) => v.boletin)) : [];
 	} else lista = (await obtenerProyectos()).slice(0, maximo);
-	console.log(`${reclasificar ? 'Decisiones del agente con un criterio anterior' : 'Proyectos sin decisión'}: ${lista.length}. Agente ${modelo}, criterio ${version}.`);
+	console.log(`${reclasificar ? 'Decisiones del agente con un criterio anterior o de proyectos publicados como ley después de decidirse' : 'Proyectos sin decisión'}: ${lista.length}. Agente ${modelo}, criterio ${version}.`);
 	let n = 0;
 	const resultados = await enParalelo(lista, async (p) => {
 		try {
@@ -493,8 +494,20 @@ SELECT (SELECT count(*) FROM clasificacion_genero WHERE incluye AND codificador 
 	console.log(`Revisión de la lista v5 con el criterio ${version}: ${r.hechas} de ${r.total}. El agente sacaría ${r.salen} (${r.salen_alta} con confianza alta).`);
 }
 
+async function informeV5() {
+	const filas = leerCsv(await psql(SQL_INFORME_V5));
+	const ejemplos = leerCsv(await psql(SQL_EJEMPLOS_V5));
+	const versiones = leerCsv(await psql(SQL_VERSIONES_V5));
+	const fecha = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+	const md = informeV5Markdown({ version, fecha, filas, ejemplos, versiones });
+	const archivo = opcion('archivo', null);
+	if (archivo) (writeFileSync(archivo, md), console.log(`Informe guardado en ${archivo}.`));
+	else console.log(md);
+}
+
 try {
 	if (orden === 'progreso') await progreso();
+	else if (orden === 'informe-v5') await informeV5();
 	else if (orden === 'version') console.log(version);
 	else if (orden === 'aplicar-niveles') await aplicarNiveles();
 	else if (orden === 'probar') await probar();
@@ -502,7 +515,7 @@ try {
 	else if (orden === 'pendientes') await pendientes();
 	else if (orden === 'validar') await validar();
 	else if (orden === 'sembrar') await sembrar();
-	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar] | validar [--n 60] | sembrar | revisar-v5 [--max 450] | probar [--casos ruta]'), (process.exitCode = 2));
+	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar] | validar [--n 60] | sembrar | revisar-v5 [--max 450] | probar [--casos ruta] | informe-v5 [--archivo ruta]'), (process.exitCode = 2));
 } catch (e) {
 	console.error(`Error: ${e.message}`);
 	process.exitCode = 1;

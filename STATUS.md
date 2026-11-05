@@ -22,12 +22,12 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 
 ## Próximo paso exacto
 
-1. Primera corrida de las tareas de la noche: jueves 5 de noviembre a las 03:01 (temporizador `observatorio-noche`, ya instalado). Revisar el correo de resumen y `clasificar.mjs progreso`; cuando termine la pasada sobre la lista original, decidir qué hacer con lo que el agente sacaría.
+1. Publicar en el VPS la verificación por ficha (migración 0009). Primera corrida de las tareas de la noche: jueves 5 de noviembre a las 03:01 (temporizador `observatorio-noche`, ya instalado). Revisar el correo de resumen y `clasificar.mjs progreso`; cuando termine la pasada sobre la lista original, decidir qué hacer con lo que el agente sacaría.
 
 ## Pendientes priorizados
 
 1. ~~Fecha de verificación por ficha~~ hecha el 4 de noviembre en el código (migración 0009); falta publicarla en el VPS.
-2. Decidir qué hacer con los falsos positivos de la lista v5. El agente revisó 849 de las 2.154 inclusiones (muestra aleatoria, tabla `revision_v5`) y dejaría fuera el 49 %; faltan 1.305 por revisar y no se ha aplicado ningún cambio. Además, volver a evaluar un proyecto cuando se convierte en ley.
+2. Decidir por señal qué hacer con los falsos positivos de la lista v5, con el [informe del 4 de noviembre](docs/mediciones/revision-v5-2026-11-04.md) (el agente sacaría el 15 % de T1 hasta el 90 % de T4; revisiones hechas con un criterio anterior al vigente). La pasada nocturna termina la revisión con el criterio vigente; regenerar el informe con `clasificar.mjs informe-v5 --archivo`. No se ha aplicado ningún cambio.
 3. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
 4. Seguir el plan de cortes: fecha de verificación por ficha, v5, autores de la Cámara, resiliencia y textos de la BCN (CI ya instalada, falta confirmar su primera corrida en verde).
 5. Revisar los términos de reutilización de datos de las tres fuentes.
