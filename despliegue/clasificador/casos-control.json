@@ -179,5 +179,21 @@
   "esperado": "incluye",
   "grupo": "debil",
   "nota": "decisión del desarrollador 2026-11-04: entra como relación débil"
+ },
+ "154-07": {
+  "esperado": "incluye",
+  "nota": "regula la maternidad en sí (decisión del desarrollador, 5 de noviembre de 2026); prevalece sobre la regla de familia"
+ },
+ "14588-13": {
+  "esperado": "incluye",
+  "nota": "mejora las pensiones del pilar solidario (decisión del desarrollador, 5 de noviembre de 2026)"
+ },
+ "2162-13": {
+  "esperado": "excluye",
+  "nota": "solo regula fondos de pensiones de las AFP (decisión del desarrollador, 5 de noviembre de 2026)"
+ },
+ "5393-11": {
+  "esperado": "excluye",
+  "nota": "beneficios del personal de salud: trabajo, no género (decisión del desarrollador, 5 de noviembre de 2026)"
  }
 }

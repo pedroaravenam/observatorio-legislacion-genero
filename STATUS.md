@@ -22,7 +22,7 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 
 ## Próximo paso exacto
 
-1. Primera corrida de las tareas de la noche: jueves 5 de noviembre a las 03:01 (temporizador `observatorio-noche`, ya instalado). Revisar el correo de resumen y `clasificar.mjs progreso`; cuando termine la pasada sobre la lista original, decidir qué hacer con lo que el agente sacaría.
+1. **Reactivar el temporizador nocturno** (`systemctl --user enable --now observatorio-noche.timer`) cuando Codex recupere su cupo (hacia las 23:00 del 5 de noviembre). Está detenido desde el 5 de noviembre porque el criterio cambió a `agente-05f93dc5` (maternidad, pensiones, asignaciones a madres, gremios) y la pasada nocturna re-evaluaría ~730 decisiones del agente hechas con el criterio anterior (~730 llamadas). Antes conviene que pasen los 48 casos de control de cada agente (`clasificar.mjs probar`, ~100 llamadas).
 
 ## Pendientes priorizados
 
@@ -33,7 +33,7 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 5. Revisar los términos de reutilización de datos de las tres fuentes.
 
 ## Riesgos activos
-- **Caída del servicio del Senado (4 de noviembre de 2026).** El servicio `wspublico/tramitacion.php` responde «No existe el número de boletín solicitado» a cualquier consulta, incluso de boletines que existen; los documentos y la ficha web del Senado siguen funcionando. La consulta diaria de las 09:02 falló (el aviso por correo llegó) y el sitio conserva los datos del 3 de noviembre. La ventana de la consulta diaria recupera hasta 14 días de atraso: si dura más, hará falta la carga completa. Si la caída continúa, la comprobación de datos al día avisará pasadas 36 horas.
+- **Caída del servicio del Senado (desde el 4 de noviembre de 2026).** `wspublico/tramitacion.php` responde HTTP 200 con «No existe el número de boletín solicitado» **tras 30 segundos exactos**, para cualquier boletín y desde cualquier red; la web de tramitación, los documentos y senado.cl sí responden. La consulta diaria falla cada día (el correo de alerta llegó el 5 a las 10:30) y el sitio conserva los datos del 3 de noviembre. La carga completa corre sin trabajo pendiente y volverá a intentar sola hacia el 14 de noviembre (según la regla del código, sin comprobar), lo que cubriría cualquier hueco si el servicio vuelve. El monitor externo abrirá un aviso al pasar 72 horas. Alternativas, a decidir: esperar, avisar al Senado, o un lector de la ficha web como respaldo (más trabajo y sin revisar sus términos de uso).
 
 - VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados.
 - El Caddy es de la plataforma educativa: si esa plataforma recrea Caddy desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.

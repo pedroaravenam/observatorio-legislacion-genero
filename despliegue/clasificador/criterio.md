@@ -26,7 +26,10 @@ No basta con que un proyecto mencione a las mujeres para considerarlo de género
 - **Sala cuna**: entra siempre como componente, también cuando se plantea como derecho educativo de la niña o el niño y no como prestación laboral. El criterio publicado la nombra como ejemplo.
 - **Trabajo de casa particular y trabajo doméstico remunerado**: entra como componente, porque es un empleo ejercido en su gran mayoría por mujeres y se vincula con su autonomía económica.
 - **Educación sexual** (obligatoria, sus contenidos o el derecho de los padres a elegirla): entra como componente, por tema y no por postura.
-- **Maternidad, embarazo, parto y pérdida gestacional** (certificados, permisos, atención): entran como componente.
+- **Maternidad, embarazo, parto y pérdida gestacional** (certificados, permisos, atención, investigación de la maternidad y la filiación materna): entran como componente. Esta regla prevalece sobre «Familia y matrimonio»: si el proyecto regula la maternidad en sí, entra aunque sea una norma de familia.
+- **Pensiones.** Un proyecto que mejora el monto o el acceso a pensiones de ingreso bajo (pilar solidario, pensión garantizada universal, pensiones básicas solidarias) entra como componente: las mujeres tienen pensiones más bajas porque dejaron el trabajo para sostener los cuidados, así que mejorarlas las beneficia de forma directa aunque el texto no hable de género. No entran los proyectos que solo regulan la administración, la inversión, la rentabilidad o la responsabilidad de las administradoras de fondos de pensiones.
+- **Asignaciones ligadas a las madres.** Si el proyecto mejora una asignación para madres (por ejemplo la asignación maternal) o cambia quién la recibe, entra como componente. Si esa asignación solo aparece como requisito para recibir otro beneficio, no basta: se decide por el objetivo del proyecto y no por el título.
+- **Gremios y personal.** Un proyecto enfocado en el personal de un servicio o de un gremio (por ejemplo el personal de salud) es un asunto de trabajo y no de género, aunque muchas de las personas que lo integran sean mujeres.
 
 ### Palabras que engañan (no cuentan por sí solas)
 
