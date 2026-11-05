@@ -1,5 +1,11 @@
 # Historial
 
+## 2026-11-05 — Copia cifrada del respaldo en R2, funcionando (commit de este avance)
+
+Con la sesión de `wrangler` del desarrollador se creó el bucket privado `observatorio-respaldos` en su cuenta de Cloudflare (sin acceso público ni dominios, y con una regla que borra los objetos a los 30 días) y se configuró la copia cifrada del respaldo diario con el método `wrangler`, sin llaves S3. Hay dos buckets más en esa cuenta (`vault-pedro` y `visor-lclu-en-vivo`) que no se tocaron. La clave de cifrado se creó en `~/.config/observatorio-genero/respaldo.clave` sin mostrarla.
+
+Error corregido en el camino: la primera subida informó «verificado» pero `wrangler` había escrito en un R2 simulado en disco, porque sin `--remote` sus comandos de objetos no usan Cloudflare. Se vio al fallar la bajada («la llave no existe»). Los scripts ahora exigen `--remote` y fallan si la salida de `wrangler` no dice `Resource location: remote`. Con eso se hicieron tres comprobaciones reales: subida, bajada y descifrado de un respaldo de 29 MB con resultado idéntico al original; confirmación de que el objeto existe en el bucket remoto; y una corrida completa del servicio diario bajo `systemd`, cuyo objeto nuevo (`ingesta-20261105-1218.dump.enc`) también quedó en el bucket.
+
 ## 2026-11-05 — Criterio con cuatro reglas nuevas y diagnóstico del Senado (commit de este avance)
 
 Por indicación del desarrollador se detuvo el temporizador nocturno (`observatorio-noche`) y se integró al criterio lo que enseñaron los casos: la maternidad prevalece sobre la regla de familia (154-07), las pensiones que mejoran el piso de ingreso entran y la administración de fondos no (14588-13 frente a 2162-13), las asignaciones ligadas a las madres cuentan solo si el proyecto las mejora (8337-05) y un proyecto sobre el personal de un gremio es de trabajo (5393-11). El criterio pasó a `agente-05f93dc5` y se agregaron cuatro casos de control (48 en total; antes eran 44). No se corrieron los casos de control: Codex tiene el cupo agotado hasta la noche del 5 de noviembre. Al reactivar el temporizador, `pendientes --reclasificar` volverá a evaluar unas 730 decisiones del agente hechas con el criterio anterior (las 623 exclusiones recién aplicadas y 108 de proyectos nuevos); conviene decidir antes si se limita.
