@@ -38,8 +38,8 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 - VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados.
 - El Caddy es de la plataforma educativa: si esa plataforma recrea Caddy desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.
 - Las decisiones del agente son automáticas y nadie las revisa antes de publicarse. Dependen del CLI de Claude y de la sesión iniciada en la máquina de desarrollo; si esa máquina está apagada, los proyectos nuevos no aparecen hasta que vuelva (y a las 48 horas llega un aviso). Ocho de las nueve inclusiones iniciales salen de la regla de delitos sexuales de `criterio.md`, que el desarrollador puede cambiar.
-- El único respaldo de la base de ingesta está en la máquina de desarrollo, con el disco al 91 %. Si se pierden el VPS y esa máquina a la vez, hay que volver a cargar todo desde el Senado.
-- Si el propio VPS se cae, nadie avisa: las alertas corren en el VPS y no hay un monitor externo.
+- El único respaldo de la base de ingesta sigue en la máquina de desarrollo (disco al 95 %). La copia cifrada a R2 está lista y probada, pero falta crear el bucket y ejecutar `despliegue/configurar-r2.sh`. Si se pierden el VPS y esa máquina a la vez, hay que volver a cargar todo desde el Senado.
+- Si el propio VPS se cae, el monitor externo (`monitor.yml`, cada 30 minutos) abre un issue; GitHub lo avisa por correo a quien sigue el repositorio.
 - La selección de género es automática y no está validada; el sitio lo declara en la portada, la ficha y «Cómo funciona».
 - Los enlaces a documentos completos fallan cuando la fuente no responde; el sitio lo advierte en cada ficha.
 
