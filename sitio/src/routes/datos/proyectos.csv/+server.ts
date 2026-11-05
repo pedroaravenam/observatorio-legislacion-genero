@@ -16,6 +16,7 @@ const COLUMNAS = [
 	'diario_oficial',
 	'ultimo_tramite',
 	'autores',
+	'autoria',
 	'temas',
 	'relacion_con_genero',
 	'ficha'

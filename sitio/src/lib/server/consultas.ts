@@ -1,5 +1,6 @@
 // Consultas a la base pública SQLite. Todos los valores van como parámetros enlazados; nunca se concatenan en el SQL.
 import {
+	AUTORIAS,
 	nivelRelacion,
 	CAMARAS,
 	consultaBusqueda,
@@ -31,6 +32,7 @@ export interface Filtros {
 	tema: string | null;
 	camara: string | null;
 	autor: string | null;
+	autoria: string | null;
 	orden: Orden;
 	pagina: number;
 }
@@ -56,6 +58,10 @@ export interface Ficha extends FilaLista {
 	url_documento: string | null;
 	materias: string[];
 	autores: string[];
+	/** mujeres, hombres, mixta, ejecutivo o sin_dato. */
+	autoria: string;
+	/** Cada autor con su sexo (F o M) y el enlace a su reseña parlamentaria; null si no se conoce. */
+	autores_detalle: [string, string | null, string | null][];
 	tramites: [string | null, string | null, string, string | null, string | null][];
 	actualizado: string;
 	/** Última vez que el Senado entregó la ficha, haya cambiado o no; null en bases publicadas antes de registrarla. */
@@ -79,6 +85,7 @@ export function leerFiltros(url: URL): Filtros {
 	const iniciativa = p.get('iniciativa');
 	const tema = p.get('tema');
 	const camara = p.get('camara');
+	const autoria = p.get('autoria');
 	const orden = p.get('orden');
 	const texto = (p.get('q') ?? '').trim().slice(0, 200);
 	return {
@@ -90,6 +97,7 @@ export function leerFiltros(url: URL): Filtros {
 		tema: tema && TEMAS.some((t) => t.clave === tema) ? tema : null,
 		camara: camara && (CAMARAS as readonly string[]).includes(camara) ? camara : null,
 		autor: (p.get('autor') ?? '').trim().slice(0, 120) || null,
+		autoria: autoria && AUTORIAS.some((a) => a.clave === autoria) ? autoria : null,
 		orden:
 			orden && (ORDENES as readonly string[]).includes(orden)
 				? (orden as Orden)
@@ -147,6 +155,10 @@ function construirConsulta(f: Filtros) {
 		condiciones.push('EXISTS (SELECT 1 FROM json_each(p.autores) WHERE value = ?)');
 		valores.push(f.autor);
 	}
+	if (f.autoria) {
+		condiciones.push('p.autoria = ?');
+		valores.push(f.autoria);
+	}
 	if (f.tema) {
 		condiciones.push('tiene_tema(p.titulo, ?) = 1');
 		valores.push(f.tema);
@@ -198,6 +210,7 @@ export interface FilaExportada {
 	diario_oficial: string | null;
 	ultimo_tramite: string | null;
 	autores: string[];
+	autoria: string;
 	temas: string[];
 	relacion_con_genero: string | null;
 }
@@ -208,7 +221,7 @@ export async function exportar(db: Base, f: Filtros): Promise<FilaExportada[]> {
 	const filas = db
 		.prepare(
 			`SELECT p.boletin, p.titulo, p.fecha_ingreso, p.iniciativa, p.camara_origen, p.estado, p.etapa,
-			        p.ley_numero, p.diario_oficial, p.ultimo_tramite, p.autores, g.grupo
+			        p.ley_numero, p.diario_oficial, p.ultimo_tramite, p.autores, p.autoria, g.grupo
 			 ${base} ORDER BY ${orden}`
 		)
 		.all(...valores) as unknown as (Omit<
@@ -230,6 +243,7 @@ export async function exportar(db: Base, f: Filtros): Promise<FilaExportada[]> {
 		diario_oficial: r.diario_oficial,
 		ultimo_tramite: r.ultimo_tramite,
 		autores: JSON.parse(r.autores) as string[],
+		autoria: r.autoria,
 		temas: temasDe(r.titulo),
 		relacion_con_genero: nivelRelacion(r.grupo)?.clave ?? null
 	}));
@@ -268,6 +282,12 @@ export async function ficha(db: Base, boletin: string): Promise<Ficha | null> {
 		...({ ...fila } as unknown as Ficha),
 		materias: JSON.parse(fila.materias as string),
 		autores: JSON.parse(fila.autores as string),
+		autoria: (fila.autoria as string | undefined) ?? 'sin_dato',
+		// Una base publicada antes de registrar el sexo no trae el detalle: se muestran solo los nombres.
+		autores_detalle:
+			typeof fila.autores_detalle === 'string'
+				? JSON.parse(fila.autores_detalle)
+				: (JSON.parse(fila.autores as string) as string[]).map((n) => [n, null, null]),
 		tramites: JSON.parse(fila.tramites as string)
 	};
 }

@@ -54,6 +54,7 @@ nombre_unidad() {
   case "$1" in
     observatorio-fecha*) echo 'la consulta diaria del Senado' ;;
     observatorio-completa*) echo 'la carga completa del Senado' ;;
+    observatorio-parlamentarios*) echo 'la carga de parlamentarios y del sexo de los autores' ;;
     *) echo "$1" ;;
   esac
 }

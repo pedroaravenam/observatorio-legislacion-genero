@@ -11,6 +11,7 @@ interface FilaSeleccion {
 	fecha_ingreso: string | null;
 	diario_oficial: string | null;
 	autores: string;
+	autoria: string;
 }
 
 export interface Conteo {
@@ -41,6 +42,20 @@ export interface CifraAutor extends Conteo {
 	nombre: string;
 }
 
+/**
+ * Mociones según el sexo de quienes las firman. «sinDato» son las que no tienen ningún firmante con sexo conocido, y de ellas
+ * «sinAutores» son las que el Senado registra sin autores.
+ */
+export interface CifraAutoria {
+	nombre: string;
+	total: number;
+	mujeres: number;
+	hombres: number;
+	mixta: number;
+	sinDato: number;
+	sinAutores: number;
+}
+
 export interface Panorama {
 	total: number;
 	leyes: number;
@@ -54,6 +69,7 @@ export interface Panorama {
 	autores: CifraAutor[];
 	totalAutores: number;
 	sinAutores: number;
+	autoria: { global: CifraAutoria; porPeriodo: CifraAutoria[] };
 	tiempoPorPeriodo: { nombre: string; leyes: number; medianaDias: number | null }[];
 }
 
@@ -81,7 +97,7 @@ export function panorama(db: Base): Panorama {
 	const filas = db
 		.prepare(
 			`SELECT p.titulo, p.anno, p.iniciativa, p.camara_origen, p.estado, p.fecha_ingreso,
-			        p.diario_oficial, p.autores
+			        p.diario_oficial, p.autores, p.autoria
 			 FROM seleccion_genero g JOIN proyecto p ON p.boletin = g.boletin`
 		)
 		.all() as unknown as FilaSeleccion[];
@@ -147,6 +163,26 @@ export function panorama(db: Base): Panorama {
 		)
 		.slice(0, 15);
 
+	const contarAutoria = (nombre: string, c: FilaSeleccion[]): CifraAutoria => ({
+		nombre,
+		total: c.length,
+		mujeres: c.filter((f) => f.autoria === 'mujeres').length,
+		hombres: c.filter((f) => f.autoria === 'hombres').length,
+		mixta: c.filter((f) => f.autoria === 'mixta').length,
+		sinDato: c.filter((f) => !['mujeres', 'hombres', 'mixta'].includes(f.autoria)).length,
+		sinAutores: c.filter((f) => (JSON.parse(f.autores) as string[]).length === 0).length
+	});
+	const mociones = filas.filter((f) => f.iniciativa === 'Moción');
+	const autoria = {
+		global: contarAutoria('Todas', mociones),
+		porPeriodo: PERIODOS.map(([nombre, desde, hasta]) =>
+			contarAutoria(
+				nombre,
+				mociones.filter((f) => f.anno !== null && f.anno >= desde && f.anno <= hasta)
+			)
+		)
+	};
+
 	const tiempoPorPeriodo = PERIODOS.map(([nombre, desde, hasta]) => {
 		const d = filas
 			.filter((f) => f.anno !== null && f.anno >= desde && f.anno <= hasta)
@@ -168,6 +204,7 @@ export function panorama(db: Base): Panorama {
 		autores,
 		totalAutores: porAutor.size,
 		sinAutores,
+		autoria,
 		tiempoPorPeriodo
 	};
 }

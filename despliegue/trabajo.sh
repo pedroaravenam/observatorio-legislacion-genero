@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
-# Trabajos programados del Observatorio en el VPS. Uso: trabajo.sh fecha|completa|publicar
+# Trabajos programados del Observatorio en el VPS. Uso: trabajo.sh fecha|completa|parlamentarios|publicar
 #   fecha     consulta diaria del Senado por fecha y luego publica
 #   completa  carga completa reanudable del Senado y luego publica
+#   parlamentarios  carga diputados y reseñas de la BCN, enlaza a los autores con su sexo y luego publica
 #   publicar  solo reescribe la base pública SQLite desde la base de ingesta
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-modo=${1:?Use fecha, completa o publicar}
+modo=${1:?Use fecha, completa, parlamentarios o publicar}
 case "$modo" in
   fecha) variable=Ingesta__FechaSenado ;;
   completa) variable=Ingesta__CompletaSenado ;;
+  parlamentarios) variable=Ingesta__Parlamentarios ;;
   publicar) variable= ;;
-  *) echo 'Modo inválido: use fecha, completa o publicar.' >&2; exit 2 ;;
+  *) echo 'Modo inválido: use fecha, completa, parlamentarios o publicar.' >&2; exit 2 ;;
 esac
 
 # Un solo trabajo a la vez: la carga completa puede durar horas y coincidir con la diaria.

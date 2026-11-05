@@ -15,6 +15,7 @@ public class ObservatorioDbContext(DbContextOptions<ObservatorioDbContext> optio
     public DbSet<TipoIniciativa> TiposIniciativa => Set<TipoIniciativa>();
     public DbSet<Camara> Camaras => Set<Camara>();
     public DbSet<Parlamentario> Parlamentarios => Set<Parlamentario>();
+    public DbSet<AutorEnlace> AutoresEnlaces => Set<AutorEnlace>();
     public DbSet<ProyectoAutor> ProyectoAutores => Set<ProyectoAutor>();
     public DbSet<TramiteSenado> TramitesSenado => Set<TramiteSenado>();
     public DbSet<ObservacionTramiteSenado> ObservacionesSenado => Set<ObservacionTramiteSenado>();
@@ -180,10 +181,26 @@ public class ObservatorioDbContext(DbContextOptions<ObservatorioDbContext> optio
             e.Property(x => x.Nombre).HasColumnName("nombre");
             e.Property(x => x.ApellidoPaterno).HasColumnName("apellido_paterno");
             e.Property(x => x.ApellidoMaterno).HasColumnName("apellido_materno");
+            e.Property(x => x.Sexo).HasColumnName("sexo").HasColumnType("character(1)");
+            e.Property(x => x.SexoOrigen).HasColumnName("sexo_origen");
+            e.Property(x => x.UrlFicha).HasColumnName("url_ficha");
             e.Property(x => x.Creado).HasColumnName("creado");
             e.Property(x => x.Actualizado).HasColumnName("actualizado");
             e.HasIndex(x => new { x.Fuente, x.CamaraId, x.IdOrigen }).IsUnique();
             e.HasOne(x => x.Camara).WithMany().HasForeignKey(x => x.CamaraId);
+        });
+
+        modelBuilder.Entity<AutorEnlace>(e =>
+        {
+            e.ToTable("autor_enlace");
+            e.HasKey(x => x.Texto);
+            e.Property(x => x.Texto).HasColumnName("texto");
+            e.Property(x => x.ParlamentarioId).HasColumnName("parlamentario_id");
+            e.Property(x => x.Sexo).HasColumnName("sexo").HasColumnType("character(1)");
+            e.Property(x => x.Metodo).HasColumnName("metodo");
+            e.Property(x => x.Url).HasColumnName("url");
+            e.Property(x => x.Actualizado).HasColumnName("actualizado");
+            e.HasOne<Parlamentario>().WithMany().HasForeignKey(x => x.ParlamentarioId);
         });
 
         modelBuilder.Entity<ProyectoAutor>(e =>

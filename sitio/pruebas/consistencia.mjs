@@ -98,6 +98,28 @@ comparar(
 	await attr('[data-cifra="camaras"]', 'data-senado')
 );
 
+// Autoría por sexo de las mociones: cada categoría coincide con la base y la descarga filtrada trae las mismas filas.
+for (const [categoria, atributo] of [
+	['mujeres', 'data-mujeres'],
+	['hombres', 'data-hombres'],
+	['mixta', 'data-mixta']
+]) {
+	comparar(
+		'autoría',
+		categoria,
+		uno(`SELECT count(*) n ${SEL} WHERE p.iniciativa = 'Moción' AND p.autoria = '${categoria}'`).n,
+		await attr('[data-cifra="autoria"]', atributo)
+	);
+}
+comparar(
+	'autoría',
+	'sin dato',
+	uno(
+		`SELECT count(*) n ${SEL} WHERE p.iniciativa = 'Moción' AND p.autoria NOT IN ('mujeres', 'hombres', 'mixta')`
+	).n,
+	await attr('[data-cifra="autoria"]', 'data-sin-dato')
+);
+
 // Autores: cada nombre listado tiene el conteo de la base, el valor visible coincide y nadie fuera de la lista supera al último.
 const autoresPagina = await p.$$eval('[data-cifra="autor"]', (els) =>
 	els.map((e) => ({

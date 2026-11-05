@@ -23,6 +23,19 @@
 		return `${a} y ${resto === 1 ? 'un mes' : `${resto} meses`}`;
 	}
 
+	const g = $derived(d.autoria.global);
+	const filasAutoria = [
+		{ clave: 'mujeres', nombre: 'Solo mujeres' },
+		{ clave: 'mixta', nombre: 'Mujeres y hombres' },
+		{ clave: 'hombres', nombre: 'Solo hombres' },
+		{ clave: 'sinDato', nombre: 'Sin autores o sin sexo conocido' }
+	] as const;
+	const maxAutoria = $derived(
+		Math.max(
+			1,
+			...d.autoria.porPeriodo.flatMap((p) => filasAutoria.map((f) => pct(p[f.clave], p.total)))
+		)
+	);
 	const maxTema = $derived(Math.max(1, ...d.temas.map((t) => t.total)));
 	const maxAutor = $derived(Math.max(1, ...d.autores.map((a) => a.total)));
 	const mensaje = $derived(d.origen.find((o) => o.iniciativa === 'Mensaje')!);
@@ -45,8 +58,7 @@
 
 {#snippet pie()}
 	<p class="pie-datos">
-		Fuente: servicio de tramitación del Senado de Chile.{#if actualizado}
-			Datos al {actualizado}.{/if}
+		Fuente: servicio de tramitación del Senado de Chile.{#if actualizado}{' '}Datos al {actualizado}.{/if}
 	</p>
 {/snippet}
 
@@ -141,6 +153,68 @@
 				{c.camara === 'Senado' ? 'el Senado' : 'la Cámara de Diputadas y Diputados'}{/each}.
 		</p>
 		{@render pie()}
+	</section>
+
+	<section aria-labelledby="sexo-titulo" class="bloque">
+		<h2 id="sexo-titulo">Quiénes firman las mociones: mujeres y hombres</h2>
+		<p
+			class="intro"
+			data-cifra="autoria"
+			data-total={g.total}
+			data-mujeres={g.mujeres}
+			data-hombres={g.hombres}
+			data-mixta={g.mixta}
+			data-sin-dato={g.sinDato}
+			data-sin-autores={g.sinAutores}
+		>
+			De las {n(g.total)} mociones de la selección, {n(g.mujeres)} ({pct(g.mujeres, g.total)} %) las firman
+			solo mujeres, {n(g.hombres)} ({pct(g.hombres, g.total)} %) solo hombres y
+			{n(g.mixta)} ({pct(g.mixta, g.total)} %) mujeres y hombres a la vez.
+			{#if g.sinDato > 0}En {n(g.sinDato)} no hay datos:
+				{#if g.sinAutores > 0}el Senado no registra autores en {n(
+						g.sinAutores
+					)}{/if}{#if g.sinDato > g.sinAutores}{g.sinAutores > 0 ? ' y ' : ''}no se conoce el sexo
+					de quienes firman {n(g.sinDato - g.sinAutores)}{/if}.{/if}
+			Los mensajes de la Presidencia no se cuentan porque no tienen autoría parlamentaria.
+		</p>
+		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+		<div class="tabla-desplazable" role="region" aria-labelledby="sexo-titulo" tabindex="0">
+			<table class="tabla-periodos">
+				<caption class="solo-lectores">Autoría de las mociones por período, en porcentaje</caption>
+				<thead>
+					<tr>
+						<th scope="col">Quiénes firman</th>
+						{#each d.autoria.porPeriodo as p (p.nombre)}
+							<th scope="col" class="num">
+								{p.nombre}<span class="th-total">{n(p.total)} mociones</span>
+							</th>
+						{/each}
+					</tr>
+				</thead>
+				<tbody>
+					{#each filasAutoria as f (f.clave)}
+						<tr>
+							<th scope="row">{f.nombre}</th>
+							{#each d.autoria.porPeriodo as p (p.nombre)}
+								{@const v = pct(p[f.clave], p.total)}
+								<td class="num" style="--intensidad: {v / maxAutoria}">{v} %</td>
+							{/each}
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+		<p class="nota">
+			El sexo de diputadas y diputados es el que informa la Cámara. Para senadoras y senadores, y
+			para quienes ese servicio no incluye, se deriva de la reseña parlamentaria de la Biblioteca
+			del Congreso Nacional o se corrige a mano, así que es un dato derivado; «Cómo funciona»
+			explica el método. «Mujeres y hombres» significa que firma al menos una persona de cada sexo.
+		</p>
+		<p class="pie-datos">
+			Fuentes: servicio de tramitación del Senado (autores), servicio de diputados de la Cámara y
+			reseñas parlamentarias de la Biblioteca del Congreso Nacional (sexo).{#if actualizado}{' '}Datos
+				al {actualizado}.{/if}
+		</p>
 	</section>
 
 	<section aria-labelledby="temas-titulo" class="bloque">
@@ -538,6 +612,14 @@
 	.tabla-desplazable {
 		overflow-x: auto;
 		max-width: 60rem;
+	}
+	.solo-lectores {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
 	}
 	.tabla-periodos {
 		width: 100%;

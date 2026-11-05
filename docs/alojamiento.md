@@ -68,6 +68,19 @@ Instalación, que se hace en el VPS con `ssh atendia-development`:
 3. Instalar las unidades: `sudo cp /opt/observatorio/systemd/observatorio-{alerta@.service,atraso.service,atraso.timer,fecha.service,completa.service} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-atraso.timer`.
 4. Probar el aviso de falla sin romper nada: `sudo systemctl start observatorio-alerta@observatorio-fecha.service`. Si ya llegó uno en las últimas 20 horas, se omite; para repetirlo se borra `/var/lib/observatorio-alertas`.
 
+## Parlamentarios y sexo de los autores
+
+El Senado entrega a cada autor como un nombre («Apellidos, Nombres»). El trabajo `trabajo.sh parlamentarios` (unidad `observatorio-parlamentarios`, 09:30 hora de Chile, después de la consulta diaria) hace cuatro cosas, en una sola ejecución de la imagen de ingesta:
+
+1. Consulta `WSDiputado.retornarDiputados` de la Cámara y guarda la respuesta cruda. De ahí salen los diputados desde 1990 con su sexo (se lee el texto «Femenino»/«Masculino»; no se guardan RUT ni fecha de nacimiento).
+2. Carga `datos/referencia/parlamentarios-bcn.csv` (1.820 reseñas parlamentarias de la BCN, con sexo derivado del texto de la reseña) y `datos/referencia/alias-autores.csv` (correcciones a mano, cada una con su nota). Ambos archivos van dentro de la imagen.
+3. Extrae los nombres de autor de todas las fichas del Senado guardadas (`//autores/autor/PARLAMENTARIO`, unos 17 segundos) y los enlaza con una persona. El método queda en `autor_enlace.metodo`: `manual`, `camara_nombre`, `bcn_nombre`, `ambiguo_mismo_sexo` (varias personas con los mismos apellidos y nombre, todas del mismo sexo: se conserva el sexo sin atribuir la persona) o `sin_dato`. La regla exige apellidos idénticos y que el nombre sea uno de los nombres de pila; no hay coincidencias aproximadas.
+4. Publica la base: el exportador calcula `proyecto.autoria` (`mujeres`, `hombres`, `mixta`, `ejecutivo` o `sin_dato`) y `proyecto.autores_detalle`.
+
+Si un autor nuevo no se enlaza, aparece con método `sin_dato` y el proyecto sigue publicándose sin su sexo: `psql -c "SELECT texto FROM autor_enlace WHERE metodo = 'sin_dato'"` lista lo pendiente, y se resuelve agregando una fila a `alias-autores.csv` (con una nota de dónde se verificó). El trabajo se niega a borrar enlaces si no encuentra ningún autor en las fichas.
+
+Instalación de las unidades en el VPS: `sudo cp /opt/observatorio/systemd/observatorio-parlamentarios.{service,timer} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-parlamentarios.timer`. Ejecución a mano: `sudo /opt/observatorio/trabajo.sh parlamentarios`.
+
 ## Clasificación automática de proyectos nuevos
 
 La selección de género ya no es una lista fija dentro de la imagen del exportador: vive en la tabla `clasificacion_genero` de la base de ingesta (una fila por boletín, con la decisión, el grupo del criterio, la señal, quién decidió, la confianza y el motivo). La lista v5 se sembró una vez, con `clasificar.mjs sembrar`, y desde entonces cada proyecto nuevo lo decide un agente. El exportador lee esa tabla al publicar y el sitio solo muestra lo que está incluido.

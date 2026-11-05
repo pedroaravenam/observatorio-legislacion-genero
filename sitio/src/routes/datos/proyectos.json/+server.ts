@@ -21,6 +21,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				tema: filtros.tema,
 				camara: filtros.camara,
 				autor: filtros.autor,
+				autoria: filtros.autoria,
 				orden: filtros.orden
 			},
 			total: proyectos.length,

@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-parlamentario-sexo
+      author: observatorio
+      comment: >
+        Sexo de cada parlamentario y su origen: el campo Sexo de WSDiputado (camara), el derivado de la reseña
+        parlamentaria de la BCN (bcn) o una corrección a mano (manual).
+      changes:
+        - addColumn:
+            tableName: parlamentario
+            columns:
+              - column: { name: sexo, type: CHAR(1), remarks: "F o M" }
+              - column: { name: sexo_origen, type: VARCHAR(20), remarks: "camara, bcn o manual" }
+              - column: { name: url_ficha, type: VARCHAR(300) }
+        - modifyDataType:
+            tableName: parlamentario
+            columnName: id_origen
+            newDataType: VARCHAR(200)
+
+  - changeSet:
+      id: 0010-autor-enlace
+      author: observatorio
+      comment: >
+        Enlace entre el nombre de un autor tal como lo escribe el Senado ("Apellidos, Nombres") y un parlamentario.
+        El método deja constancia de cómo se resolvió; sin enlace queda el sexo conocido o ninguno.
+      changes:
+        - createTable:
+            tableName: autor_enlace
+            columns:
+              - column: { name: texto, type: VARCHAR(200), constraints: { primaryKey: true, primaryKeyName: pk_autor_enlace, nullable: false } }
+              - column:
+                  name: parlamentario_id
+                  type: BIGINT
+                  constraints: { foreignKeyName: fk_autor_enlace_parlam, references: parlamentario(id) }
+              - column: { name: sexo, type: CHAR(1) }
+              - column: { name: metodo, type: VARCHAR(30), constraints: { nullable: false }, remarks: "camara_nombre, bcn_nombre, manual, ambiguo_mismo_sexo o sin_dato" }
+              - column: { name: url, type: VARCHAR(300) }
+              - column: { name: actualizado, type: TIMESTAMP WITH TIME ZONE, constraints: { nullable: false } }

@@ -12,7 +12,8 @@ import {
 	pasoTramitacion,
 	fechaLarga,
 	numeroLey,
-	urlFichaSenado
+	urlFichaSenado,
+	textoAutoria
 } from './formato';
 
 describe('fechas', () => {
@@ -81,6 +82,16 @@ describe('CSV', () => {
 	});
 });
 
+describe('textoAutoria', () => {
+	it('describe cada autoría y calla lo que no se sabe', () => {
+		expect(textoAutoria('mujeres')).toBe('firmado solo por mujeres');
+		expect(textoAutoria('mixta')).toBe('firmado por mujeres y hombres');
+		expect(textoAutoria('ejecutivo')).toBe('presentado por la Presidencia de la República');
+		expect(textoAutoria('sin_dato')).toBeNull();
+		expect(textoAutoria(undefined)).toBeNull();
+	});
+});
+
 describe('parametrosFiltros', () => {
 	const base = {
 		texto: '',
@@ -90,6 +101,7 @@ describe('parametrosFiltros', () => {
 		tema: null,
 		camara: null,
 		autor: null,
+		autoria: null,
 		orden: 'recientes' as const,
 		pagina: 1
 	};
@@ -103,12 +115,13 @@ describe('parametrosFiltros', () => {
 		).toBe('q=sala+cuna');
 		expect(parametrosFiltros({ ...base, orden: 'antiguos' }).get('orden')).toBe('antiguos');
 	});
-	it('arrastra autor y cámara, y cambia de página', () => {
+	it('arrastra autor, autoría y cámara, y cambia de página', () => {
 		const p = parametrosFiltros(
-			{ ...base, autor: 'Pérez Ana', camara: 'Senado', pagina: 2 },
+			{ ...base, autor: 'Pérez Ana', autoria: 'mujeres', camara: 'Senado', pagina: 2 },
 			{ pagina: 3 }
 		);
 		expect(p.get('autor')).toBe('Pérez Ana');
+		expect(p.get('autoria')).toBe('mujeres');
 		expect(p.get('camara')).toBe('Senado');
 		expect(p.get('pagina')).toBe('3');
 	});

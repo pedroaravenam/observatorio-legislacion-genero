@@ -28,6 +28,7 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0 AS ingesta
 WORKDIR /app
 COPY --from=compilacion /salida/ingesta .
 COPY datos/referencia/titulos-boletines-1990-2026.csv /app/referencia/titulos-boletines-1990-2026.csv
+COPY datos/referencia/parlamentarios-bcn.csv datos/referencia/alias-autores.csv /app/referencia/
 RUN chmod -R a+rX /app
 USER $APP_UID
 ENTRYPOINT ["dotnet", "Observatorio.Ingesta.dll"]

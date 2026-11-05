@@ -26,6 +26,15 @@ public class OpcionesIngesta
 
     /// <summary>Carga histórica del Senado, reanudable y con cadencia quincenal.</summary>
     public bool CompletaSenado { get; set; }
+
+    /// <summary>Cargar diputados y reseñas de la BCN, y enlazar con ellos a los autores de las fichas del Senado.</summary>
+    public bool Parlamentarios { get; set; }
+
+    /// <summary>Listado de la BCN (reseñas parlamentarias) con sexo derivado.</summary>
+    public string RutaBcn { get; set; } = "/app/referencia/parlamentarios-bcn.csv";
+
+    /// <summary>Correcciones a mano: autores que ninguna lista identifica por nombre.</summary>
+    public string RutaAlias { get; set; } = "/app/referencia/alias-autores.csv";
 }
 
 /// <summary>
@@ -56,6 +65,26 @@ public sealed partial class EjecutorIngesta(
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 LogFallaCompleta(log, ex);
+                Environment.ExitCode = 1;
+            }
+            vida.StopApplication();
+            return;
+        }
+
+        if (opciones.Value.Parlamentarios)
+        {
+            using var scope = scopes.CreateScope();
+            try
+            {
+                var ingesta = scope.ServiceProvider.GetRequiredService<IngestaParlamentarios>();
+                var ejecucion = await ingesta.EjecutarAsync(stoppingToken).ConfigureAwait(false);
+                LogResumenParlamentarios(log, ejecucion.Id, ejecucion.RegistrosInsertados, ejecucion.RegistrosActualizados,
+                    ejecucion.RegistrosSinCambio, ejecucion.Detalle);
+                Environment.ExitCode = 0;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                LogFallaParlamentarios(log, ex);
                 Environment.ExitCode = 1;
             }
             vida.StopApplication();
@@ -137,6 +166,12 @@ public sealed partial class EjecutorIngesta(
 
     [LoggerMessage(Level = LogLevel.Error, Message = "La ingesta del año {Anno} falló.")]
     private static partial void LogFalla(ILogger log, Exception ex, int anno);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Parlamentarios (ejecución {Id}): {Insertados} insertados, {Actualizados} actualizados, {SinCambio} sin cambio. {Detalle}")]
+    private static partial void LogResumenParlamentarios(ILogger log, long id, int insertados, int actualizados, int sinCambio, string? detalle);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "La carga de parlamentarios falló.")]
+    private static partial void LogFallaParlamentarios(ILogger log, Exception ex);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Senado {Boletin} (ejecución {Id}): respuestas {Nuevas} nuevas / {Repetidas} repetidas; registros {Insertados} insertados, {Actualizados} actualizados, {SinCambio} sin cambio.")]
     private static partial void LogResumenSenado(ILogger log, string boletin, long id, int nuevas, int repetidas, int insertados, int actualizados, int sinCambio);

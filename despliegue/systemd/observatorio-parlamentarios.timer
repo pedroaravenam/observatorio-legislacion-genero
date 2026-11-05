@@ -1,0 +1,10 @@
+[Unit]
+Description=Observatorio de Legislación de Género: Diputados y sexo de los autores (09:30, hora de Chile, después de la consulta diaria)
+
+[Timer]
+OnCalendar=*-*-* 09:30 America/Santiago
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

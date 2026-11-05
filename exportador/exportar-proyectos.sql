@@ -42,7 +42,7 @@ $$ SELECT coalesce(json_agg(v ORDER BY o), '[]')::text
    WHERE v IS NOT NULL $$;
 
 SELECT format(
-  'INSERT INTO proyecto (boletin, numero, titulo, fecha_ingreso, anno, iniciativa, camara_origen, estado, etapa, subetapa, urgencia, ley_numero, diario_oficial, url_documento, materias, autores, tramites, ultimo_tramite, fuente, actualizado, verificado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (boletin) DO UPDATE SET numero = excluded.numero, titulo = excluded.titulo, fecha_ingreso = excluded.fecha_ingreso, anno = excluded.anno, iniciativa = excluded.iniciativa, camara_origen = excluded.camara_origen, estado = excluded.estado, etapa = excluded.etapa, subetapa = excluded.subetapa, urgencia = excluded.urgencia, ley_numero = excluded.ley_numero, diario_oficial = excluded.diario_oficial, url_documento = excluded.url_documento, materias = excluded.materias, autores = excluded.autores, tramites = excluded.tramites, ultimo_tramite = excluded.ultimo_tramite, fuente = excluded.fuente, actualizado = excluded.actualizado, verificado = excluded.verificado;',
+  'INSERT INTO proyecto (boletin, numero, titulo, fecha_ingreso, anno, iniciativa, camara_origen, estado, etapa, subetapa, urgencia, ley_numero, diario_oficial, url_documento, materias, autores, tramites, ultimo_tramite, fuente, actualizado, verificado, autoria, autores_detalle) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (boletin) DO UPDATE SET numero = excluded.numero, titulo = excluded.titulo, fecha_ingreso = excluded.fecha_ingreso, anno = excluded.anno, iniciativa = excluded.iniciativa, camara_origen = excluded.camara_origen, estado = excluded.estado, etapa = excluded.etapa, subetapa = excluded.subetapa, urgencia = excluded.urgencia, ley_numero = excluded.ley_numero, diario_oficial = excluded.diario_oficial, url_documento = excluded.url_documento, materias = excluded.materias, autores = excluded.autores, tramites = excluded.tramites, ultimo_tramite = excluded.ultimo_tramite, fuente = excluded.fuente, actualizado = excluded.actualizado, verificado = excluded.verificado, autoria = excluded.autoria, autores_detalle = excluded.autores_detalle;',
   pg_temp.lit(f.boletin),
   split_part(f.boletin, '-', 1)::int,
   pg_temp.lit(btrim(regexp_replace(f.titulo, '\s+', ' ', 'g'))),
@@ -63,7 +63,9 @@ SELECT format(
   pg_temp.lit(tr.ultimo::text),
   pg_temp.lit(f.fuente),
   pg_temp.lit(to_char(f.actualizado AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')),
-  pg_temp.lit(to_char(f.verificado AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))
+  pg_temp.lit(to_char(f.verificado AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')),
+  pg_temp.lit(au.autoria),
+  pg_temp.lit(au.detalle)
 )
 FROM ficha f
 LEFT JOIN LATERAL (
@@ -72,6 +74,20 @@ LEFT JOIN LATERAL (
          max(s.fecha) AS ultimo
   FROM tramite_senado s WHERE s.proyecto_id = f.id
 ) tr ON true
+-- Autoría por sexo. Cada autor se enlaza por su nombre exacto con autor_enlace; un autor sin sexo conocido no cuenta
+-- para ninguna de las dos categorías, y si ninguno lo tiene el proyecto queda «sin_dato». Los mensajes los presenta el Ejecutivo.
+LEFT JOIN LATERAL (
+  SELECT coalesce(json_agg(json_build_array(a.texto, e.sexo, e.url) ORDER BY a.o), '[]')::text AS detalle,
+         CASE WHEN f.iniciativa = 'Mensaje' THEN 'ejecutivo'
+              WHEN count(*) FILTER (WHERE e.sexo = 'F') > 0 AND count(*) FILTER (WHERE e.sexo = 'M') > 0 THEN 'mixta'
+              WHEN count(*) FILTER (WHERE e.sexo = 'F') > 0 THEN 'mujeres'
+              WHEN count(*) FILTER (WHERE e.sexo = 'M') > 0 THEN 'hombres'
+              ELSE 'sin_dato' END AS autoria
+  FROM (SELECT pg_temp.plano(u.e::text) AS texto, u.o
+        FROM unnest(xpath('/proyecto/autores/autor/PARLAMENTARIO/text()', f.x)) WITH ORDINALITY AS u(e, o)) a
+  LEFT JOIN autor_enlace e ON e.texto = a.texto
+  WHERE a.texto IS NOT NULL
+) au ON true
 ORDER BY f.boletin;
 
 -- Última consulta exitosa al Senado (diaria o completa). Se toma de las ejecuciones y no de las fichas,

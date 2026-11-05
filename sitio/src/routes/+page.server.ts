@@ -9,7 +9,7 @@ import {
 	POR_PAGINA,
 	resumenGenero
 } from '#lib/server/consultas';
-import { CAMARAS } from '#lib/formato';
+import { AUTORIAS, CAMARAS } from '#lib/formato';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
@@ -34,6 +34,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 			estados: ESTADOS,
 			iniciativas: INICIATIVAS,
 			camaras: CAMARAS,
+			autorias: AUTORIAS,
 			autores
 		}
 	};

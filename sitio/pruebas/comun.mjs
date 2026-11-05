@@ -14,6 +14,7 @@ export const RUTAS = {
 	lista: { ruta: '/', espera: '.lista .fila' },
 	autor: { ruta: `/?autor=${encodeURIComponent(AUTOR)}`, espera: '.lista .fila' },
 	camaraOrden: { ruta: '/?camara=Senado&orden=antiguos', espera: '.lista .fila' },
+	autoria: { ruta: '/?autoria=mujeres', espera: '.lista .fila' },
 	pertinencia: { ruta: '/?q=sala+cuna&orden=pertinencia', espera: '.lista .fila' },
 	panorama: { ruta: '/panorama', espera: '[data-cifra="tema"]' },
 	acerca: { ruta: '/acerca', espera: 'h1' },

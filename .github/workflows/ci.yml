@@ -95,8 +95,9 @@ jobs:
           sqlite3 "$db" "CREATE TABLE proyecto (boletin TEXT PRIMARY KEY, actualizado TEXT NOT NULL); INSERT INTO proyecto VALUES ('1-01', '2026-11-01T00:00:00Z')"
           sh exportador/actualizar-esquema.sh "$db"
           sh exportador/actualizar-esquema.sh "$db"   # repetirlo no falla ni cambia nada
-          test "$(sqlite3 "$db" "SELECT count(*) FROM pragma_table_info('proyecto') WHERE name = 'verificado'")" = 1
+          test "$(sqlite3 "$db" "SELECT count(*) FROM pragma_table_info('proyecto') WHERE name IN ('verificado', 'autoria', 'autores_detalle')")" = 3
           test "$(sqlite3 "$db" "SELECT count(*) FROM proyecto")" = 1
+          test "$(sqlite3 "$db" "SELECT autoria, autores_detalle FROM proyecto")" = "sin_dato|[]"
       - name: Aplicar los esquemas a una base vacía
         run: |
           cat exportador/esquema.sql exportador/esquema-seleccion.sql | sqlite3 -bail "$RUNNER_TEMP/prueba.db"

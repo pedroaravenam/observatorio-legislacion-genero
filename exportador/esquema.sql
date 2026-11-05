@@ -23,12 +23,15 @@ CREATE TABLE IF NOT EXISTS proyecto (
   ultimo_tramite     TEXT,                      -- AAAA-MM-DD
   fuente             TEXT NOT NULL,
   actualizado        TEXT NOT NULL,             -- ISO 8601, última vez que se registró un cambio en la ficha
-  verificado         TEXT                       -- ISO 8601, última vez que el Senado entregó la ficha, haya cambiado o no
+  verificado         TEXT,                      -- ISO 8601, última vez que el Senado entregó la ficha, haya cambiado o no
+  autoria            TEXT NOT NULL DEFAULT 'sin_dato',  -- mujeres, hombres, mixta, ejecutivo o sin_dato
+  autores_detalle    TEXT NOT NULL DEFAULT '[]'         -- JSON: [[nombre, sexo F o M o null, enlace a la reseña o null]]
 );
 
 CREATE INDEX IF NOT EXISTS proyecto_fecha ON proyecto (fecha_ingreso DESC, numero DESC);
 CREATE INDEX IF NOT EXISTS proyecto_anno ON proyecto (anno);
 CREATE INDEX IF NOT EXISTS proyecto_ultimo ON proyecto (ultimo_tramite DESC);
+CREATE INDEX IF NOT EXISTS proyecto_autoria ON proyecto (autoria);
 
 -- La tabla seleccion_genero vive en esquema-seleccion.sql y se recrea en cada publicación.
 

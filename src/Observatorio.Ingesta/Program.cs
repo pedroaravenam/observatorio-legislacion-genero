@@ -15,6 +15,7 @@ builder.Services.Configure<OpcionesSenado>(builder.Configuration.GetSection(Opci
 builder.Services.AddHttpClient<ClienteSenado>(h => h.Timeout = Timeout.InfiniteTimeSpan);
 builder.Services.AddScoped<NormalizadorProyectos>();
 builder.Services.AddScoped<IngestaProyectosCamara>();
+builder.Services.AddScoped<IngestaParlamentarios>();
 builder.Services.AddScoped<NormalizadorSenado>();
 builder.Services.AddScoped<IngestaFichaSenado>();
 builder.Services.AddScoped<IngestaFechaSenado>();

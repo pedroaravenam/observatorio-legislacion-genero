@@ -253,14 +253,15 @@
 			<tr>
 				<td>Biblioteca del Congreso Nacional</td>
 				<td>
-					El texto de las leyes publicadas, que usamos en la selección y enlazamos desde cada ficha.
+					El texto de las leyes publicadas, que usamos en la selección y enlazamos desde cada ficha,
+					y las reseñas parlamentarias, de donde sale el sexo de quienes la Cámara no informa.
 				</td>
 			</tr>
 			<tr>
 				<td>Cámara de Diputadas y Diputados</td>
 				<td>
-					Datos de diputadas y diputados, como su sexo y su partido, que todavía estamos
-					incorporando.
+					El servicio de diputados, que informa el sexo de cada diputada y diputado desde 1990.
+					Todavía no incorporamos su partido ni sus votaciones.
 				</td>
 			</tr>
 		</tbody>
@@ -276,6 +277,24 @@
 		Los documentos, en cambio, no se copian: el texto de cada proyecto y de cada ley se abre
 		directamente en el sitio oficial. Ninguna de estas instituciones patrocina ni opera el
 		Observatorio.
+	</p>
+
+	<h3 id="sexo">Sexo de quienes firman</h3>
+	<p>
+		El Senado entrega a cada autor como un nombre, sin identificador ni sexo. Para saber si un
+		proyecto lo firman mujeres, hombres o ambos, enlazamos cada nombre con una persona: primero con
+		el servicio de diputados de la Cámara, que informa el sexo; si no figura allí, con las reseñas
+		parlamentarias de la Biblioteca del Congreso Nacional, donde el sexo se deriva del texto de la
+		reseña («diputada», «senador»); y, para los pocos nombres que ninguna lista identifica, con una
+		corrección a mano que declara su origen en el repositorio. El enlace exige que los apellidos
+		coincidan por completo y que el nombre sea uno de los nombres de pila de la persona; ante una
+		duda no adivinamos, y si todos los candidatos tienen el mismo sexo conservamos el sexo sin
+		atribuir la persona.
+	</p>
+	<p>
+		«Solo mujeres», «solo hombres» y «mujeres y hombres» se refieren a quienes firman la moción. No
+		dicen nada sobre su contenido, sobre quién la impulsó ni sobre el partido, y los mensajes de la
+		Presidencia quedan aparte porque no tienen autoría parlamentaria.
 	</p>
 
 	<h2 id="actualizacion">Cómo se actualizan</h2>
@@ -329,12 +348,15 @@
 		<li>
 			Los proyectos presentados después del 22 de octubre de 2026 los decide el agente, que puede
 			equivocarse y no distingue los matices que una persona detectaría al leer el proyecto
-			completo. Tampoco los volvemos a evaluar cuando se convierten en ley, aunque el texto final
-			pueda incluir disposiciones de género que el proyecto no tenía.
+			completo. Los que decidió el agente se vuelven a evaluar cuando se convierten en ley; los de
+			la lista inicial, no, aunque el texto final pueda incluir disposiciones de género que el
+			proyecto no tenía.
 		</li>
 		<li>
-			Todavía no mostramos datos propios de la Cámara, como el sexo de quienes firman cada proyecto,
-			así que los autores aparecen tal como los registra el Senado.
+			El sexo de senadoras y senadores, y de quienes no figuran en el servicio de la Cámara, es un
+			dato derivado de una reseña o corregido a mano, no uno que informe una fuente. Unos pocos
+			autores se corrigieron a mano según su nombre propio y están pendientes de verificar. Los
+			autores siguen apareciendo tal como los escribe el Senado, y todavía no mostramos votaciones.
 		</li>
 	</ul>
 
@@ -349,9 +371,10 @@
 	<p>
 		Cada fila es un proyecto, con su boletín, título, fecha de ingreso, tipo de iniciativa, cámara
 		de origen, estado, etapa, número de ley, fecha de publicación en el Diario Oficial, fecha del
-		último trámite, autores y temas, además de un enlace a su ficha. Los autores y los temas vienen
-		separados por punto y coma. Los datos provienen de fuentes públicas oficiales y se actualizan
-		con la frecuencia descrita arriba; la fecha de la última consulta aparece al pie de cada página.
+		último trámite, autores, autoría según el sexo de quienes firman y temas, además de un enlace a
+		su ficha. Los autores y los temas vienen separados por punto y coma. Los datos provienen de
+		fuentes públicas oficiales y se actualizan con la frecuencia descrita arriba; la fecha de la
+		última consulta aparece al pie de cada página.
 	</p>
 
 	<h2>Código, datos y correcciones</h2>

@@ -78,7 +78,26 @@ public class Parlamentario
     public required string Nombre { get; set; }
     public required string ApellidoPaterno { get; set; }
     public string? ApellidoMaterno { get; set; }
+    /// <summary>F o M; null si no se conoce.</summary>
+    public char? Sexo { get; set; }
+    /// <summary>camara (campo de la fuente), bcn (derivado de la reseña) o manual.</summary>
+    public string? SexoOrigen { get; set; }
+    public string? UrlFicha { get; set; }
     public DateTimeOffset Creado { get; set; }
+    public DateTimeOffset Actualizado { get; set; }
+}
+
+/// <summary>
+/// Enlace entre el nombre de un autor como lo escribe el Senado y un parlamentario. Si la identidad no es única
+/// pero todos los candidatos comparten sexo, queda el sexo sin parlamentario.
+/// </summary>
+public class AutorEnlace
+{
+    public required string Texto { get; set; }
+    public long? ParlamentarioId { get; set; }
+    public char? Sexo { get; set; }
+    public required string Metodo { get; set; }
+    public string? Url { get; set; }
     public DateTimeOffset Actualizado { get; set; }
 }
 

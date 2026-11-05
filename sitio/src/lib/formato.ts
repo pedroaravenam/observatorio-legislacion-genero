@@ -165,6 +165,32 @@ export type Orden = (typeof ORDENES)[number];
 
 export const CAMARAS = ['Cámara de Diputados', 'Senado'] as const;
 
+/**
+ * Autoría de una moción según el sexo de quienes la firman. «mixta» es al menos una mujer y al menos un hombre.
+ * Los mensajes (Presidencia) y las mociones sin sexo conocido de sus autores no se pueden filtrar así.
+ */
+export const AUTORIAS = [
+	{ clave: 'mujeres', nombre: 'Solo mujeres' },
+	{ clave: 'hombres', nombre: 'Solo hombres' },
+	{ clave: 'mixta', nombre: 'Mujeres y hombres' }
+] as const;
+
+/** Texto de la autoría de un proyecto para mostrar en su ficha. */
+export function textoAutoria(autoria: string | null | undefined): string | null {
+	switch (autoria) {
+		case 'mujeres':
+			return 'firmado solo por mujeres';
+		case 'hombres':
+			return 'firmado solo por hombres';
+		case 'mixta':
+			return 'firmado por mujeres y hombres';
+		case 'ejecutivo':
+			return 'presentado por la Presidencia de la República';
+		default:
+			return null;
+	}
+}
+
 /** Orden que se aplica cuando la persona no elige uno: por pertinencia si buscó palabras, si no por fecha. */
 export function ordenPorDefecto(texto: string): Orden {
 	return texto.trim() ? 'pertinencia' : 'recientes';
@@ -179,6 +205,7 @@ export interface FiltrosUrl {
 	tema: string | null;
 	camara: string | null;
 	autor: string | null;
+	autoria: string | null;
 	orden: Orden;
 	pagina: number;
 }
@@ -196,6 +223,7 @@ export function parametrosFiltros(
 	if (f.tema) p.set('tema', f.tema);
 	if (f.camara) p.set('camara', f.camara);
 	if (f.autor) p.set('autor', f.autor);
+	if (f.autoria) p.set('autoria', f.autoria);
 	if (f.orden !== ordenPorDefecto(f.texto)) p.set('orden', f.orden);
 	const pagina = cambios.pagina ?? f.pagina;
 	if (pagina > 1) p.set('pagina', String(pagina));

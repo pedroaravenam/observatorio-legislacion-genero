@@ -9,6 +9,7 @@
 		numeroLey,
 		PASOS_TRAMITACION,
 		pasoTramitacion,
+		textoAutoria,
 		urlFichaSenado,
 		urlLeyBcn
 	} from '#lib/formato';
@@ -179,11 +180,26 @@
 					<h2 id="autores-titulo">
 						{p.autores.length === 1 ? 'Autor o autora' : `Autores (${p.autores.length})`}
 					</h2>
+					{#if textoAutoria(p.autoria) && p.autoria !== 'ejecutivo'}
+						<p class="autoria" data-autoria={p.autoria}>Proyecto {textoAutoria(p.autoria)}.</p>
+					{/if}
 					<ul class="nombres">
-						{#each p.autores as a (a)}<li>
-								<a href="/?autor={encodeURIComponent(a)}">{a}</a>
+						{#each p.autores_detalle as [nombre, sexo, url] (nombre)}<li>
+								<a href="/?autor={encodeURIComponent(nombre)}">{nombre}</a>
+								{#if sexo}<span class="suave"> · {sexo === 'F' ? 'mujer' : 'hombre'}</span>{/if}
+								{#if url}<a
+										class="resena"
+										href={url}
+										rel="noopener noreferrer"
+										aria-label="Reseña parlamentaria de {nombre} en la Biblioteca del Congreso Nacional"
+										>reseña</a
+									>{/if}
 							</li>{/each}
 					</ul>
+					<p class="nota-sexo suave">
+						El sexo viene del servicio de diputados de la Cámara o, cuando no figura allí, se deriva
+						de la reseña de la Biblioteca del Congreso Nacional; ver «Cómo funciona».
+					</p>
 				</section>
 			{/if}
 
@@ -402,6 +418,21 @@
 		margin: 0;
 		padding-left: 1.1rem;
 		font-size: 0.95rem;
+	}
+	.nombres li + li {
+		margin-top: 0.15rem;
+	}
+	.autoria {
+		margin: 0 0 0.5rem;
+		font-size: 0.95rem;
+	}
+	.resena {
+		margin-left: 0.4rem;
+		font-size: 0.85rem;
+	}
+	.nota-sexo {
+		margin: 0.6rem 0 0;
+		font-size: 0.82rem;
 	}
 	.materias {
 		list-style: none;

@@ -11,7 +11,9 @@
 	let texto = $derived(f.texto);
 	let autor = $derived(f.autor ?? '');
 	const hayFiltros = $derived(
-		Boolean(f.texto || f.anno || f.estado || f.iniciativa || f.tema || f.camara || f.autor)
+		Boolean(
+			f.texto || f.anno || f.estado || f.iniciativa || f.tema || f.camara || f.autor || f.autoria
+		)
 	);
 	const totales = $derived(
 		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
@@ -145,6 +147,19 @@
 						<option value={c} selected={f.camara === c}>{c}</option>
 					{/each}
 				</select>
+			</div>
+			<div class="campo">
+				<label for="autoria">Autoría de las mociones</label>
+				<select id="autoria" name="autoria" aria-describedby="autoria-ayuda">
+					<option value="">Todas</option>
+					{#each data.opciones.autorias as a (a.clave)}
+						<option value={a.clave} selected={f.autoria === a.clave}>{a.nombre}</option>
+					{/each}
+				</select>
+				<p id="autoria-ayuda" class="ayuda">
+					Según el sexo de quienes firman. Los mensajes de la Presidencia no tienen autoría
+					parlamentaria.
+				</p>
 			</div>
 			<div class="campo campo-autor">
 				<label for="autor">Autor o autora <span class="opcional">(opcional)</span></label>
