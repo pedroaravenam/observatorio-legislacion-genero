@@ -104,3 +104,46 @@ test('el informe de la lista v5 calcula porcentajes y deja una fila de decisión
 	assert.match(md, /\| regla\/T4_cuerpo_amplio \| \|/);
 	assert.match(md, /\*\*123-07\*\* — Título/);
 });
+
+test('el cruce pide mitad de lo que el otro sacó y mitad de lo que dejó, y solo señales discutibles', async () => {
+	const { sqlCruce } = await import('./lib.mjs');
+	const sql = sqlCruce('agente-abc123', 'claude', 40);
+	assert.match(sql, /r\.revisor <> 'claude'/);
+	assert.equal((sql.match(/LIMIT 20/g) ?? []).length, 2);
+	assert.match(sql, /r\.incluye = false/);
+	assert.match(sql, /r\.incluye = true/);
+	assert.match(sql, /\^\(T2\|T3\|T4\|T5\|L_\)/);
+	assert.throws(() => sqlCruce('agente-abc123', "x'; DROP", 40));
+	assert.throws(() => sqlCruce('agente-abc123', 'claude', 3.5));
+});
+
+test('el informe del cruce cuenta acuerdos y detalla cada desacuerdo con ambos motivos', async () => {
+	const { informeCruceMarkdown } = await import('./lib.mjs');
+	const caso = (b, o, s) => ({ boletin: b, titulo: `Título ${b}`, senal: 'regla/T4_cuerpo_amplio',
+		original: { revisor: 'claude', incluye: o, grupo: o ? 'componente' : 'fuera', confianza: 'alta', motivo: `m-claude-${b}`, sin_texto: null },
+		segundo: { revisor: 'codex', incluye: s, grupo: s ? 'componente' : 'fuera', confianza: 'media', motivo: `m-codex-${b}`, sin_texto: null } });
+	const md = informeCruceMarkdown({ version: 'v', fecha: '2026-11-05', filas: [caso('1-01', false, false), caso('2-01', false, true), caso('3-01', true, true)] });
+	assert.match(md, /\| claude → codex \| 3 \| 2 \(67 %\) \| 1 \| 2 \(67 %\) \|/);
+	assert.match(md, /### 2-01 — Título 2-01/);
+	assert.doesNotMatch(md, /### 1-01/);
+	assert.match(md, /m-claude-2-01/);
+	assert.match(md, /m-codex-2-01/);
+});
+
+test('aplicar la revisión v5 se hace en una transacción que se revierte si la cuenta no es la esperada', async () => {
+	const { sqlAplicarV5, sqlConteoAplicarV5 } = await import('./lib.mjs');
+	const manuales = [{ boletin: '154-07', grupo: 'componente', version: 'manual-2026-11-05', motivo: "Es d'ella" }];
+	const sql = sqlAplicarV5({ version: 'agente-abc123', esperadas: 623, manuales });
+	assert.match(sql, /^BEGIN;/);
+	assert.match(sql, /COMMIT;/);
+	assert.match(sql, /IF n <> 623 THEN RAISE EXCEPTION/);
+	assert.match(sql, /motivo = 'Es d''ella'/);
+	assert.ok(sql.indexOf("WHERE boletin = '154-07'") < sql.indexOf('WITH aplicadas'), 'las decisiones manuales van antes de las del agente');
+	assert.match(sql, /c\.codificador IN \('regla', 'claude'\)/);
+	assert.throws(() => sqlAplicarV5({ version: 'agente-abc123', esperadas: 0, manuales }));
+	assert.throws(() => sqlAplicarV5({ version: "x'; DROP", esperadas: 5, manuales }));
+	assert.throws(() => sqlAplicarV5({ version: 'agente-abc123', esperadas: 5, manuales: [{ ...manuales[0], grupo: 'otro' }] }));
+	const conteo = sqlConteoAplicarV5('agente-abc123', ['154-07', "1'-07"]);
+	assert.match(conteo, /NOT IN \('154-07','1''-07'\)/);
+	assert.doesNotMatch(conteo, /UPDATE|DELETE|INSERT/);
+});

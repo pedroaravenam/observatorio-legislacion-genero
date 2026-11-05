@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { SQL_EJEMPLOS_V5, SQL_INFORME_V5, SQL_VERSIONES_V5, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -494,6 +494,67 @@ SELECT (SELECT count(*) FROM clasificacion_genero WHERE incluye AND codificador 
 	console.log(`Revisión de la lista v5 con el criterio ${version}: ${r.hechas} de ${r.total}. El agente sacaría ${r.salen} (${r.salen_alta} con confianza alta).`);
 }
 
+/** Segunda opinión: este agente (REVISOR) revisa casos que revisó el otro. No escribe en la base; deja un JSON en la carpeta de salida. */
+async function cruzarV5() {
+	const n = Number(opcion('n', 40));
+	const casos = leerCsv(await psql(sqlCruce(version, revisor, n)));
+	const proyectos = await obtenerProyectos(casos.map((c) => c.boletin));
+	const porBoletin = new Map(proyectos.map((p) => [p.boletin, p]));
+	console.log(`[${revisor}] Segunda opinión sobre ${casos.length} proyectos revisados por el otro agente. Criterio ${version}, modelo ${modelo}.`);
+	let hechos = 0;
+	const resultados = await enParalelo(casos, async (c) => {
+		try {
+			const r = await clasificarUno(porBoletin.get(c.boletin), { esperarTexto: false });
+			hechos++;
+			if (hechos % 10 === 0) console.log(`[${revisor}] ${hechos} de ${casos.length}`);
+			return {
+				boletin: c.boletin, titulo: porBoletin.get(c.boletin).titulo, senal: c.senal,
+				original: { revisor: c.revisor_original, incluye: c.incluye === 't', grupo: c.grupo, confianza: c.confianza, motivo: c.motivo, sin_texto: c.sin_texto || null },
+				segundo: { revisor, incluye: r.incluye, grupo: r.grupo, confianza: r.confianza, motivo: r.motivo, sin_texto: r.sin_texto }
+			};
+		} catch (e) {
+			console.error(`[${revisor}] ${c.boletin} FALLÓ: ${e.message}`);
+			return null;
+		}
+	});
+	const ok = resultados.filter(Boolean);
+	mkdirSync(salida, { recursive: true });
+	const archivo = opcion('archivo', join(salida, `cruce-${revisor}.json`));
+	writeFileSync(archivo, JSON.stringify(ok, null, 1));
+	const iguales = ok.filter((f) => f.original.incluye === f.segundo.incluye).length;
+	console.log(`[${revisor}] ${ok.length} de ${casos.length} con segunda opinión; coinciden en la decisión ${iguales}. Guardado en ${archivo}.`);
+	if (limiteAlcanzado) {
+		console.error(`[${revisor}] Se agotó el límite de uso: quedaron ${casos.length - ok.length} sin revisar.`);
+		process.exitCode = CODIGO_LIMITE;
+	}
+}
+
+/** Junta los JSON de las segundas opiniones en un informe de acuerdos y desacuerdos. */
+function informeCruce() {
+	const filas = ['claude', 'codex'].flatMap((r) => {
+		try { return JSON.parse(readFileSync(join(salida, `cruce-${r}.json`), 'utf8')); } catch { return []; }
+	});
+	if (!filas.length) throw new Error(`No hay resultados de cruce en ${salida}.`);
+	const fecha = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+	const md = informeCruceMarkdown({ version, fecha, filas });
+	const archivo = opcion('archivo', null);
+	if (archivo) (writeFileSync(archivo, md), console.log(`Informe guardado en ${archivo}.`));
+	else console.log(md);
+}
+
+/** Aplica la revisión del agente a la selección: saca las inclusiones de la v5 que el agente sacó, salvo las decisiones manuales. */
+async function aplicarV5() {
+	const manuales = JSON.parse(readFileSync(join(aqui, 'decisiones-desarrollador.json'), 'utf8'));
+	const [r] = leerCsv(await psql(sqlConteoAplicarV5(version, manuales.map((m) => m.boletin))));
+	console.log(`Criterio ${version}. Se retirarían ${r.a_sacar} proyectos de la selección (hoy hay ${r.incluidos} incluidos; quedarían ${Number(r.incluidos) - Number(r.a_sacar)}). Decisiones manuales que se registran: ${manuales.length}.`);
+	if (!args.includes('--aplicar')) return console.log(`Ensayo: no se cambió nada. Para aplicar: aplicar-v5 --aplicar --esperadas ${r.a_sacar}`);
+	if (Number(opcion('esperadas', NaN)) !== Number(r.a_sacar)) throw new Error(`Falta --esperadas ${r.a_sacar} (la cantidad que acaba de calcularse); no se aplica nada.`);
+	console.log(await psql(sqlAplicarV5({ version, esperadas: Number(r.a_sacar), manuales })));
+	console.log('Publicando la base del sitio...');
+	await ssh('sudo /opt/observatorio/trabajo.sh publicar');
+	console.log('Aplicado y publicado.');
+}
+
 async function informeV5() {
 	const filas = leerCsv(await psql(SQL_INFORME_V5));
 	const ejemplos = leerCsv(await psql(SQL_EJEMPLOS_V5));
@@ -508,6 +569,9 @@ async function informeV5() {
 try {
 	if (orden === 'progreso') await progreso();
 	else if (orden === 'informe-v5') await informeV5();
+	else if (orden === 'cruzar-v5') await cruzarV5();
+	else if (orden === 'aplicar-v5') await aplicarV5();
+	else if (orden === 'informe-cruce') informeCruce();
 	else if (orden === 'version') console.log(version);
 	else if (orden === 'aplicar-niveles') await aplicarNiveles();
 	else if (orden === 'probar') await probar();

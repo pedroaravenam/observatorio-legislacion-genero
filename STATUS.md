@@ -27,7 +27,7 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 ## Pendientes priorizados
 
 1. ~~Fecha de verificación por ficha~~ hecha y publicada el 4 de noviembre (migración 0009, versión `0cf5927`); las fechas parten de la cota del relleno y avanzan con cada consulta.
-2. Decidir por señal qué hacer con los falsos positivos de la lista v5, con el [informe del 5 de noviembre](docs/mediciones/revision-v5-2026-11-05.md): el agente revisó las 2.149 con el criterio vigente y sacaría 624 (521 con confianza alta), desde el 8 % de T1 hasta el 66 % de T4. No se ha aplicado ningún cambio.
+2. **Aplicar la revisión del agente a la selección** (decidido el 5 de noviembre tras validar 24 casos): ejecutar `node --disable-warning=ExperimentalWarning despliegue/clasificador/clasificar.mjs aplicar-v5 --aplicar --esperadas 623`. Retira 623 proyectos (quedan 1.547), registra 154-07 y 14588-13 como decisiones manuales y publica. Hay respaldo previo y la lista de lo retirado está en `docs/mediciones/exclusiones-v5-aplicadas-2026-11-05.csv`.
 3. Incorporar votaciones de la Cámara y textos de la BCN. El sexo de los autores ya está (4 de noviembre; 7 correcciones manuales por verificar en `datos/referencia/alias-autores.csv`).
 4. Seguir el plan de cortes: fecha de verificación por ficha, v5, autores de la Cámara, resiliencia y textos de la BCN (CI ya instalada, falta confirmar su primera corrida en verde).
 5. Revisar los términos de reutilización de datos de las tres fuentes.

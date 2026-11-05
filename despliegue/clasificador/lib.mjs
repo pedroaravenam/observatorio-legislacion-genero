@@ -259,3 +259,87 @@ export function informeV5Markdown({ version, fecha, filas, ejemplos, versiones =
 	l.push('', '## Decisión del desarrollador', '', 'Por cada señal: mantener, sacar o revisar caso a caso. Lo que se decida se aplica como una sola operación por señal, con su motivo registrado.', '', '| Señal | Decisión |', '|---|---|', ...filas.map((f) => `| ${f.senal} | |`), '');
 	return l.join('\n');
 }
+
+/** Casos para que un agente dé su segunda opinión sobre lo que revisó el otro: mitad que el otro sacó, mitad que dejó. */
+export function sqlCruce(version, revisor, n) {
+	if (!/^[\w.-]+$/.test(version) || !/^[a-z]+$/.test(revisor) || !Number.isInteger(n) || n < 2 || n > 400) throw new Error('Parámetros de cruce no válidos.');
+	const base = (incluye) => `SELECT c.boletin, c.codificador || '/' || coalesce(c.nivel_senal, '-') AS senal, r.revisor AS revisor_original,
+  r.incluye, r.grupo, r.confianza, r.motivo, r.sin_texto
+  FROM revision_v5 r JOIN clasificacion_genero c ON c.boletin = r.boletin
+  WHERE r.version = '${version}' AND r.revisor <> '${revisor}' AND c.incluye AND c.codificador IN ('regla', 'claude')
+    AND c.nivel_senal ~ '^(T2|T3|T4|T5|L_)' AND r.incluye = ${incluye}
+  ORDER BY md5(r.boletin || 'cruce') LIMIT ${n / 2}`;
+	return `(${base(false)}) UNION ALL (${base(true)});`;
+}
+
+/** Informe de los casos en que dos agentes revisaron el mismo proyecto: acuerdo y detalle de cada desacuerdo. */
+export function informeCruceMarkdown({ version, fecha, filas }) {
+	const pct = (a, b) => (b ? `${Math.round((100 * a) / b)} %` : '—');
+	const mismo = (f) => f.original.incluye === f.segundo.incluye;
+	const grupoIgual = (f) => f.original.grupo === f.segundo.grupo;
+	const desacuerdos = filas.filter((f) => !mismo(f));
+	const l = [`# Segunda opinión cruzada sobre la lista v5 — ${fecha}`, '',
+		`Criterio \`${version}\`. Cada proyecto lo revisó primero un agente y después el otro, con la misma evidencia, sin ver la decisión anterior. Son ${filas.length} proyectos de las señales T2, T3, T4, T5 y lectura de leyes, la mitad de los que el primer agente sacó y la mitad de los que dejó. No es una muestra aleatoria de la lista: sobrerrepresenta lo dudoso, así que el desacuerdo real de toda la lista es menor.`, '',
+		'## Cuánto coinciden', '',
+		'| Primer agente → segundo | Casos | Misma decisión | Distinta decisión | Mismo grupo |', '|---|---:|---:|---:|---:|'];
+	for (const [a, b] of [['claude', 'codex'], ['codex', 'claude']]) {
+		const c = filas.filter((f) => f.original.revisor === a && f.segundo.revisor === b);
+		l.push(`| ${a} → ${b} | ${c.length} | ${c.filter(mismo).length} (${pct(c.filter(mismo).length, c.length)}) | ${c.filter((f) => !mismo(f)).length} | ${c.filter(grupoIgual).length} (${pct(c.filter(grupoIgual).length, c.length)}) |`);
+	}
+	const sacoPrimero = filas.filter((f) => !f.original.incluye);
+	const dejoPrimero = filas.filter((f) => f.original.incluye);
+	l.push('', '| Qué hizo el primero | Casos | El segundo coincide |', '|---|---:|---:|',
+		`| Sacó el proyecto | ${sacoPrimero.length} | ${sacoPrimero.filter(mismo).length} (${pct(sacoPrimero.filter(mismo).length, sacoPrimero.length)}) |`,
+		`| Lo dejó | ${dejoPrimero.length} | ${dejoPrimero.filter(mismo).length} (${pct(dejoPrimero.filter(mismo).length, dejoPrimero.length)}) |`, '',
+		`## Los ${desacuerdos.length} desacuerdos`, '',
+		'Por cada uno: qué dijo cada agente y por qué. La columna «Acierta» es para que el desarrollador marque quién tiene razón: primero, segundo, ninguno o dudoso. El texto de los motivos es de los agentes.', '');
+	const etiqueta = (d) => `${d.revisor}: **${d.incluye ? `deja (${d.grupo})` : 'saca'}**, confianza ${d.confianza}${d.sin_texto ? `, sin texto (${d.sin_texto})` : ''}`;
+	for (const f of desacuerdos.sort((a, b) => a.senal.localeCompare(b.senal) || a.boletin.localeCompare(b.boletin))) {
+		l.push(`### ${f.boletin} — ${f.titulo.slice(0, 160)}`, '', `Señal de la v5: ${f.senal}`, '',
+			`- ${etiqueta(f.original)}. ${f.original.motivo}`, `- ${etiqueta(f.segundo)}. ${f.segundo.motivo}`, '', 'Acierta: ', '');
+	}
+	return l.join('\n');
+}
+
+const GRUPOS_VALIDOS = ['tema_central', 'componente', 'debil'];
+const lit = (s) => `'${String(s).replaceAll("'", "''")}'`;
+
+/** Cuántas inclusiones de la lista v5 sacaría la revisión del agente, sin contar las decisiones manuales. Solo lee. */
+export function sqlConteoAplicarV5(version, manuales) {
+	if (!/^[\w.-]+$/.test(version)) throw new Error('Versión de criterio no válida.');
+	const excluidos = manuales.length ? manuales.map(lit).join(',') : "''";
+	return `SELECT count(*) FILTER (WHERE NOT r.incluye AND r.boletin NOT IN (${excluidos})) AS a_sacar,
+       (SELECT count(*) FROM clasificacion_genero WHERE incluye) AS incluidos
+FROM revision_v5 r JOIN clasificacion_genero c ON c.boletin = r.boletin
+WHERE r.version = '${version}' AND c.incluye AND c.codificador IN ('regla', 'claude');`;
+}
+
+/**
+ * Aplica en una sola transacción lo que el desarrollador decidió: primero sus decisiones manuales (prevalecen) y luego las
+ * salidas del agente. Si la cantidad de salidas no es exactamente la esperada, se revierte todo.
+ */
+export function sqlAplicarV5({ version, esperadas, manuales }) {
+	if (!/^[\w.-]+$/.test(version)) throw new Error('Versión de criterio no válida.');
+	if (!Number.isInteger(esperadas) || esperadas < 1 || esperadas > 2000) throw new Error('La cantidad esperada debe ser un entero entre 1 y 2000.');
+	for (const m of manuales) {
+		if (!/^\d{1,6}-\d{2}$/.test(m.boletin) || !GRUPOS_VALIDOS.includes(m.grupo) || !m.motivo || m.motivo.length > 600 || !/^[\w.-]+$/.test(m.version))
+			throw new Error(`Decisión manual no válida: ${m.boletin}`);
+	}
+	const manual = manuales.map((m) => `UPDATE clasificacion_genero SET incluye = true, grupo = ${lit(m.grupo)}, nivel_senal = 'M_decision_manual',
+  version = ${lit(m.version)}, codificador = 'desarrollador', confianza = NULL, motivo = ${lit(m.motivo)}, clasificado = now()
+  WHERE boletin = ${lit(m.boletin)};`).join('\n');
+	return `BEGIN;
+${manual}
+DO $$ DECLARE n int; BEGIN
+  WITH aplicadas AS (
+    UPDATE clasificacion_genero c SET incluye = false, grupo = 'fuera', nivel_senal = NULL, version = r.version, codificador = 'agente',
+      confianza = r.confianza, motivo = r.motivo, clasificado = now()
+    FROM revision_v5 r
+    WHERE r.boletin = c.boletin AND r.version = '${version}' AND NOT r.incluye AND c.incluye AND c.codificador IN ('regla', 'claude')
+    RETURNING 1)
+  SELECT count(*) INTO n FROM aplicadas;
+  IF n <> ${esperadas} THEN RAISE EXCEPTION 'Se esperaban ${esperadas} exclusiones y salieron %; no se aplica nada.', n; END IF;
+END $$;
+COMMIT;
+SELECT count(*) AS incluidos_ahora FROM clasificacion_genero WHERE incluye;`;
+}
