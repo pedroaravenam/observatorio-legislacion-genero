@@ -10,3 +10,6 @@ tmp/
 *.log
 __pycache__/
 despliegue/alerta.conf
+
+# Salida de los agentes del clasificador (se regenera; la procedencia queda en la base y en docs/mediciones)
+clasificador-salida/
