@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-05 — Limpieza de volúmenes de pruebas en la máquina de desarrollo (commit de este avance)
+
+Con la aprobación del desarrollador («los que son nuestros sí, los de otros proyectos no, solo los que estén sin uso») se eliminaron 328 volúmenes anónimos de Podman, 19,75 GB, creados entre el 14 de octubre y el 4 de noviembre por contenedores de PostgreSQL de CI y de pruebas. Para saber de quién era cada uno se leyó, solo lectura, el catálogo `pg_database` de cada volumen: los 328 contenían una base llamada `observatorio` y ninguna otra, y no estaban referenciados por ningún contenedor. No se tocaron los 46 con una base `educacion`, los 2 de supabase, los 20 ilegibles o vacíos, los 8 sin nombre de base reconocible ni los 8 volúmenes con nombre. Se borraron uno a uno con `podman volume rm`, sin forzar. El disco pasó de 96 % a 82 % (26 GB libres). Los volúmenes venían de los contenedores `postgres` de los servicios de CI del ejecutor propio y de mis pruebas locales, que usaban `docker rm -f` sin `-v`; las pruebas de esta sesión ya usan `-fv`.
+
 ## 2026-11-05 — Copia cifrada del respaldo en R2, funcionando (commit de este avance)
 
 Con la sesión de `wrangler` del desarrollador se creó el bucket privado `observatorio-respaldos` en su cuenta de Cloudflare (sin acceso público ni dominios, y con una regla que borra los objetos a los 30 días) y se configuró la copia cifrada del respaldo diario con el método `wrangler`, sin llaves S3. Hay dos buckets más en esa cuenta (`vault-pedro` y `visor-lclu-en-vivo`) que no se tocaron. La clave de cifrado se creó en `~/.config/observatorio-genero/respaldo.clave` sin mostrarla.
