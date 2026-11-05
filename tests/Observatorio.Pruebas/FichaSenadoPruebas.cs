@@ -63,11 +63,74 @@ public class IngestaFichaSenadoPruebas : IAsyncLifetime
         await Ingestas.Crear(db, FuenteSimulada.ConFixtures2025(), detalle: false).EjecutarAsync(2025, CancellationToken.None);
     }
 
-    private static async Task<EjecucionIngesta> EjecutarAsync(SenadoSimulado fuente)
+    private static async Task<EjecucionIngesta> EjecutarAsync(SenadoSimulado fuente, TimeProvider? reloj = null,
+        string origen = "ficha", ContextoCargaSenado? contexto = null)
     {
+        reloj ??= TimeProvider.System;
         await using var db = BaseDeDatos.NuevoContexto();
-        var ingesta = new IngestaFichaSenado(fuente.Cliente(), db, new NormalizadorSenado(db, TimeProvider.System), TimeProvider.System);
-        return await ingesta.EjecutarAsync("17641-13", CancellationToken.None);
+        var ingesta = new IngestaFichaSenado(fuente.Cliente(reloj), db, new NormalizadorSenado(db, reloj), reloj);
+        return await ingesta.EjecutarAsync("17641-13", CancellationToken.None, origen, contexto);
+    }
+
+    private sealed class RelojManual(DateTimeOffset inicio) : TimeProvider
+    {
+        public DateTimeOffset Ahora { get; set; } = inicio;
+        public override DateTimeOffset GetUtcNow() => Ahora;
+    }
+
+    [FactConBaseDatos]
+    public async Task LaVerificacionAvanzaConUnaRespuestaRepetidaSinMoverLaFechaDelCambio()
+    {
+        await CargarCamaraAsync();
+        var fuente = new SenadoSimulado();
+        var reloj = new RelojManual(new DateTimeOffset(2026, 11, 1, 10, 0, 0, TimeSpan.Zero));
+        await EjecutarAsync(fuente, reloj);
+        var primera = reloj.Ahora;
+        reloj.Ahora = primera.AddDays(1);
+
+        var segunda = await EjecutarAsync(fuente, reloj);
+
+        Assert.Equal(1, segunda.RespuestasRepetidas);
+        await using var db = BaseDeDatos.NuevoContexto();
+        var proyecto = await db.Proyectos.SingleAsync(x => x.Boletin == "17641-13");
+        Assert.Equal(primera, proyecto.FechaConsultaSenado);
+        Assert.Equal(primera.AddDays(1), proyecto.VerificadoSenado);
+    }
+
+    [FactConBaseDatos]
+    public async Task LaDesactualizacionUsaLaUltimaVerificacionDeLaFichaYNoLaCargaAnterior()
+    {
+        await CargarCamaraAsync();
+        var fuente = new SenadoSimulado();
+        var reloj = new RelojManual(new DateTimeOffset(2026, 11, 1, 10, 0, 0, TimeSpan.Zero));
+        var cargaAnterior = reloj.Ahora;
+        await EjecutarAsync(fuente, reloj);
+        reloj.Ahora = cargaAnterior.AddDays(1);
+        await EjecutarAsync(fuente, reloj);
+        var ultimaVerificacion = reloj.Ahora;
+
+        reloj.Ahora = cargaAnterior.AddDays(3);
+        long padre;
+        await using (var db = BaseDeDatos.NuevoContexto())
+        {
+            var ejecucion = new EjecucionIngesta
+            {
+                Proceso = IngestaCompletaSenado.Proceso, Parametros = "prueba", Inicio = reloj.Ahora,
+                Estado = EstadoEjecucion.EnCurso,
+            };
+            db.Ejecuciones.Add(ejecucion);
+            await db.SaveChangesAsync();
+            padre = ejecucion.Id;
+        }
+        fuente.Contenido = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(fuente.Contenido).Replace(
+            "Ingreso de proyecto .", "Ingreso de proyecto corregido.", StringComparison.Ordinal));
+        await EjecutarAsync(fuente, reloj, "completa", new ContextoCargaSenado(padre, cargaAnterior));
+
+        await using var verificacion = BaseDeDatos.NuevoContexto();
+        var diferencia = await verificacion.DesactualizacionesSenado.SingleAsync();
+        Assert.Equal(ultimaVerificacion, diferencia.UltimaConfirmacion);
+        var proyecto = await verificacion.Proyectos.SingleAsync(x => x.Boletin == "17641-13");
+        Assert.Equal(reloj.Ahora, proyecto.VerificadoSenado);
     }
 
     [FactConBaseDatos]
@@ -165,10 +228,10 @@ public class IngestaFichaSenadoPruebas : IAsyncLifetime
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(Contenido) });
         }
 
-        public ClienteSenado Cliente() => new(
+        public ClienteSenado Cliente(TimeProvider? reloj = null) => new(
             new HttpClient(this, disposeHandler: false),
             Options.Create(new OpcionesSenado { Intentos = 1 }),
-            TimeProvider.System,
+            reloj ?? TimeProvider.System,
             NullLogger<ClienteSenado>.Instance);
     }
 }

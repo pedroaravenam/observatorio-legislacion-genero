@@ -95,6 +95,7 @@ public class ObservatorioDbContext(DbContextOptions<ObservatorioDbContext> optio
             e.Property(x => x.SubetapaSenado).HasColumnName("subetapa_senado");
             e.Property(x => x.RespuestaSenadoId).HasColumnName("respuesta_senado_id");
             e.Property(x => x.FechaConsultaSenado).HasColumnName("fecha_consulta_senado");
+            e.Property(x => x.VerificadoSenado).HasColumnName("verificado_senado");
             e.Property(x => x.HashSenado).HasColumnName("hash_senado").IsFixedLength();
             e.HasIndex(x => x.Boletin).IsUnique();
             e.HasOne(x => x.TipoIniciativa).WithMany().HasForeignKey(x => x.TipoIniciativaId);

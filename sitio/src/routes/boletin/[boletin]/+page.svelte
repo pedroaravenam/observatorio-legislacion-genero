@@ -229,6 +229,9 @@
 
 	<p class="procedencia">
 		Los datos de esta ficha provienen del servicio de tramitación del Senado.
+		{#if fechaHoraChile(p.verificado)}Se verificó con el Senado por última vez el {fechaHoraChile(
+				p.verificado
+			)}.{/if}
 		{#if fechaHoraChile(p.actualizado)}Su último cambio se registró el {fechaHoraChile(
 				p.actualizado
 			)}.{/if}

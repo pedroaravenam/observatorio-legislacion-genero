@@ -16,20 +16,20 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
     public const string Fuente = "senado";
 
     public async Task<ResultadoNormalizacion> NormalizarAsync(RespuestaCruda cruda, string boletin, CancellationToken ct,
-        string origen = "ficha", ContextoCargaSenado? contextoCarga = null)
+        string origen = "ficha", ContextoCargaSenado? contextoCarga = null, DateTimeOffset? consultadoEn = null)
     {
         ValidarCruda(cruda);
         var ficha = LectorFichaSenado.Leer(Encoding.UTF8.GetBytes(cruda.Contenido), boletin,
             origen is "base" or "completa");
-        return await NormalizarFichasAsync(cruda, [ficha], origen, contextoCarga, ct).ConfigureAwait(false);
+        return await NormalizarFichasAsync(cruda, [ficha], origen, contextoCarga, consultadoEn, ct).ConfigureAwait(false);
     }
 
     public async Task<ResultadoNormalizacion> NormalizarLoteAsync(RespuestaCruda cruda, CancellationToken ct,
-        string origen = "fecha")
+        string origen = "fecha", DateTimeOffset? consultadoEn = null)
     {
         ValidarCruda(cruda);
         var fichas = LectorFichaSenado.LeerLote(Encoding.UTF8.GetBytes(cruda.Contenido));
-        return await NormalizarFichasAsync(cruda, fichas, origen, null, ct).ConfigureAwait(false);
+        return await NormalizarFichasAsync(cruda, fichas, origen, null, consultadoEn, ct).ConfigureAwait(false);
     }
 
     private static void ValidarCruda(RespuestaCruda cruda)
@@ -41,7 +41,7 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
 
     private async Task<ResultadoNormalizacion> NormalizarFichasAsync(
         RespuestaCruda cruda, IReadOnlyList<FichaFuenteSenado> fichas, string origen,
-        ContextoCargaSenado? contextoCarga, CancellationToken ct)
+        ContextoCargaSenado? contextoCarga, DateTimeOffset? consultadoEn, CancellationToken ct)
     {
         // Toda la respuesta se valida antes de modificar la base. Una falla posterior revierte el lote.
         await using var transaccion = await db.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
@@ -52,7 +52,7 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
         foreach (var ficha in fichas)
         {
             var (resultado, proyecto, hashAnterior, fechaAnterior) =
-                await NormalizarFichaAsync(cruda, ficha, origen, ct).ConfigureAwait(false);
+                await NormalizarFichaAsync(cruda, ficha, origen, consultadoEn ?? cruda.FechaConsulta, ct).ConfigureAwait(false);
             insertados += resultado.Insertados;
             actualizados += resultado.Actualizados;
             sinCambio += resultado.SinCambio;
@@ -91,7 +91,7 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
 
     private async Task<(ResultadoNormalizacion Resultado, ProyectoLey Proyecto, string? HashAnterior,
         DateTimeOffset? FechaAnterior)> NormalizarFichaAsync(
-        RespuestaCruda cruda, FichaFuenteSenado ficha, string origen, CancellationToken ct)
+        RespuestaCruda cruda, FichaFuenteSenado ficha, string origen, DateTimeOffset consultadoEn, CancellationToken ct)
     {
         var proyecto = await db.Proyectos.Include(x => x.TramitesSenado).Include(x => x.ObservacionesSenado)
             .SingleOrDefaultAsync(x => x.Boletin == ficha.Boletin, ct).ConfigureAwait(false);
@@ -100,7 +100,8 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
         int insertados = 0, actualizados = 0, sinCambio = 0;
         var nuevo = proyecto is null;
         var hashAnterior = proyecto?.HashSenado;
-        var fechaAnterior = proyecto?.FechaConsultaSenado;
+        // La última confirmación de la ficha es su última verificación válida, no el último cambio de estado.
+        var fechaAnterior = proyecto?.VerificadoSenado ?? proyecto?.FechaConsultaSenado;
         var hashEstado = HashEstado(ficha);
         if (nuevo)
         {
@@ -123,6 +124,7 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
                 SubetapaSenado = ficha.Subetapa,
                 RespuestaSenadoId = cruda.Id,
                 FechaConsultaSenado = cruda.FechaConsulta,
+                VerificadoSenado = consultadoEn,
                 HashSenado = hashEstado,
             };
             db.Proyectos.Add(proyecto);
@@ -155,6 +157,10 @@ public sealed class NormalizadorSenado(ObservatorioDbContext db, TimeProvider re
             }
             else sinCambio++;
         }
+
+        // Una respuesta repetida reutiliza la fila cruda anterior: la hora real de la consulta viene aparte.
+        if (proyecto!.VerificadoSenado is null || consultadoEn > proyecto.VerificadoSenado)
+            proyecto.VerificadoSenado = consultadoEn;
 
         var existentes = proyecto!.TramitesSenado.ToDictionary(x => x.Posicion);
         foreach (var tramite in ficha.Tramites)

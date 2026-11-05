@@ -30,7 +30,10 @@ public class ProyectoLey
     public string? EtapaSenado { get; set; }
     public string? SubetapaSenado { get; set; }
     public long? RespuestaSenadoId { get; set; }
+    /// <summary>Cuándo cambió por última vez el estado de la ficha en la base (no cuándo se verificó).</summary>
     public DateTimeOffset? FechaConsultaSenado { get; set; }
+    /// <summary>Última consulta que devolvió esta ficha, haya cambiado o no.</summary>
+    public DateTimeOffset? VerificadoSenado { get; set; }
     public string? HashSenado { get; set; }
     public List<TramiteSenado> TramitesSenado { get; } = [];
     public List<ObservacionTramiteSenado> ObservacionesSenado { get; } = [];

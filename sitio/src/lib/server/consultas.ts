@@ -58,6 +58,8 @@ export interface Ficha extends FilaLista {
 	autores: string[];
 	tramites: [string | null, string | null, string, string | null, string | null][];
 	actualizado: string;
+	/** Última vez que el Senado entregó la ficha, haya cambiado o no; null en bases publicadas antes de registrarla. */
+	verificado: string | null;
 	fuente: string;
 	nivel_senal: string | null;
 	version_seleccion: string | null;

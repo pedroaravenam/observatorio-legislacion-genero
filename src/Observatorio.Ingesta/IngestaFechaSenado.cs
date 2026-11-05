@@ -71,7 +71,7 @@ public sealed class IngestaFechaSenado(
                 // Leer el lote completo antes de modificar tablas canónicas.
                 _ = LectorFichaSenado.LeerLote(respuesta.Contenido);
                 var resultado = await normalizador.NormalizarLoteAsync(cruda, ct,
-                    hayBase ? "fecha" : "base").ConfigureAwait(false);
+                    hayBase ? "fecha" : "base", respuesta.FechaConsulta).ConfigureAwait(false);
                 ejecucion.RegistrosInsertados = resultado.Insertados;
                 ejecucion.RegistrosActualizados = resultado.Actualizados;
                 ejecucion.RegistrosSinCambio = resultado.SinCambio;

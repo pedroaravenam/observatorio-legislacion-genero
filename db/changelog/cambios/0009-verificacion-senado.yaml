@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0009-verificado-senado
+      author: observatorio
+      comment: >
+        Última vez que el Senado entregó la ficha, haya cambiado o no. fecha_consulta_senado solo avanza cuando
+        cambia el estado; esta columna avanza con toda respuesta válida y sirve de cota de la última confirmación.
+      changes:
+        - addColumn:
+            tableName: proyecto_ley
+            columns:
+              - column: { name: verificado_senado, type: TIMESTAMP WITH TIME ZONE }
+        - sql:
+            comment: Cota inferior para lo ya cargado; las verificaciones sin cambio anteriores no quedaron registradas.
+            sql: UPDATE proyecto_ley SET verificado_senado = fecha_consulta_senado WHERE fecha_consulta_senado IS NOT NULL

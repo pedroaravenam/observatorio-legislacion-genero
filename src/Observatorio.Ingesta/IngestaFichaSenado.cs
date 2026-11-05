@@ -70,7 +70,7 @@ public sealed class IngestaFichaSenado(
             }
             else
             {
-                var resultado = await normalizador.NormalizarAsync(cruda, boletin, ct, origen, contextoCarga).ConfigureAwait(false);
+                var resultado = await normalizador.NormalizarAsync(cruda, boletin, ct, origen, contextoCarga, respuesta.FechaConsulta).ConfigureAwait(false);
                 ejecucion.RegistrosInsertados = resultado.Insertados;
                 ejecucion.RegistrosActualizados = resultado.Actualizados;
                 ejecucion.RegistrosSinCambio = resultado.SinCambio;

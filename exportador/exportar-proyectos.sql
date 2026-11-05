@@ -7,7 +7,8 @@
 
 CREATE TEMP TABLE ficha AS
 SELECT p.id, p.boletin, p.titulo, p.fecha_ingreso, p.estado_senado, p.etapa_senado, p.subetapa_senado,
-       p.fuente, coalesce(p.fecha_consulta_senado, p.fecha_consulta) AS verificado,
+       p.fuente, coalesce(p.fecha_consulta_senado, p.fecha_consulta) AS actualizado,
+       coalesce(p.verificado_senado, p.fecha_consulta_senado, p.fecha_consulta) AS verificado,
        t.nombre AS iniciativa, c.nombre AS camara_origen,
        CASE WHEN xml_is_well_formed_document(r.contenido)
             THEN (xpath(format('/proyectos/proyecto[descripcion/boletin="%s"]', p.boletin), r.contenido::xml))[1]
@@ -16,7 +17,7 @@ FROM proyecto_ley p
 LEFT JOIN tipo_iniciativa t ON t.id = p.tipo_iniciativa_id
 LEFT JOIN camara c ON c.id = p.camara_origen_id
 LEFT JOIN respuesta_cruda r ON r.id = p.respuesta_senado_id
-WHERE coalesce(p.fecha_consulta_senado, p.fecha_consulta) >= :'desde'::timestamptz;
+WHERE coalesce(p.verificado_senado, p.fecha_consulta_senado, p.fecha_consulta) >= :'desde'::timestamptz;
 
 -- Literal SQLite en una sola línea: comillas simples duplicadas, sin secuencias de escape.
 -- Los saltos de línea pasan a espacios, para que cada sentencia ocupe una línea, y «--» se escribe
@@ -41,7 +42,7 @@ $$ SELECT coalesce(json_agg(v ORDER BY o), '[]')::text
    WHERE v IS NOT NULL $$;
 
 SELECT format(
-  'INSERT INTO proyecto (boletin, numero, titulo, fecha_ingreso, anno, iniciativa, camara_origen, estado, etapa, subetapa, urgencia, ley_numero, diario_oficial, url_documento, materias, autores, tramites, ultimo_tramite, fuente, actualizado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (boletin) DO UPDATE SET numero = excluded.numero, titulo = excluded.titulo, fecha_ingreso = excluded.fecha_ingreso, anno = excluded.anno, iniciativa = excluded.iniciativa, camara_origen = excluded.camara_origen, estado = excluded.estado, etapa = excluded.etapa, subetapa = excluded.subetapa, urgencia = excluded.urgencia, ley_numero = excluded.ley_numero, diario_oficial = excluded.diario_oficial, url_documento = excluded.url_documento, materias = excluded.materias, autores = excluded.autores, tramites = excluded.tramites, ultimo_tramite = excluded.ultimo_tramite, fuente = excluded.fuente, actualizado = excluded.actualizado;',
+  'INSERT INTO proyecto (boletin, numero, titulo, fecha_ingreso, anno, iniciativa, camara_origen, estado, etapa, subetapa, urgencia, ley_numero, diario_oficial, url_documento, materias, autores, tramites, ultimo_tramite, fuente, actualizado, verificado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT (boletin) DO UPDATE SET numero = excluded.numero, titulo = excluded.titulo, fecha_ingreso = excluded.fecha_ingreso, anno = excluded.anno, iniciativa = excluded.iniciativa, camara_origen = excluded.camara_origen, estado = excluded.estado, etapa = excluded.etapa, subetapa = excluded.subetapa, urgencia = excluded.urgencia, ley_numero = excluded.ley_numero, diario_oficial = excluded.diario_oficial, url_documento = excluded.url_documento, materias = excluded.materias, autores = excluded.autores, tramites = excluded.tramites, ultimo_tramite = excluded.ultimo_tramite, fuente = excluded.fuente, actualizado = excluded.actualizado, verificado = excluded.verificado;',
   pg_temp.lit(f.boletin),
   split_part(f.boletin, '-', 1)::int,
   pg_temp.lit(btrim(regexp_replace(f.titulo, '\s+', ' ', 'g'))),
@@ -61,6 +62,7 @@ SELECT format(
   pg_temp.lit(coalesce(tr.json, '[]')),
   pg_temp.lit(tr.ultimo::text),
   pg_temp.lit(f.fuente),
+  pg_temp.lit(to_char(f.actualizado AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')),
   pg_temp.lit(to_char(f.verificado AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'))
 )
 FROM ficha f

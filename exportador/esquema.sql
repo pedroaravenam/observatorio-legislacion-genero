@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS proyecto (
   tramites           TEXT NOT NULL DEFAULT '[]',  -- JSON: [[fecha, sesión, descripción, etapa, cámara]]
   ultimo_tramite     TEXT,                      -- AAAA-MM-DD
   fuente             TEXT NOT NULL,
-  actualizado        TEXT NOT NULL              -- ISO 8601, última vez que se registró un cambio en la ficha
+  actualizado        TEXT NOT NULL,             -- ISO 8601, última vez que se registró un cambio en la ficha
+  verificado         TEXT                       -- ISO 8601, última vez que el Senado entregó la ficha, haya cambiado o no
 );
 
 CREATE INDEX IF NOT EXISTS proyecto_fecha ON proyecto (fecha_ingreso DESC, numero DESC);

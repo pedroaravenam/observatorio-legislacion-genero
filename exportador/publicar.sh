@@ -29,6 +29,8 @@ if [ "$boletines" -lt 1000 ]; then
   exit 1
 fi
 
+/app/actualizar-esquema.sh "$base"
+
 {
   echo '.bail on'
   echo '.timeout 60000'
