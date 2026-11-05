@@ -73,6 +73,16 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  clasificador:
+    name: Clasificador - pruebas de las funciones puras
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node --test despliegue/clasificador/lib.test.mjs
+
   exportador:
     name: Exportador - el esquema de SQLite es válido
     runs-on: ubuntu-latest
