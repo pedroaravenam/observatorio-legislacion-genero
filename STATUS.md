@@ -2,7 +2,7 @@
 
 ## Resumen
 
-Fecha: 2026-11-03. Último commit: clasificación automática de proyectos nuevos (este avance). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí).
+Fecha: 2026-11-03. Último avance: verificación por ficha, informe de la lista v5 y reevaluación al publicarse como ley (versión `0cf5927` en el VPS). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí).
 
 El sitio está en línea con los 18.616 boletines del Senado (1990–2026): listado con búsqueda de texto completo, filtros por año, estado y origen, y ficha por boletín con su tramitación y enlaces a la ficha oficial del Senado, al texto del mensaje o moción y a la ley en la BCN. Por defecto muestra la selección de género (lista v5, 2.155 boletines; 2.154 cruzan con la base), presentada como criterio propio del Observatorio. «Cómo funciona» explica el criterio, los cinco pasos de selección con conteos en vivo, los temas, las fuentes y la actualización. «Panorama» (/panorama) muestra estados, mensajes frente a mociones, temas, temas por período, tiempo hasta ser ley y los 15 parlamentarios con más proyectos. La selección vive en la tabla `clasificacion_genero` del VPS y es el único universo del sitio (ya no hay opción «Todos»; un boletín fuera de ella responde 404). Los proyectos nuevos los decide cada noche un agente que aplica el criterio (`despliegue/clasificador/`), con su motivo y su nivel de relación con el género (alta, media o débil) visibles en la ficha; lo dudoso entra marcado como relación débil. La portada filtra por tema, cámara de origen y autor, ordena de cuatro maneras y descarga los resultados en CSV o JSON (`/datos/proyectos.csv` y `.json`, con los mismos filtros). Las pruebas con navegador (Chromium, Firefox y WebKit), axe y consistencia están en `sitio/pruebas/` y su informe en [docs/pruebas](docs/pruebas/2026-11-03-pruebas-del-sitio.md); los temas se asignan por el título con el léxico de `sitio/src/lib/temas.ts`.
 
@@ -22,11 +22,11 @@ Arquitectura vigente: todo en el VPS Hetzner compartido con Atendia, en el Compo
 
 ## Próximo paso exacto
 
-1. Publicar en el VPS la verificación por ficha (migración 0009). Primera corrida de las tareas de la noche: jueves 5 de noviembre a las 03:01 (temporizador `observatorio-noche`, ya instalado). Revisar el correo de resumen y `clasificar.mjs progreso`; cuando termine la pasada sobre la lista original, decidir qué hacer con lo que el agente sacaría.
+1. Primera corrida de las tareas de la noche: jueves 5 de noviembre a las 03:01 (temporizador `observatorio-noche`, ya instalado). Revisar el correo de resumen y `clasificar.mjs progreso`; cuando termine la pasada sobre la lista original, decidir qué hacer con lo que el agente sacaría.
 
 ## Pendientes priorizados
 
-1. ~~Fecha de verificación por ficha~~ hecha el 4 de noviembre en el código (migración 0009); falta publicarla en el VPS.
+1. ~~Fecha de verificación por ficha~~ hecha y publicada el 4 de noviembre (migración 0009, versión `0cf5927`); las fechas parten de la cota del relleno y avanzan con cada consulta.
 2. Decidir por señal qué hacer con los falsos positivos de la lista v5, con el [informe del 4 de noviembre](docs/mediciones/revision-v5-2026-11-04.md) (el agente sacaría el 15 % de T1 hasta el 90 % de T4; revisiones hechas con un criterio anterior al vigente). La pasada nocturna termina la revisión con el criterio vigente; regenerar el informe con `clasificar.mjs informe-v5 --archivo`. No se ha aplicado ningún cambio.
 3. Incorporar datos de la Cámara (autores con identificador y sexo, votaciones) y textos de la BCN.
 4. Seguir el plan de cortes: fecha de verificación por ficha, v5, autores de la Cámara, resiliencia y textos de la BCN (CI ya instalada, falta confirmar su primera corrida en verde).
