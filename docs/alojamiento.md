@@ -119,7 +119,7 @@ Los dos trabajadores no se pisan: cada uno **reclama una tanda de 30 proyectos e
 
 Codex se lanza con `--ignore-user-config --ignore-rules`: la configuración personal de Codex tiene un hook que fallaba con un modelo no admitido por la cuenta ChatGPT. El modelo se fija en el script porque el rol `ligero` de OMP alterna entre modelos de distintos proveedores en cada consulta; se cambia con `CODEX_MODELO=openai-codex/<modelo>:<esfuerzo>`.
 
-La pasada **no cambia quién está en la selección**: deja su opinión en `revision_v5`, y `clasificar.mjs progreso` muestra cuánto se lleva y cuántos sacaría el agente. Aplicar esas salidas es una decisión pendiente. Para ensayar la lógica sin gastar créditos: `SOLO=ninguno despliegue/tareas-de-noche.sh`. Para pararlo: `systemctl --user disable --now observatorio-noche.timer`.
+Desde el 5 de noviembre de 2026 esta pasada solo corre si se la pide con `REVISAR_V5=1`: la revisión ya se aceptó y se aplicó, y cada cambio de criterio la repetiría entera. La pasada **no cambia quién está en la selección**: deja su opinión en `revision_v5`, y `clasificar.mjs progreso` muestra cuánto se lleva y cuántos sacaría el agente. Aplicar esas salidas es una decisión pendiente. Para ensayar la lógica sin gastar créditos: `SOLO=ninguno despliegue/tareas-de-noche.sh`. Para pararlo: `systemctl --user disable --now observatorio-noche.timer`.
 
 Casos de control: `clasificar.mjs probar` prueba al agente contra `despliegue/clasificador/casos-control.json` (cada caso con la respuesta que decidió el desarrollador) y debe repetirse cada vez que cambie `criterio.md`. `clasificar.mjs pendientes --reclasificar` repasa las decisiones que el propio agente tomó con una versión anterior del criterio.
 

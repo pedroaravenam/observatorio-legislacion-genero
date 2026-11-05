@@ -3,7 +3,7 @@
 # nadie trabaja. En orden:
 #   1. Casos de control: cada versión del criterio se prueba una vez por trabajador (Claude y Codex). Si uno no pasa, no corre.
 #   2. Proyectos nuevos: el agente clasifica lo que ingresó y reclasifica lo decidido con un criterio anterior.
-#   3. Pasada sobre la lista v5, con Claude y Codex EN PARALELO. Reclaman tandas en la base y no se pisan. Cada uno sigue
+#   3. (Solo con REVISAR_V5=1) Pasada sobre la lista v5, con Claude y Codex EN PARALELO. Reclaman tandas en la base y no se pisan. Cada uno sigue
 #      hasta terminar o hasta que se agote su límite de uso; lo hecho queda guardado y se retoma la noche siguiente.
 #   4. Niveles de relación con el género para los proyectos de la lista v5 que el agente mantiene, y publicación del sitio.
 #   5. Un correo con el resumen, si hubo novedades.
@@ -62,10 +62,11 @@ if [[ ${puede[claude]:-9} == 0 ]]; then
   done
 fi
 
-# 3. Pasada sobre la lista v5, en paralelo.
+# 3. Pasada sobre la lista v5, en paralelo. Desde el 5 de noviembre de 2026 la revisión de la v5 está aceptada y aplicada, y cada
+#    cambio de criterio la repetiría entera (más de mil llamadas): solo corre si se pide con REVISAR_V5=1.
 pids=()
 for rev in "${trabajadores[@]}"; do
-  if [[ ${puede[$rev]:-9} == 0 ]]; then
+  if [[ ${REVISAR_V5:-0} == 1 && ${puede[$rev]:-9} == 0 ]]; then
     ( REVISOR=$rev "${nodo[@]}" revisar-v5 >"$tmp/v5-$rev.log" 2>&1; echo $? >"$tmp/v5-$rev.codigo" ) &
     pids+=($!)
   fi
