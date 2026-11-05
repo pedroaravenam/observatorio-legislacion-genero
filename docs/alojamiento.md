@@ -68,6 +68,14 @@ Instalación, que se hace en el VPS con `ssh atendia-development`:
 3. Instalar las unidades: `sudo cp /opt/observatorio/systemd/observatorio-{alerta@.service,atraso.service,atraso.timer,fecha.service,completa.service} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now observatorio-atraso.timer`.
 4. Probar el aviso de falla sin romper nada: `sudo systemctl start observatorio-alerta@observatorio-fecha.service`. Si ya llegó uno en las últimas 20 horas, se omite; para repetirlo se borra `/var/lib/observatorio-alertas`.
 
+## Monitor externo y segunda copia del respaldo
+
+**Monitor.** `.github/workflows/monitor.yml` corre cada 30 minutos en GitHub, fuera del VPS. `despliegue/monitor/comprobar.sh` pide la portada y `/estado.json` (tres intentos) y mira la antigüedad de la última consulta exitosa al Senado (umbral de 72 horas). Si el sitio no responde o los datos pasan el umbral, abre un issue con la etiqueta `monitor` (GitHub avisa por correo a quien sigue el repositorio) y lo cierra solo cuando todo vuelve. Complementa las alertas por correo del VPS, que no pueden avisar si el propio VPS cae.
+
+**Segunda copia.** El respaldo diario (`respaldar-ingesta.sh`) queda en esta máquina y, si existe `~/.config/observatorio-genero/r2.conf`, `subir-respaldo-r2.sh` lo cifra con AES-256 (PBKDF2, clave en `respaldo.clave`) y lo sube a un bucket privado de Cloudflare R2; vuelve a bajarlo y compara su SHA-256 antes de darlo por bueno. Una falla de esa subida hace fallar el respaldo y dispara el aviso por correo. Si faltan la configuración o la clave, la subida se omite. Para dejarla lista: crear el bucket y un token de R2 limitado a ese bucket en el panel de Cloudflare, ejecutar `despliegue/configurar-r2.sh` (pide las llaves por pantalla) y guardar `respaldo.clave` en el gestor de contraseñas, porque sin ella las copias no se pueden leer. Se recomienda una regla de ciclo de vida del bucket que borre a los 30 días. Para recuperar: `despliegue/descargar-respaldo-r2.sh <objeto>.dump.enc <destino>.dump` y luego `pg_restore`. La cadena cifrar, subir, bajar y descifrar se probó con un respaldo real contra un servidor de pruebas que verifica la firma SigV4; no se ha probado contra Cloudflare mismo.
+
+El respaldo local también se niega a correr con menos de 1,5 GB libres en el disco y avisa por correo.
+
 ## Parlamentarios y sexo de los autores
 
 El Senado entrega a cada autor como un nombre («Apellidos, Nombres»). El trabajo `trabajo.sh parlamentarios` (unidad `observatorio-parlamentarios`, 09:30 hora de Chile, después de la consulta diaria) hace cuatro cosas, en una sola ejecución de la imagen de ingesta:

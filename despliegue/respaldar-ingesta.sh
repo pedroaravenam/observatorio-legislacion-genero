@@ -5,6 +5,8 @@
 #   RESPALDOS     carpeta de destino (por defecto ~/respaldos/observatorio)
 #   DIAS_DIARIOS  cuántos días seguidos se conservan (7)       SEMANAS  cuántas semanas se conserva el de los domingos (4)
 #   VPS           alias SSH del servidor (atendia-development)
+#   MINIMO_LIBRE  bytes libres exigidos antes de volcar (1500000000)
+# Si existe ~/.config/observatorio-genero/r2.conf, cada respaldo se sube además, cifrado, a Cloudflare R2 (subir-respaldo-r2.sh).
 set -euo pipefail
 # Bajo systemd el PATH es mínimo y docker puede estar en ~/.local/bin.
 export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
@@ -14,6 +16,7 @@ destino=${RESPALDOS:-$HOME/respaldos/observatorio}
 dias_diarios=${DIAS_DIARIOS:-7}
 semanas=${SEMANAS:-4}
 minimo_bytes=${MINIMO_BYTES:-5000000}
+minimo_libre=${MINIMO_LIBRE:-1500000000}
 ssh_opciones=(-o BatchMode=yes -o ConnectTimeout=20)
 
 mkdir -p "$destino"
@@ -51,6 +54,10 @@ podar() {
 }
 
 respaldar() {
+  # Con el disco lleno el volcado queda cortado o no se escribe; mejor fallar antes y avisar.
+  local libre
+  libre=$(df --output=avail -B1 "$destino" | tail -n 1 | tr -d ' ')
+  ((libre > minimo_libre)) || { echo "Quedan solo $((libre / 1024 / 1024)) MB libres donde se guardan los respaldos; se necesitan más de $((minimo_libre / 1024 / 1024)) MB." >&2; return 1; }
   echo "Volcando la base en $vps..."
   local sha_remoto sha_local bytes entradas
   sha_remoto=$(ssh "${ssh_opciones[@]}" "$vps" "set -e; cd /opt/observatorio
@@ -69,6 +76,11 @@ respaldar() {
   chmod 600 "$final"
   printf '%s  %s\n' "$sha_local" "$(basename "$final")" >"$final.sha256"
   echo "Respaldo guardado: $final ($((bytes / 1024 / 1024)) MB, $entradas entradas, SHA-256 verificado)."
+  # Segunda copia, cifrada, fuera de esta máquina (Cloudflare R2). Código 3: no está configurada, se omite sin error.
+  local subir codigo=0
+  subir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/subir-respaldo-r2.sh"
+  "$subir" "$final" || codigo=$?
+  ((codigo == 0 || codigo == 3)) || { echo 'Falló la copia externa a R2; el respaldo local sí quedó guardado.' >&2; return 1; }
   # Señal de vida: la comprobación diaria del VPS avisa si pasan 48 horas sin esta marca.
   ssh "${ssh_opciones[@]}" "$vps" 'sudo mkdir -p /var/lib/observatorio-alertas && sudo touch /var/lib/observatorio-alertas/respaldo-ok'
   podar

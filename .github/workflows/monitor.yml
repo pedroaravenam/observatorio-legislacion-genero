@@ -1,0 +1,56 @@
+name: Monitor
+
+# Comprueba desde fuera del VPS que el sitio responde y que los datos no están viejos. Si algo falla abre un issue
+# (GitHub avisa por correo a quien sigue el repositorio) y lo cierra solo cuando se recupera. Las alertas del propio VPS
+# no pueden avisar si el VPS se cae; esto sí.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+env:
+  URL_SITIO: https://legislaciongenero.cl
+  UMBRAL_HORAS: "72"
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  sitio:
+    name: Disponibilidad y frescura
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar
+        run: |
+          resultado=$(despliegue/monitor/comprobar.sh "$URL_SITIO")
+          echo "$resultado"
+          echo "sitio=$(grep '^sitio=' <<<"$resultado" | cut -d= -f2-)" >> "$GITHUB_ENV"
+          echo "datos=$(grep '^datos=' <<<"$resultado" | cut -d= -f2-)" >> "$GITHUB_ENV"
+      - name: Abrir o cerrar los avisos
+        run: |
+          gh label create monitor --color B60205 --description "Aviso automático del monitor" 2>/dev/null || true
+          # gestionar <título> <estado>: abre un issue si el estado no es «ok» y no hay uno abierto; lo cierra si volvió a «ok».
+          gestionar() {
+            local titulo=$1 estado=$2 abierto
+            abierto=$(gh issue list --label monitor --state open --search "\"$titulo\" in:title" --json number,title \
+              --jq "map(select(.title == \"$titulo\")) | .[0].number // empty")
+            if [[ $estado == ok ]]; then
+              [[ -n $abierto ]] && gh issue close "$abierto" --comment "Se recuperó: el monitor volvió a comprobar $URL_SITIO y está en orden."
+            elif [[ $estado != desconocido && -z $abierto ]]; then
+              gh issue create --label monitor --title "$titulo" --body "El monitor detectó un problema en $URL_SITIO: **${estado#*:}**.
+
+          Revisión sugerida: \`ssh atendia-development\`, luego \`sudo docker compose -p observatorio ps\` y \`sudo journalctl -u observatorio-fecha.service -n 100 --no-pager\`.
+          Este aviso se cierra solo cuando el monitor vuelve a ver todo en orden. Comprobación: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            fi
+            return 0
+          }
+          gestionar "Monitor: el sitio no responde" "$sitio"
+          gestionar "Monitor: los datos están desactualizados" "$datos"
