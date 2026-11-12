@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0011-validacion-genero
+      author: observatorio
+      comment: >
+        Cola de casos limite que el desarrollador valida a mano. Mientras un caso esta pendiente, el exportador
+        no lo publica. Cada caso guarda lo que recomendo el agente y lo que decidio el desarrollador, para medir
+        la coincidencia y para dar al agente precedentes.
+      changes:
+        - createTable:
+            tableName: validacion_genero
+            columns:
+              - column: { name: boletin, type: VARCHAR(20), constraints: { primaryKey: true, primaryKeyName: pk_validacion_genero, nullable: false } }
+              - column: { name: estado, type: VARCHAR(10), constraints: { nullable: false }, remarks: "pendiente o validado" }
+              - column: { name: agente_incluye, type: BOOLEAN, constraints: { nullable: false } }
+              - column: { name: agente_grupo, type: VARCHAR(20) }
+              - column: { name: agente_confianza, type: VARCHAR(10) }
+              - column: { name: agente_motivo, type: VARCHAR(600) }
+              - column: { name: version, type: VARCHAR(20), constraints: { nullable: false }, remarks: "criterio con que decidio el agente" }
+              - column: { name: veredicto, type: BOOLEAN, remarks: "decision del desarrollador: true incluye, false excluye" }
+              - column: { name: grupo_veredicto, type: VARCHAR(20) }
+              - column: { name: razon, type: VARCHAR(600), remarks: "por que decidio asi el desarrollador" }
+              - column: { name: creado, type: TIMESTAMP WITH TIME ZONE, defaultValueComputed: CURRENT_TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: validado, type: TIMESTAMP WITH TIME ZONE }
+        - createIndex:
+            tableName: validacion_genero
+            indexName: ix_validacion_estado
+            columns:
+              - column: { name: estado }

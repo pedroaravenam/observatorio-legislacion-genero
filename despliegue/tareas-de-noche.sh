@@ -50,7 +50,8 @@ for rev in "${trabajadores[@]}"; do puerta "$rev"; puede[$rev]=$?; done
 
 # 2. Proyectos nuevos y decisiones del agente con un criterio anterior (siempre con Claude, que es lo que pasa la puerta del criterio).
 if [[ ${puede[claude]:-9} == 0 ]]; then
-  for modo in "pendientes" "pendientes --reclasificar"; do
+  # Lo decidido con un criterio anterior se repasa en tandas de TANDA_REPASO (50) por noche, primero lo publicado.
+  for modo in "pendientes" "pendientes --reclasificar --max ${TANDA_REPASO:-50}"; do
     REVISOR=claude "${nodo[@]}" $modo >"$tmp/paso.log" 2>&1
     c=$?
     cat "$tmp/paso.log" >>"$registro"
@@ -94,6 +95,12 @@ if [[ ${actualizados:-0} -gt 0 ]]; then
   ssh -o BatchMode=yes -o ConnectTimeout=20 "$vps" 'sudo /opt/observatorio/trabajo.sh publicar' >>"$registro" 2>&1 &&
     anotar "Niveles asignados a ${actualizados} proyectos de la lista v5 y sitio publicado." ||
     anotar "Se asignaron niveles a ${actualizados} proyectos, pero falló la publicación del sitio."
+fi
+# Casos límite que esperan la validación del desarrollador: se avisa siempre que haya, para que no queden olvidados.
+en_cola=$("${nodo[@]}" cola --contar 2>/dev/null | tail -1)
+if [[ ${en_cola:-0} =~ ^[0-9]+$ ]] && ((en_cola > 0)); then
+  novedad=1
+  anotar "Hay ${en_cola} casos límite pendientes de tu validación (no se publican hasta que los revises). Abre Claude Code en el proyecto y pide «revisemos los casos pendientes»."
 fi
 avance=$("${nodo[@]}" progreso 2>&1 | tail -1)
 echo "$avance" >>"$registro"

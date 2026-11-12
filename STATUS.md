@@ -31,6 +31,7 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 
 ## Próximo paso exacto
 
+0. **Clasificación (en curso, 12 de noviembre):** el criterio `agente-ed63abc7` («objeto primero») y la validación manual de casos límite están en el repositorio pero **sin aplicar en producción**. Orden: respaldo fresco (`despliegue/respaldar-ingesta.sh`) → migración `0011` → `clasificar.mjs encolar-publicados` (ensayo y luego `--aplicar --esperados N`; saca del sitio los débiles publicados con confianza media o baja hasta validarlos) → validar la cola con Claude (`clasificar.mjs cola`, luego `resolver`) → `systemctl --user enable --now observatorio-noche.timer` (hoy detenido). La noche repasa 50 decisiones del agente con criterio anterior, primero las incluidas (766 en total; unas 16 noches). No activar el temporizador antes de la migración: sin la tabla no se puede retener. Medido: 49 de 50 casos de control con Sonnet, 47 de 50 con Haiku (falla el caso de los animales); Sonnet sigue como agente principal.
 1. Activar la recepción de `contacto@legislaciongenero.cl` (Resend o un registro MX): el sitio ya publica esa dirección y el dominio raíz no tenía MX el 12 de noviembre, así que hoy no recibe correo.
 2. Crear las cuentas de Mercado Pago, GitHub Sponsors y Ko-fi y poner sus direcciones en `sitio/src/lib/sitio.ts`; mientras estén vacías, el sitio dice que los canales se están habilitando.
 3. Escribir la reseña del autor (`AUTOR.resena` en el mismo archivo) y revisar los nombres de las 16 leyes hito (`sitio/src/lib/server/contexto.ts`).

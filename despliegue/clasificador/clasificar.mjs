@@ -6,6 +6,10 @@
 //   node clasificar.mjs sembrar                               carga una vez las decisiones de la lista v5
 //   node clasificar.mjs probar [--casos ruta]                 prueba al agente con casos de control (casos-control.json)
 //   node clasificar.mjs revisar-v5 [--max 450]                segunda opinión del agente sobre la lista v5 (no cambia la selección)
+//   node clasificar.mjs cola [--archivo ruta.json] [--contar]  casos límite pendientes de validación manual (no se publican hasta validarlos)
+//   node clasificar.mjs resolver --archivo veredictos.json [--aplicar]   registra lo que decidió el desarrollador (ensayo sin --aplicar)
+//   node clasificar.mjs encolar-publicados [--aplicar]       manda a la cola lo ya publicado como débil sin confianza alta (ensayo sin --aplicar)
+//   node clasificar.mjs acuerdo                              coincidencia entre el agente y el desarrollador, y pendientes
 //   node clasificar.mjs informe-v5 [--archivo ruta.md]        resume esa segunda opinión por señal de la lista v5 (solo lee)
 // Variables: VPS (atendia-development), CLASIFICADOR_MODELO (sonnet), CONCURRENCIA (3), SALIDA (./clasificador-salida).
 import { execFile, spawn } from 'node:child_process';
@@ -14,7 +18,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -44,6 +48,8 @@ const esquema = {
 
 // Al primer límite de uso se detiene todo: seguir llamando no sirve y gasta el cupo que se renueve.
 let limiteAlcanzado = false;
+// Casos que el desarrollador ya validó: se dan al agente como precedentes (solo en `pendientes`, no en los casos de control).
+let precedentes = [];
 const args = process.argv.slice(2);
 const orden = args[0];
 const opcion = (n, d) => (args.includes(`--${n}`) ? args[args.indexOf(`--${n}`) + 1] : d);
@@ -237,7 +243,7 @@ async function clasificarUno(p, { esperarTexto }) {
 	const dias = (Date.now() - Date.parse(p.fecha_ingreso)) / 86_400_000;
 	if (!texto && esperarTexto && dias < DIAS_ESPERA_TEXTO) return { boletin: p.boletin, espera: motivo };
 	const analisis = texto ? analizar(texto) : null;
-	const d = await preguntar(construirEvidencia(p, analisis));
+	const d = await preguntar(construirEvidencia(p, analisis) + bloqueEjemplos(ejemplosParecidos(p.titulo, precedentes)));
 	// Sin texto no se puede dar más que confianza media.
 	if (!analisis && d.confianza === 'alta') d.confianza = 'media';
 	return { boletin: p.boletin, titulo: p.titulo, ...d, nivel_senal: nivelSenal(d), apariciones: analisis?.apariciones ?? null, densidad: analisis?.densidad ?? null, sin_texto: analisis ? null : motivo };
@@ -264,7 +270,17 @@ async function pendientes() {
 	const reclasificar = args.includes('--reclasificar');
 	let antes = new Map();
 	let lista;
-	if (reclasificar) {
+	try {
+		precedentes = leerCsv(await psql(SQL_VALIDADOS));
+	} catch (e) {
+		console.error(`Sin precedentes (¿falta aplicar la migración 0011?): ${e.message.slice(0, 120)}`);
+	}
+	if (opcion('boletines', null)) {
+		// Muestra puntual: solo con --simulacro, para medir un criterio sin tocar la base.
+		if (!simulacro) throw new Error('--boletines solo se usa con --simulacro.');
+		const l = opcion('boletines').split(',');
+		lista = await obtenerProyectos(l);
+	} else if (reclasificar) {
 		const viejas = leerCsv(await psql(sqlReclasificar(version, maximo)));
 		antes = new Map(viejas.map((v) => [v.boletin, v.incluye === 't']));
 		lista = viejas.length ? await obtenerProyectos(viejas.map((v) => v.boletin)) : [];
@@ -287,6 +303,17 @@ async function pendientes() {
 	mkdirSync(salida, { recursive: true });
 	writeFileSync(join(salida, `pendientes-${new Date().toISOString().slice(0, 10)}.json`), JSON.stringify(resultados, null, 1));
 	if (!simulacro) await guardar(decididos);
+	const limite = decididos.filter(esCasoLimite);
+	if (!simulacro && limite.length) {
+		try {
+			await psql(sqlEncolar(decididos, version));
+			console.log(`A validación manual: ${limite.length} casos límite (no se publican hasta que los valides).`);
+		} catch (e) {
+			// Sin la tabla no se puede retener: es mejor avisar fuerte que publicar sin saberlo.
+			console.error(`NO SE PUDO ENCOLAR para validación: ${e.message.slice(0, 200)}`);
+			process.exitCode = 1;
+		}
+	}
 	console.log(`\nDecididos: ${decididos.length} (incluye ${decididos.filter((d) => d.incluye).length}). Esperan texto: ${esperan.length}. Fallos: ${fallos.length}.`);
 	if (reclasificar) {
 		const cambios = decididos.filter((d) => antes.get(d.boletin) !== d.incluye);
@@ -555,6 +582,54 @@ async function aplicarV5() {
 	console.log('Aplicado y publicado.');
 }
 
+/** Casos límite pendientes. Con --archivo los guarda como JSON para revisarlos con el desarrollador. */
+async function cola() {
+	const filas = leerCsv(await psql(SQL_COLA));
+	if (args.includes('--contar')) return console.log(filas.length);
+	const archivo = opcion('archivo', null);
+	if (archivo) writeFileSync(archivo, JSON.stringify(filas, null, 1));
+	console.log(`Pendientes de validación: ${filas.length}${archivo ? ` (guardados en ${archivo})` : ''}.`);
+	for (const f of filas) console.log(`\n${f.boletin} ${f.publicado === 't' ? '[hoy publicado]' : ''} ${f.titulo.slice(0, 140)}\n  agente: ${f.agente_incluye === 't' ? `incluye ${f.agente_grupo}` : 'excluye'} (${f.agente_confianza}). ${f.agente_motivo}`);
+}
+
+/** Registra los veredictos del desarrollador. Ensayo por defecto; con --aplicar escribe y publica. */
+async function resolver() {
+	const archivo = opcion('archivo', null);
+	if (!archivo) throw new Error('Falta --archivo con los veredictos: [{ boletin, incluye, grupo?, razon }].');
+	const veredictos = JSON.parse(readFileSync(archivo, 'utf8'));
+	const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+	const sql = sqlResolver(veredictos, hoy);
+	const si = veredictos.filter((v) => v.incluye).length;
+	console.log(`Veredictos: ${veredictos.length} (incluye ${si}, excluye ${veredictos.length - si}).`);
+	if (!args.includes('--aplicar')) return console.log(`Ensayo: no se cambió nada. Para aplicar: resolver --archivo ${archivo} --aplicar --esperados ${veredictos.length}`);
+	if (Number(opcion('esperados', NaN)) !== veredictos.length) throw new Error(`Falta --esperados ${veredictos.length}; no se aplica nada.`);
+	console.log(await psql(sql));
+	console.log('Publicando la base del sitio...');
+	await ssh('sudo /opt/observatorio/trabajo.sh publicar');
+	console.log('Aplicado y publicado.');
+}
+
+/** Manda a la cola lo ya publicado como débil sin confianza alta: sale del sitio hasta que se valide. */
+async function encolarPublicados() {
+	const [r] = leerCsv(await psql(SQL_PUBLICADOS_LIMITE));
+	console.log(`Publicados como débil con confianza media o baja y sin validación en curso: ${r.n}. Saldrían del sitio hasta que se validen.`);
+	if (!args.includes('--aplicar')) return console.log(`Ensayo: no se cambió nada. Para aplicar: encolar-publicados --aplicar --esperados ${r.n}`);
+	if (Number(opcion('esperados', NaN)) !== Number(r.n)) throw new Error(`Falta --esperados ${r.n}; no se aplica nada.`);
+	await psql(sqlEncolarPublicados(version));
+	console.log('Encolados. Publicando la base del sitio...');
+	await ssh('sudo /opt/observatorio/trabajo.sh publicar');
+	console.log('Aplicado y publicado.');
+}
+
+async function acuerdo() {
+	const validados = leerCsv(await psql(SQL_VALIDADOS));
+	const [p] = leerCsv(await psql(`SELECT count(*) AS n FROM validacion_genero WHERE estado = 'pendiente';`));
+	const r = resumenAcuerdo(validados, Number(p.n));
+	console.log(`Pendientes de validación: ${r.pendientes}. Validados: ${r.total}.`);
+	if (r.total) console.log(`Coincidencia del agente con el desarrollador: ${r.coincide} de ${r.total} (${((r.coincide / r.total) * 100).toFixed(0)} %).`);
+	for (const m of r.porMes) console.log(`  ${m.mes}: ${m.coincide} de ${m.total} coinciden (${((m.coincide / m.total) * 100).toFixed(0)} %)`);
+}
+
 async function informeV5() {
 	const filas = leerCsv(await psql(SQL_INFORME_V5));
 	const ejemplos = leerCsv(await psql(SQL_EJEMPLOS_V5));
@@ -568,6 +643,10 @@ async function informeV5() {
 
 try {
 	if (orden === 'progreso') await progreso();
+	else if (orden === 'cola') await cola();
+	else if (orden === 'resolver') await resolver();
+	else if (orden === 'encolar-publicados') await encolarPublicados();
+	else if (orden === 'acuerdo') await acuerdo();
 	else if (orden === 'informe-v5') await informeV5();
 	else if (orden === 'cruzar-v5') await cruzarV5();
 	else if (orden === 'aplicar-v5') await aplicarV5();
@@ -579,7 +658,7 @@ try {
 	else if (orden === 'pendientes') await pendientes();
 	else if (orden === 'validar') await validar();
 	else if (orden === 'sembrar') await sembrar();
-	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar] | validar [--n 60] | sembrar | revisar-v5 [--max 450] | probar [--casos ruta] | informe-v5 [--archivo ruta]'), (process.exitCode = 2));
+	else (console.error('Uso: clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar] | cola | resolver | encolar-publicados | acuerdo | validar [--n 60] | sembrar | revisar-v5 [--max 450] | probar [--casos ruta] | informe-v5 [--archivo ruta]'), (process.exitCode = 2));
 } catch (e) {
 	console.error(`Error: ${e.message}`);
 	process.exitCode = 1;

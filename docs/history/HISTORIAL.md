@@ -1,5 +1,11 @@
 # Historial
 
+## 2026-11-12 — Criterio «objeto primero» y validación manual de casos límite (commit de este avance)
+
+Dos proyectos mal incluidos (18081-17, una nacionalidad por gracia, y 18853-12, animales de compañía; «cuidado» está en el léxico) mostraron que el agente partía del léxico y no del objeto. `criterio.md` ahora fija primero de qué trata el proyecto y exige que `motivo` empiece con «Objeto:»; versión `agente-ed63abc7`. Se agregó un paso manual: las decisiones límite (débil con confianza media o baja, o exclusión sin confianza alta) quedan en `validacion_genero` (migración `0011`) y el exportador no las publica hasta que el desarrollador las valida con Claude (`cola`, `resolver`); las decisiones validadas pasan a manuales y alimentan al agente como precedentes por semejanza de título (sin cambiar la versión del criterio), con `acuerdo` para medir la coincidencia. La pasada nocturna avisa por correo si hay pendientes y repasa en tandas de 50 las decisiones con criterio anterior (766 hoy), primero las incluidas.
+
+Medido con Claude Sonnet: casos de control 49 de 50 (falla 5087-07, pensión de vejez universal, incluido con confianza baja); muestra de 60 débiles publicados (20 por T3, T4 y A3): el agente excluye 30 y 36 quedarían en la cola. Haiku: 47 de 50, incluye de más los animales de compañía. Nada de esto se aplicó en producción todavía; no se midió cuánto de lo excluido hoy por el agente (708) cambiaría. Los comandos `cola`, `resolver`, `encolar-publicados` y `acuerdo` no se probaron contra la base: solo las funciones puras (23 pruebas).
+
 ## 2026-11-12 — Se quita la barra deslizante de carga (commit de este avance)
 
 La línea que cruzaba la cabecera de izquierda a derecha mientras cargaba una página (`.progreso` en `sitio/src/routes/+layout.svelte`, propia del sitio y no del framework) se eliminó a pedido del desarrollador. En su lugar, el contenido se atenúa a 55 % de opacidad mientras `navigating` está activo, con 300 ms de retraso para que las cargas rápidas no parpadeen; `aria-busy` sigue marcando la carga para lectores de pantalla. Verificado en local: 186 pruebas de navegador sin fallas y axe sin violaciones. No se vio a ojo el efecto de la atenuación en una carga lenta.

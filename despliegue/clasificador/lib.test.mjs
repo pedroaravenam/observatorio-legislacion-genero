@@ -147,3 +147,69 @@ test('aplicar la revisión v5 se hace en una transacción que se revierte si la 
 	assert.match(conteo, /NOT IN \('154-07','1''-07'\)/);
 	assert.doesNotMatch(conteo, /UPDATE|DELETE|INSERT/);
 });
+
+test('solo los casos límite van a validación manual', async () => {
+	const { esCasoLimite } = await import('./lib.mjs');
+	assert.equal(esCasoLimite({ incluye: true, grupo: 'debil', confianza: 'media' }), true);
+	assert.equal(esCasoLimite({ incluye: true, grupo: 'debil', confianza: 'alta' }), false);
+	assert.equal(esCasoLimite({ incluye: true, grupo: 'componente', confianza: 'baja' }), false);
+	assert.equal(esCasoLimite({ incluye: false, grupo: 'fuera', confianza: 'media' }), true);
+	assert.equal(esCasoLimite({ incluye: false, grupo: 'fuera', confianza: 'alta' }), false);
+});
+
+test('encolar no pisa casos validados y rechaza boletines o versiones inválidos', async () => {
+	const { sqlEncolar } = await import('./lib.mjs');
+	const d = { boletin: '1-01', incluye: true, grupo: 'debil', confianza: 'media', motivo: "Objeto: d'x" };
+	const sql = sqlEncolar([d, { ...d, boletin: '2-01', confianza: 'alta' }], 'agente-abc');
+	assert.match(sql, /WHERE validacion_genero\.estado = 'pendiente'/);
+	assert.match(sql, /'Objeto: d''x'/);
+	assert.doesNotMatch(sql, /'2-01'/);
+	assert.equal(sqlEncolar([{ ...d, confianza: 'alta' }], 'agente-abc'), null);
+	assert.throws(() => sqlEncolar([{ ...d, boletin: "1'-01" }], 'agente-abc'));
+	assert.throws(() => sqlEncolar([d], "x'; DROP"));
+});
+
+test('resolver deja la decisión como manual y exige grupo al incluir', async () => {
+	const { sqlResolver } = await import('./lib.mjs');
+	const sql = sqlResolver([{ boletin: '1-01', incluye: true, grupo: 'componente', razon: 'Regula la jubilación de las mujeres' }, { boletin: '2-01', incluye: false, razon: 'Es de animales' }], '2026-11-13');
+	assert.match(sql, /^BEGIN;/);
+	assert.match(sql, /COMMIT;/);
+	assert.match(sql, /codificador = 'desarrollador'/);
+	assert.match(sql, /nivel_senal = 'M_decision_manual'/);
+	assert.match(sql, /incluye = false, grupo = 'fuera', nivel_senal = NULL/);
+	assert.throws(() => sqlResolver([{ boletin: '1-01', incluye: true, razon: 'x' }], '2026-11-13'));
+	assert.throws(() => sqlResolver([{ boletin: '1-01', incluye: false, razon: '' }], '2026-11-13'));
+	assert.throws(() => sqlResolver([], '2026-11-13'));
+	assert.throws(() => sqlResolver([{ boletin: '1-01', incluye: false, razon: 'x' }], "2026'; --"));
+});
+
+test('los precedentes salen de los casos validados con palabras en común', async () => {
+	const { ejemplosParecidos, bloqueEjemplos } = await import('./lib.mjs');
+	const val = [
+		{ boletin: '1-01', titulo: 'Establece el cuidado de animales de compañía', veredicto: 'f', razon: 'Son animales, no género', validado: '2026-11-13' },
+		{ boletin: '2-01', titulo: 'Rehabilita la nacionalidad chilena a una persona', veredicto: 'f', razon: 'Es un trámite personal', validado: '2026-11-13' },
+		{ boletin: '3-01', titulo: 'Sala cuna para trabajadoras', veredicto: 't', grupo_veredicto: 'componente', razon: 'Cuidados', validado: '2026-11-14' }
+	];
+	const e = ejemplosParecidos('Modifica la ley sobre tenencia responsable de animales de compañía', val);
+	assert.deepEqual(e.map((x) => x.boletin), ['1-01']);
+	assert.match(bloqueEjemplos(e), /EXCLUYE\. Razón: Son animales/);
+	assert.equal(bloqueEjemplos([]), '');
+	assert.deepEqual(ejemplosParecidos('Otro tema distinto', val), []);
+});
+
+test('el resumen de coincidencia agrupa por mes', async () => {
+	const { resumenAcuerdo } = await import('./lib.mjs');
+	const r = resumenAcuerdo([
+		{ agente_incluye: 't', veredicto: 't', validado: '2026-11-13' },
+		{ agente_incluye: 't', veredicto: 'f', validado: '2026-11-14' },
+		{ agente_incluye: 'f', veredicto: 'f', validado: '2026-12-01' }
+	], 4);
+	assert.deepEqual(r, { total: 3, coincide: 2, pendientes: 4, porMes: [{ mes: '2026-11', total: 2, coincide: 1 }, { mes: '2026-12', total: 1, coincide: 1 }] });
+});
+
+test('el repaso por versión empieza por lo incluido y respeta la tanda', async () => {
+	const { sqlReclasificar } = await import('./lib.mjs');
+	const sql = sqlReclasificar('agente-abc', 50);
+	assert.match(sql, /ORDER BY c\.incluye DESC, c\.boletin LIMIT 50;/);
+	assert.match(sql, /c\.codificador = 'agente'/);
+});

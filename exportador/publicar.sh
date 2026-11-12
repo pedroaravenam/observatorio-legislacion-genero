@@ -15,8 +15,9 @@ psql -X -q -v ON_ERROR_STOP=1 -At -c "
   SELECT format('INSERT INTO seleccion_genero (boletin, grupo, nivel_senal, version, codificador, confianza, motivo) VALUES (%L, %L, %L, %L, %L, %L, %L);',
                 boletin, grupo, nivel_senal, version, codificador, confianza,
                 regexp_replace(motivo, '[\r\n]+', ' ', 'g'))
-  FROM clasificacion_genero
+  FROM clasificacion_genero c
   WHERE incluye AND nivel_senal IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM validacion_genero v WHERE v.boletin = c.boletin AND v.estado = 'pendiente')
   ORDER BY boletin" > "$tmp/seleccion.sql"
 selecc=$(grep -c '^INSERT INTO seleccion_genero ' "$tmp/seleccion.sql" || true)
 if [ "$selecc" -lt 1000 ]; then

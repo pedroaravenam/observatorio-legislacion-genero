@@ -204,13 +204,15 @@ export function leerCsv(texto) {
  * que se publicaron como ley después de decidirse (`fecha_consulta_senado` es la última vez que cambió el estado, así que
  * una decisión posterior a ese cambio ya vio el proyecto publicado). Las del desarrollador y las de la lista v5 no se tocan.
  */
+// Primero las inclusiones (lo que está en el sitio) y después las exclusiones; en tandas, cada noche sigue donde quedó la anterior
+// porque lo repasado ya tiene la versión vigente.
 export function sqlReclasificar(version, maximo) {
 	if (!/^[\w.-]+$/.test(version)) throw new Error('Versión de criterio no válida.');
 	if (!Number.isInteger(maximo) && maximo !== 1e9) throw new Error('El máximo debe ser un entero.');
 	return `SELECT c.boletin, c.incluye FROM clasificacion_genero c JOIN proyecto_ley p ON p.boletin = c.boletin
 WHERE c.codificador = 'agente'
   AND (c.version <> '${version}' OR (p.estado_senado = 'Publicado' AND c.clasificado < p.fecha_consulta_senado))
-ORDER BY c.boletin LIMIT ${maximo};`;
+ORDER BY c.incluye DESC, c.boletin LIMIT ${maximo};`;
 }
 
 /** Consulta del informe de la lista v5: por señal que decidió cada inclusión, cuánto revisó el agente y cuánto sacaría. */
@@ -342,4 +344,121 @@ DO $$ DECLARE n int; BEGIN
 END $$;
 COMMIT;
 SELECT count(*) AS incluidos_ahora FROM clasificacion_genero WHERE incluye;`;
+}
+
+// --- Validación manual de casos límite -----------------------------------------------------------------------------
+// Un caso es límite cuando el agente lo incluye como «debil» sin confianza alta, o lo excluye sin confianza alta.
+// Esos casos no se publican hasta que el desarrollador los valida.
+
+/** ¿Hay que pedir validación manual de esta decisión del agente? */
+export function esCasoLimite(d) {
+	if (d.confianza === 'alta') return false;
+	return d.incluye ? d.grupo === 'debil' : true;
+}
+
+const BOLETIN = /^\d{1,6}-\d{2}$/;
+
+/** Agrega a la cola de validación las decisiones límite. No toca los casos ya validados y refresca los pendientes. */
+export function sqlEncolar(decisiones, version) {
+	if (!/^[\w.-]+$/.test(version)) throw new Error('Versión de criterio no válida.');
+	const filas = decisiones.filter(esCasoLimite);
+	if (!filas.length) return null;
+	for (const d of filas) if (!BOLETIN.test(d.boletin)) throw new Error(`Boletín con formato inválido: ${d.boletin}`);
+	const valores = filas.map((d) => `(${lit(d.boletin)}, 'pendiente', ${d.incluye ? 'true' : 'false'}, ${lit(d.grupo)}, ${lit(d.confianza)}, ${lit(d.motivo)}, ${lit(version)})`).join(',\n');
+	return `INSERT INTO validacion_genero (boletin, estado, agente_incluye, agente_grupo, agente_confianza, agente_motivo, version) VALUES
+${valores}
+ON CONFLICT (boletin) DO UPDATE SET agente_incluye = EXCLUDED.agente_incluye, agente_grupo = EXCLUDED.agente_grupo,
+  agente_confianza = EXCLUDED.agente_confianza, agente_motivo = EXCLUDED.agente_motivo, version = EXCLUDED.version
+WHERE validacion_genero.estado = 'pendiente';`;
+}
+
+/** Encola lo ya publicado como débil sin confianza alta (vale también para cualquier lista de boletines). Solo agrega. */
+export function sqlEncolarPublicados(version) {
+	if (!/^[\w.-]+$/.test(version)) throw new Error('Versión de criterio no válida.');
+	return `INSERT INTO validacion_genero (boletin, estado, agente_incluye, agente_grupo, agente_confianza, agente_motivo, version)
+SELECT boletin, 'pendiente', incluye, grupo, confianza, motivo, version FROM clasificacion_genero
+WHERE incluye AND codificador = 'agente' AND grupo = 'debil' AND confianza IN ('media', 'baja')
+ON CONFLICT (boletin) DO NOTHING;`;
+}
+
+export const SQL_PUBLICADOS_LIMITE = `SELECT count(*) AS n FROM clasificacion_genero c
+WHERE incluye AND codificador = 'agente' AND grupo = 'debil' AND confianza IN ('media', 'baja')
+  AND NOT EXISTS (SELECT 1 FROM validacion_genero v WHERE v.boletin = c.boletin);`;
+
+/** La cola, con lo que hace falta para decidir: título, motivo del agente y fecha de ingreso. */
+export const SQL_COLA = `SELECT v.boletin, btrim(regexp_replace(p.titulo, '\\s+', ' ', 'g')) AS titulo, p.fecha_ingreso, v.agente_incluye, v.agente_grupo,
+  v.agente_confianza, v.agente_motivo, coalesce(c.incluye, false) AS publicado
+FROM validacion_genero v JOIN proyecto_ley p ON p.boletin = v.boletin LEFT JOIN clasificacion_genero c ON c.boletin = v.boletin
+WHERE v.estado = 'pendiente' ORDER BY p.fecha_ingreso DESC, v.boletin;`;
+
+/**
+ * Aplica los veredictos del desarrollador en una transacción: cierra la validación y deja su decisión como manual,
+ * que el agente no reclasifica. Veredicto: { boletin, incluye, grupo?, razon }.
+ */
+export function sqlResolver(veredictos, hoy) {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(hoy)) throw new Error('Fecha no válida.');
+	if (!veredictos.length) throw new Error('No hay veredictos.');
+	const sentencias = veredictos.map((v) => {
+		if (!BOLETIN.test(v.boletin) || typeof v.incluye !== 'boolean' || !v.razon || v.razon.length > 600) throw new Error(`Veredicto no válido: ${v.boletin}`);
+		if (v.incluye && !GRUPOS_VALIDOS.includes(v.grupo)) throw new Error(`Falta un grupo válido para incluir ${v.boletin}`);
+		const clasif = v.incluye
+			? `incluye = true, grupo = ${lit(v.grupo)}, nivel_senal = 'M_decision_manual'`
+			: `incluye = false, grupo = 'fuera', nivel_senal = NULL`;
+		return `UPDATE validacion_genero SET estado = 'validado', veredicto = ${v.incluye}, grupo_veredicto = ${v.incluye ? lit(v.grupo) : 'NULL'}, razon = ${lit(v.razon)}, validado = now()
+  WHERE boletin = ${lit(v.boletin)} AND estado = 'pendiente';
+UPDATE clasificacion_genero SET ${clasif}, version = ${lit(`manual-${hoy}`)}, codificador = 'desarrollador', confianza = NULL, motivo = ${lit(v.razon)}, clasificado = now()
+  WHERE boletin = ${lit(v.boletin)};
+INSERT INTO clasificacion_genero (boletin, incluye, grupo, nivel_senal, version, codificador, motivo)
+  SELECT ${lit(v.boletin)}, ${v.incluye}, ${v.incluye ? lit(v.grupo) : "'fuera'"}, ${v.incluye ? "'M_decision_manual'" : 'NULL'}, ${lit(`manual-${hoy}`)}, 'desarrollador', ${lit(v.razon)}
+  WHERE NOT EXISTS (SELECT 1 FROM clasificacion_genero WHERE boletin = ${lit(v.boletin)})
+    AND EXISTS (SELECT 1 FROM validacion_genero WHERE boletin = ${lit(v.boletin)} AND estado = 'validado');`;
+	});
+	return `BEGIN;
+${sentencias.join('\n')}
+COMMIT;
+SELECT count(*) AS pendientes_ahora FROM validacion_genero WHERE estado = 'pendiente';`;
+}
+
+/** Casos validados, para dar precedentes al agente y medir su coincidencia con el desarrollador. */
+export const SQL_VALIDADOS = `SELECT v.boletin, btrim(regexp_replace(p.titulo, '\\s+', ' ', 'g')) AS titulo, v.agente_incluye, v.agente_grupo, v.agente_confianza,
+  v.veredicto, v.grupo_veredicto, v.razon, to_char(v.validado, 'YYYY-MM-DD') AS validado
+FROM validacion_genero v JOIN proyecto_ley p ON p.boletin = v.boletin WHERE v.estado = 'validado' ORDER BY v.validado;`;
+
+const sinTildes = (t) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const VACIAS = new Set(['proyecto', 'ley', 'modifica', 'establece', 'sobre', 'para', 'otras', 'otros', 'materia', 'materias', 'entre', 'texto', 'codigo', 'normas', 'norma', 'dicta', 'crea', 'regula', 'declara', 'artculo']);
+const palabras = (t) => new Set(sinTildes(t).match(/[a-z]{4,}/g)?.filter((w) => !VACIAS.has(w)) ?? []);
+
+/** Los k casos validados más parecidos por palabras del título (solo los que comparten alguna). */
+export function ejemplosParecidos(titulo, validados, k = 5) {
+	const mias = palabras(titulo);
+	return validados
+		.map((v) => ({ v, comunes: [...palabras(v.titulo)].filter((w) => mias.has(w)).length }))
+		.filter((x) => x.comunes > 0)
+		.sort((a, b) => b.comunes - a.comunes || (b.v.validado ?? '').localeCompare(a.v.validado ?? ''))
+		.slice(0, k)
+		.map((x) => x.v);
+}
+
+/** Bloque de precedentes que se agrega a la evidencia. Vacío si no hay casos parecidos. */
+export function bloqueEjemplos(ejemplos) {
+	if (!ejemplos.length) return '';
+	const l = ['', 'Precedentes: casos parecidos que el desarrollador ya resolvió. Sigue su razonamiento cuando el objeto del proyecto sea el mismo.'];
+	ejemplos.forEach((e, i) => l.push(`${i + 1}. «${e.titulo.slice(0, 160)}» → ${e.veredicto === 't' || e.veredicto === true ? `INCLUYE (${e.grupo_veredicto})` : 'EXCLUYE'}. Razón: ${e.razon}`));
+	return l.join('\n');
+}
+
+/** Coincidencia entre lo que recomendó el agente y lo que decidió el desarrollador, por mes de validación. */
+export function resumenAcuerdo(validados, pendientes) {
+	const bool = (x) => x === true || x === 't';
+	const meses = new Map();
+	for (const v of validados) {
+		const mes = (v.validado ?? '').slice(0, 7);
+		const m = meses.get(mes) ?? { total: 0, coincide: 0 };
+		m.total++;
+		if (bool(v.agente_incluye) === bool(v.veredicto)) m.coincide++;
+		meses.set(mes, m);
+	}
+	const total = validados.length;
+	const coincide = [...meses.values()].reduce((s, m) => s + m.coincide, 0);
+	return { total, coincide, pendientes, porMes: [...meses].sort(([a], [b]) => a.localeCompare(b)).map(([mes, m]) => ({ mes, ...m })) };
 }
