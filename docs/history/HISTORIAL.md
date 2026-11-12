@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-12 — Se quita la barra deslizante de carga (commit de este avance)
+
+La línea que cruzaba la cabecera de izquierda a derecha mientras cargaba una página (`.progreso` en `sitio/src/routes/+layout.svelte`, propia del sitio y no del framework) se eliminó a pedido del desarrollador. En su lugar, el contenido se atenúa a 55 % de opacidad mientras `navigating` está activo, con 300 ms de retraso para que las cargas rápidas no parpadeen; `aria-busy` sigue marcando la carga para lectores de pantalla. Verificado en local: 186 pruebas de navegador sin fallas y axe sin violaciones. No se vio a ojo el efecto de la atenuación en una carga lenta.
+
 ## 2026-11-12 — Rediseño del sitio: portada de contexto, Panorama ampliado, Actualidad, modo claro y oscuro (commit de este avance)
 
 A pedido del desarrollador, la portada dejó de ser el buscador. Ahora `/` es un ensayo de contexto con cifras al margen e índice (qué cuenta como legislación de género, cuánto se legisla, 16 leyes hito, quién presenta y qué prospera, temas, estado actual, quién hace el sitio); el buscador pasó a `/proyectos` y los enlaces antiguos con filtros en `/` redirigen con 308. Panorama ganó índice, el gráfico anual, los niveles de relación con el género, el estado de los 779 proyectos en tramitación (etapa y antigüedad del último trámite) y las mociones que llegan a ley según el sexo de quienes firman. Se agregó `/actualidad` (últimos trámites, ingresos y leyes, con aviso si el Senado lleva más de 72 horas sin datos). Tema claro y oscuro con selector en la cabecera, sobre `light-dark()` y `data-theme`; cabecera clara y fija, menú desplegable en teléfonos. Autoría, contacto (`contacto@legislaciongenero.cl`) y apoyo en la portada, en «Cómo funciona» y en el pie; los canales de aporte (Mercado Pago, GitHub Sponsors, Ko-fi) quedan ocultos hasta tener dirección (`sitio/src/lib/sitio.ts`).

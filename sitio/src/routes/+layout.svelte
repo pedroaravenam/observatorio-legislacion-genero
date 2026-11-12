@@ -116,9 +116,6 @@
 			</details>
 		</div>
 	</div>
-	{#if navigating.to}
-		<div class="progreso" role="progressbar" aria-label="Cargando"></div>
-	{/if}
 </header>
 
 <main id="contenido" aria-busy={navigating.to ? 'true' : 'false'}>
@@ -401,26 +398,15 @@
 		}
 	}
 
-	.progreso {
-		position: absolute;
-		left: 0;
-		bottom: -1px;
-		height: 3px;
-		width: 40%;
-		background: var(--verde);
-		animation: avance 1s ease-in-out infinite;
-	}
-	@keyframes avance {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(250%);
-		}
-	}
 	main {
 		min-height: 60vh;
 		padding-bottom: 4rem;
+		transition: opacity 200ms ease;
+	}
+	/* Mientras carga otra página el contenido se atenúa, pero solo si tarda: las cargas rápidas no parpadean. */
+	main[aria-busy='true'] {
+		opacity: 0.55;
+		transition-delay: 300ms;
 	}
 	.pie {
 		border-top: 1px solid var(--borde);
@@ -449,10 +435,8 @@
 		color: var(--tinta);
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.progreso {
-			animation: none;
-			width: 100%;
-			opacity: 0.6;
+		main {
+			transition: none;
 		}
 		.tema .astro,
 		.tema .rayos,
