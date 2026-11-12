@@ -42,7 +42,7 @@
 </svelte:head>
 
 <article class="contenedor">
-	<p class="volver"><a href="/">Volver a los proyectos</a></p>
+	<p class="volver"><a href="/proyectos">Volver a los proyectos</a></p>
 
 	<header class="encabezado">
 		<p class="meta">
@@ -166,7 +166,7 @@
 					{#if temas.length}
 						<p>
 							{temas.length === 1 ? 'Tema' : 'Temas'}:
-							{#each temas as t, i (t.clave)}{i > 0 ? ', ' : ''}<a href="/?tema={t.clave}"
+							{#each temas as t, i (t.clave)}{i > 0 ? ', ' : ''}<a href="/proyectos?tema={t.clave}"
 									>{t.nombre.toLocaleLowerCase('es-CL')}</a
 								>{/each}.
 						</p>
@@ -185,7 +185,7 @@
 					{/if}
 					<ul class="nombres">
 						{#each p.autores_detalle as [nombre, sexo, url] (nombre)}<li>
-								<a href="/?autor={encodeURIComponent(nombre)}">{nombre}</a>
+								<a href="/proyectos?autor={encodeURIComponent(nombre)}">{nombre}</a>
 								{#if sexo}<span class="suave"> · {sexo === 'F' ? 'mujer' : 'hombre'}</span>{/if}
 								{#if url}<a
 										class="resena"

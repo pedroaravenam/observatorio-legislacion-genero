@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { fechaLarga } from '#lib/formato';
+	import GraficoAnual from '../../lib/GraficoAnual.svelte';
+	import { fechaLarga, NIVELES_RELACION } from '#lib/formato';
 	import { TEMAS } from '#lib/temas';
 	import type { PageProps } from './$types';
 
@@ -49,6 +50,34 @@
 			...d.periodos.flatMap((p) => ordenTemas.map((c) => pct(p.porTema[c] ?? 0, p.total)))
 		)
 	);
+	const maxNivel = $derived(Math.max(1, ...d.niveles.map((x) => x.total)));
+	const t = $derived(d.enTramite);
+	const NOMBRE_NIVEL = {
+		tema_central: 'Relación alta',
+		componente: 'Relación media',
+		debil: 'Relación débil'
+	} as const;
+	const tramosMovimiento = $derived([
+		{ nombre: 'Durante el último año', total: t.movimiento.reciente },
+		{ nombre: 'Hace entre uno y tres años', total: t.movimiento.medio },
+		{ nombre: 'Hace más de tres años', total: t.movimiento.antiguo }
+	]);
+	const etapas = $derived([
+		{ nombre: 'Primer trámite constitucional', total: t.primerTramite },
+		{ nombre: 'Segundo trámite constitucional', total: t.segundoTramite },
+		{ nombre: 'Etapas posteriores', total: t.otrasEtapas }
+	]);
+	const INDICE = [
+		['annos', 'Cada año'],
+		['niveles', 'Relación con el género'],
+		['origen', 'Quién los presenta'],
+		['autoria', 'Mujeres y hombres'],
+		['temas', 'Temas'],
+		['periodos', 'Cambio de los temas'],
+		['abiertos', 'En tramitación'],
+		['tiempo', 'Cuánto tardan'],
+		['autores', 'Quiénes presentan más']
+	] as const;
 	/** Nombre en el orden habitual: «Apellidos, Nombre» pasa a «Nombre Apellidos». */
 	const nombrePersona = (x: string) => {
 		const [apellidos, nombre] = x.split(',').map((s) => s.trim());
@@ -103,11 +132,70 @@
 				<span class="clave e-cerrado"></span>Cerrado sin ser ley · {pct(d.cerrados, d.total)} %
 			</li>
 		</ul>
+		<nav class="indice" aria-labelledby="indice-titulo">
+			<h2 id="indice-titulo">En esta página</h2>
+			<ol>
+				{#each INDICE as [ancla, nombre] (ancla)}
+					<li><a href="#{ancla}">{nombre}</a></li>
+				{/each}
+			</ol>
+		</nav>
 	</div>
 </section>
 
 <div class="contenedor cuerpo">
-	<section aria-labelledby="origen-titulo" class="bloque origen">
+	<section aria-labelledby="annos-titulo" class="bloque" id="annos">
+		<h2 id="annos-titulo">Cuántos proyectos se presentan cada año</h2>
+		<p class="intro">
+			Cada barra es un año de ingreso. La parte verde muestra los proyectos de ese año que hoy son
+			ley; los años recientes tienen menos porque sus proyectos todavía se tramitan. Al elegir un
+			año se abre la lista de sus proyectos.
+		</p>
+		<div class="lamina">
+			<GraficoAnual resumen={data.resumen} seleccionado={null} />
+		</div>
+		{@render pie()}
+	</section>
+
+	<section aria-labelledby="niveles-titulo" class="bloque" id="niveles">
+		<h2 id="niveles-titulo">Qué tan de género es cada proyecto</h2>
+		<p class="intro">
+			El Observatorio ordena la selección en tres niveles según cuánto pesa el género en lo que el
+			proyecto regula. La barra completa indica los proyectos de cada nivel y el tramo verde, los
+			que ya son ley.
+		</p>
+		<ul class="barras-h">
+			{#each d.niveles as x (x.clave)}
+				<li
+					class="fila-barra estatica"
+					data-cifra="nivel"
+					data-clave={x.clave}
+					data-total={x.total}
+					data-leyes={x.leyes}
+				>
+					<span class="b-nombre">
+						{NOMBRE_NIVEL[x.clave]}
+						<span class="b-explicacion">{NIVELES_RELACION[x.clave].explicacion}</span>
+					</span>
+					<span class="b-pista" aria-hidden="true">
+						<span class="b-total" style="width: {(x.total / maxNivel) * 100}%">
+							<span class="b-ley" style="width: {pct(x.leyes, x.total)}%"></span>
+						</span>
+					</span>
+					<span class="b-valor">
+						{n(x.total)}
+						<span class="suave">· {n(x.leyes)} {x.leyes === 1 ? 'ley' : 'leyes'}</span>
+					</span>
+				</li>
+			{/each}
+		</ul>
+		<p class="nota">
+			<a href="/acerca#criterio">Cómo funciona</a> explica cada nivel y da ejemplos.
+		</p>
+		{@render pie()}
+	</section>
+
+	<section aria-labelledby="origen-titulo" class="bloque origen" id="origen">
 		<h2 id="origen-titulo">Quién los presenta y cuáles prosperan</h2>
 		<p class="intro">
 			Un proyecto puede nacer como mensaje, cuando lo envía la Presidencia de la República, o como
@@ -155,7 +243,7 @@
 		{@render pie()}
 	</section>
 
-	<section aria-labelledby="sexo-titulo" class="bloque">
+	<section aria-labelledby="sexo-titulo" class="bloque" id="autoria">
 		<h2 id="sexo-titulo">Quiénes firman las mociones: mujeres y hombres</h2>
 		<p
 			class="intro"
@@ -204,6 +292,18 @@
 				</tbody>
 			</table>
 		</div>
+		<p class="intro" data-cifra="autoria-leyes">
+			De las mociones firmadas solo por mujeres, {n(d.autoria.leyes.mujeres)} ({pct(
+				d.autoria.leyes.mujeres,
+				g.mujeres
+			)} %) ya son ley; de las firmadas solo por hombres, {n(d.autoria.leyes.hombres)} ({pct(
+				d.autoria.leyes.hombres,
+				g.hombres
+			)} %), y de las que firman mujeres y hombres, {n(d.autoria.leyes.mixta)} ({pct(
+				d.autoria.leyes.mixta,
+				g.mixta
+			)} %).
+		</p>
 		<p class="nota">
 			El sexo de diputadas y diputados es el que informa la Cámara. Para senadoras y senadores, y
 			para quienes ese servicio no incluye, se deriva de la reseña parlamentaria de la Biblioteca
@@ -217,7 +317,7 @@
 		</p>
 	</section>
 
-	<section aria-labelledby="temas-titulo" class="bloque">
+	<section aria-labelledby="temas-titulo" class="bloque" id="temas">
 		<h2 id="temas-titulo">Temas</h2>
 		<p class="intro">
 			Cada proyecto se asigna a los temas que nombra su título, de modo que uno puede contar en
@@ -228,7 +328,7 @@
 		<ul class="barras-h">
 			{#each d.temas as t (t.clave)}
 				<li data-cifra="tema" data-clave={t.clave} data-total={t.total} data-leyes={t.leyes}>
-					<a href="/?tema={t.clave}" class="fila-barra">
+					<a href="/proyectos?tema={t.clave}" class="fila-barra">
 						<span class="b-nombre">{t.nombre}</span>
 						<span class="b-pista" aria-hidden="true">
 							<span class="b-total" style="width: {(t.total / maxTema) * 100}%">
@@ -247,7 +347,7 @@
 		{@render pie()}
 	</section>
 
-	<section aria-labelledby="periodos-titulo" class="bloque">
+	<section aria-labelledby="periodos-titulo" class="bloque" id="periodos">
 		<h2 id="periodos-titulo">Cómo han cambiado los temas</h2>
 		<p class="intro">
 			La tabla muestra qué parte de los proyectos de cada período trató cada tema. Como un proyecto
@@ -291,7 +391,65 @@
 		{@render pie()}
 	</section>
 
-	<section aria-labelledby="tiempo-titulo" class="bloque">
+	<section aria-labelledby="abiertos-titulo" class="bloque" id="abiertos">
+		<h2 id="abiertos-titulo">Dónde están los proyectos en tramitación</h2>
+		<p
+			class="intro"
+			data-cifra="abiertos"
+			data-total={t.total}
+			data-primer={t.primerTramite}
+			data-segundo={t.segundoTramite}
+			data-antiguo={t.movimiento.antiguo}
+		>
+			{n(t.total)} proyectos siguen formalmente abiertos. El primer trámite ocurre en la cámara donde
+			se presentó el proyecto y el segundo, en la otra. Un proyecto puede seguir «en tramitación» durante
+			años sin que nadie lo mueva, por eso se muestra también cuándo fue su último trámite.
+		</p>
+		<div class="pares">
+			<div>
+				<h3>Etapa en que están</h3>
+				<dl class="medidas">
+					{#each etapas as e (e.nombre)}
+						<div>
+							<dt>{e.nombre}</dt>
+							<dd>
+								<span class="m-pista" aria-hidden="true"
+									><span style="width: {pct(e.total, t.total)}%"></span></span
+								>
+								<span class="m-valor"
+									>{n(e.total)} <span class="suave">· {pct(e.total, t.total)} %</span></span
+								>
+							</dd>
+						</div>
+					{/each}
+				</dl>
+			</div>
+			<div>
+				<h3>Cuándo fue su último trámite</h3>
+				<dl class="medidas">
+					{#each tramosMovimiento as e (e.nombre)}
+						<div>
+							<dt>{e.nombre}</dt>
+							<dd>
+								<span class="m-pista" aria-hidden="true"
+									><span style="width: {pct(e.total, t.total)}%"></span></span
+								>
+								<span class="m-valor"
+									>{n(e.total)} <span class="suave">· {pct(e.total, t.total)} %</span></span
+								>
+							</dd>
+						</div>
+					{/each}
+				</dl>
+			</div>
+		</div>
+		<p class="nota">
+			<a href="/actualidad">Actualidad</a> muestra los trámites de los últimos días.
+		</p>
+		{@render pie()}
+	</section>
+
+	<section aria-labelledby="tiempo-titulo" class="bloque" id="tiempo">
 		<h2 id="tiempo-titulo">Cuánto tarda un proyecto en ser ley</h2>
 		<p class="intro">
 			Entre los proyectos que llegaron a publicarse, esta es la mediana del tiempo que pasó desde su
@@ -318,7 +476,7 @@
 		{@render pie()}
 	</section>
 
-	<section aria-labelledby="autores-titulo" class="bloque">
+	<section aria-labelledby="autores-titulo" class="bloque" id="autores">
 		<h2 id="autores-titulo">Quiénes han presentado más proyectos</h2>
 		<p class="intro">
 			{n(d.totalAutores)} parlamentarias y parlamentarios firman al menos un proyecto de la selección.
@@ -330,7 +488,7 @@
 			{#each d.autores as a, i (a.nombre)}
 				<li data-cifra="autor" data-nombre={a.nombre} data-total={a.total} data-leyes={a.leyes}>
 					<span class="a-pos" aria-hidden="true">{i + 1}</span>
-					<a class="a-nombre" href="/?autor={encodeURIComponent(a.nombre)}"
+					<a class="a-nombre" href="/proyectos?autor={encodeURIComponent(a.nombre)}"
 						>{nombrePersona(a.nombre)}</a
 					>
 					<span class="b-pista" aria-hidden="true">
@@ -386,7 +544,7 @@
 	.estados {
 		display: flex;
 		height: 14px;
-		border-radius: 3px;
+		border-radius: 4px;
 		overflow: hidden;
 		gap: 2px;
 		max-width: 46rem;
@@ -401,7 +559,7 @@
 		background: var(--barra);
 	}
 	.e-cerrado {
-		background: rgb(255 255 255 / 0.28);
+		background: rgb(255 255 255 / 0.32);
 	}
 	.estados-leyenda {
 		display: flex;
@@ -421,11 +579,110 @@
 		margin-right: 0.4rem;
 		vertical-align: -0.05rem;
 	}
+	.indice {
+		margin-top: 1.75rem;
+		border-top: 1px solid var(--franja-linea);
+		padding-top: 1rem;
+	}
+	.indice h2 {
+		font-family: var(--sans);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--franja-suave);
+		margin: 0 0 0.3rem;
+	}
+	.indice ol {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 1.6rem;
+	}
+	.indice a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: var(--franja-texto);
+		text-decoration-color: var(--franja-linea);
+	}
+	.indice a:hover {
+		text-decoration-color: currentColor;
+	}
+	.lamina {
+		max-width: 60rem;
+		padding: clamp(1.1rem, 3vw, 2rem);
+		border-radius: var(--radio-grande);
+		background: var(--franja);
+		color: var(--franja-texto);
+		box-shadow: var(--sombra);
+	}
+	.fila-barra.estatica {
+		align-items: start;
+	}
+	.fila-barra.estatica .b-pista {
+		margin-top: 0.45rem;
+	}
+	.b-explicacion {
+		display: block;
+		font-weight: 400;
+		font-size: 0.88rem;
+		color: var(--tinta-suave);
+	}
+	.pares {
+		display: grid;
+		gap: 1.5rem 3rem;
+		max-width: 60rem;
+	}
+	@media (min-width: 46rem) {
+		.pares {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+	.pares h3 {
+		font-size: 1rem;
+		margin: 0 0 0.5rem;
+	}
+	.medidas {
+		margin: 0;
+		display: grid;
+		gap: 0.8rem;
+	}
+	.medidas dt {
+		font-weight: 500;
+		font-size: 0.95rem;
+	}
+	.medidas dd {
+		margin: 0.25rem 0 0;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		gap: 1rem;
+	}
+	.m-pista {
+		height: 10px;
+		border-radius: 5px;
+		background: var(--violeta-suave);
+		overflow: hidden;
+	}
+	.m-pista span {
+		display: block;
+		height: 100%;
+		border-radius: 5px;
+		background: var(--violeta-medio);
+	}
+	.m-valor {
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+		min-width: 6.5rem;
+		text-align: right;
+	}
 	.cuerpo {
 		padding-top: 0.5rem;
 	}
 	.bloque {
-		padding: 2rem 0 0.5rem;
+		padding: clamp(2rem, 5vw, 3rem) 0 1.25rem;
 		border-bottom: 1px solid var(--borde);
 	}
 	.bloque:last-of-type {
@@ -471,7 +728,8 @@
 		background: var(--superficie);
 		border: 1px solid var(--borde);
 		border-top: 4px solid var(--verde);
-		border-radius: var(--radio);
+		border-radius: var(--radio-grande);
+		box-shadow: var(--sombra);
 		padding: 1.25rem 1.35rem 1.1rem;
 	}
 	.tarjeta-origen.mocion {
@@ -662,8 +920,8 @@
 		max-width: 60rem;
 	}
 	.tiempos div {
-		border-left: 3px solid var(--verde);
-		padding: 0.2rem 0 0.2rem 0.9rem;
+		border-top: 2px solid var(--verde);
+		padding: 0.6rem 0 0.2rem;
 	}
 	.tiempos dt {
 		font-size: 0.9rem;

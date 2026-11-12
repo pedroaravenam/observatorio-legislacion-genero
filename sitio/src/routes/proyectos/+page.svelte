@@ -1,0 +1,585 @@
+<script lang="ts">
+	import { claseEstado, fechaCorta, NIVELES_RELACION, parametrosFiltros } from '#lib/formato';
+	import { TEMAS } from '#lib/temas';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+	const f = $derived(data.filtros);
+	// Con bind:value, lo que alguien escribe antes de que cargue el JavaScript se conserva al hidratar.
+	// Son derivados asignables: los enlaces de navegación siguen actualizando los campos.
+	let texto = $derived(f.texto);
+	let autor = $derived(f.autor ?? '');
+	const hayFiltros = $derived(
+		Boolean(
+			f.texto || f.anno || f.estado || f.iniciativa || f.tema || f.camara || f.autor || f.autoria
+		)
+	);
+	const totales = $derived(
+		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
+			total: 0,
+			leyes: 0
+		})
+	);
+	const desde = $derived(data.resumen[0]?.anno ?? 1990);
+
+	function enlacePagina(n: number): string {
+		const s = parametrosFiltros(f, { pagina: n }).toString();
+		return s ? `/proyectos?${s}` : '/proyectos';
+	}
+
+	const enlaceSinAutor = $derived.by(() => {
+		const q = parametrosFiltros({ ...f, autor: null }, { pagina: 1 }).toString();
+		return q ? `/proyectos?${q}` : '/proyectos';
+	});
+
+	/** Enlace de descarga con los filtros vigentes, sin página: se baja todo lo que cumple. */
+	function enlaceDatos(formato: 'csv' | 'json'): string {
+		const s = parametrosFiltros(f, { pagina: 1 }).toString();
+		return `/datos/proyectos.${formato}${s ? `?${s}` : ''}`;
+	}
+
+	/** Filtros vigentes como campos ocultos del formulario de orden; el orden mismo lo elige el selector. */
+	const camposOcultos = $derived(
+		[...parametrosFiltros(f, { pagina: 1 })].filter(([nombre]) => nombre !== 'orden')
+	);
+
+	// La pertinencia solo existe cuando hay palabras que buscar.
+	const ordenMostrado = $derived(f.orden === 'pertinencia' && !f.texto ? 'recientes' : f.orden);
+
+	const numero = new Intl.NumberFormat('es-CL');
+</script>
+
+<svelte:head>
+	<title>{f.texto ? `«${f.texto}» · ` : ''}Proyectos · Observatorio de Legislación de Género</title>
+	<meta
+		name="description"
+		content="Busca proyectos de ley relacionados con género en Chile desde 1990, con su tramitación y enlace a la fuente oficial."
+	/>
+</svelte:head>
+
+<section class="franja" aria-labelledby="titulo">
+	<div class="contenedor">
+		<h1 id="titulo">Proyectos de ley sobre género</h1>
+		<p class="bajada">
+			Los {numero.format(totales.total)} proyectos presentados desde {desde}, con su etapa de
+			tramitación y sus documentos en el Senado y en la Biblioteca del Congreso. {numero.format(
+				totales.leyes
+			)} ya son ley.
+		</p>
+	</div>
+</section>
+
+<div class="contenedor">
+	<form
+		id="filtros"
+		method="GET"
+		action="/proyectos"
+		class="filtros"
+		role="search"
+		aria-label="Buscar proyectos"
+	>
+		<div class="busqueda">
+			<label for="q">Buscar <span class="opcional">(opcional)</span></label>
+			<div class="busqueda-fila">
+				<input
+					id="q"
+					name="q"
+					type="search"
+					bind:value={texto}
+					maxlength="200"
+					placeholder="Palabras o número de boletín"
+					aria-describedby="q-ayuda"
+					enterkeyhint="search"
+				/>
+				<button class="boton" type="submit">Buscar</button>
+			</div>
+			<p id="q-ayuda" class="ayuda">
+				Escribe palabras, como «sala cuna», o un número de boletín, como 11077-07. La búsqueda
+				revisa títulos, materias y autores.
+			</p>
+		</div>
+
+		<div class="selectores">
+			<div class="campo">
+				<label for="tema">Tema</label>
+				<select id="tema" name="tema">
+					<option value="">Todos</option>
+					{#each TEMAS as t (t.clave)}
+						<option value={t.clave} selected={f.tema === t.clave}>{t.nombre}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="anno">Año de ingreso</label>
+				<select id="anno" name="anno">
+					<option value="">Todos</option>
+					{#each data.opciones.annos as a (a)}
+						<option value={a} selected={f.anno === a}>{a}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="estado">Estado</label>
+				<select id="estado" name="estado">
+					<option value="">Todos</option>
+					{#each data.opciones.estados as e (e)}
+						<option value={e} selected={f.estado === e}>{e}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="iniciativa">Origen</label>
+				<select id="iniciativa" name="iniciativa">
+					<option value="">Todos</option>
+					{#each data.opciones.iniciativas as i (i)}
+						<option value={i} selected={f.iniciativa === i}>
+							{i === 'Mensaje' ? 'Mensaje (Presidencia)' : 'Moción (parlamentarios)'}
+						</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="camara">Cámara de origen</label>
+				<select id="camara" name="camara">
+					<option value="">Todas</option>
+					{#each data.opciones.camaras as c (c)}
+						<option value={c} selected={f.camara === c}>{c}</option>
+					{/each}
+				</select>
+			</div>
+			<div class="campo">
+				<label for="autoria">Autoría de las mociones</label>
+				<select id="autoria" name="autoria" aria-describedby="autoria-ayuda">
+					<option value="">Todas</option>
+					{#each data.opciones.autorias as a (a.clave)}
+						<option value={a.clave} selected={f.autoria === a.clave}>{a.nombre}</option>
+					{/each}
+				</select>
+				<p id="autoria-ayuda" class="ayuda">
+					Según el sexo de quienes firman. Los mensajes de la Presidencia no tienen autoría
+					parlamentaria.
+				</p>
+			</div>
+			<div class="campo campo-autor">
+				<label for="autor">Autor o autora <span class="opcional">(opcional)</span></label>
+				<input
+					id="autor"
+					name="autor"
+					type="text"
+					list="autores"
+					bind:value={autor}
+					maxlength="120"
+					autocomplete="off"
+					placeholder="Empieza a escribir un apellido"
+					aria-describedby="autor-ayuda"
+					aria-invalid={data.autorDesconocido ? 'true' : undefined}
+				/>
+				<datalist id="autores">
+					{#each data.opciones.autores as a (a)}<option value={a}></option>{/each}
+				</datalist>
+				<p id="autor-ayuda" class="ayuda" class:error={data.autorDesconocido}>
+					{#if data.autorDesconocido}
+						No hay una persona con ese nombre. Elígelo de la lista que aparece al escribir; los
+						nombres están escritos como «Apellidos, Nombre».
+					{:else}
+						Elige un nombre de la lista; están escritos como «Apellidos, Nombre».
+					{/if}
+				</p>
+			</div>
+		</div>
+
+		<div class="acciones">
+			<button class="boton secundario" type="submit">Aplicar filtros</button>
+			{#if hayFiltros}
+				<a class="limpiar" href="/proyectos">Quitar filtros</a>
+			{/if}
+		</div>
+	</form>
+
+	<div class="resultados-cabecera">
+		<h2 class="resumen" role="status">
+			{#if data.total === 0}
+				Sin resultados
+			{:else}
+				{numero.format(data.total)}
+				{data.total === 1 ? 'proyecto' : 'proyectos'}
+				{#if f.anno}<span class="suave">de {f.anno}</span>{/if}
+			{/if}
+		</h2>
+		{#if data.paginas > 1}
+			<p class="suave">Página {f.pagina} de {numero.format(data.paginas)}</p>
+		{/if}
+	</div>
+
+	{#if data.total > 0}
+		<div class="herramientas">
+			<!-- Formulario propio: así una búsqueda nueva no arrastra el orden anterior y conserva el que corresponde. -->
+			<form class="campo-orden" method="GET" action="/proyectos" aria-label="Ordenar resultados">
+				{#each camposOcultos as [nombre, valor] (nombre)}
+					<input type="hidden" name={nombre} value={valor} />
+				{/each}
+				<label for="orden">Ordenar por</label>
+				<select id="orden" name="orden">
+					{#if f.texto}
+						<option value="pertinencia" selected={ordenMostrado === 'pertinencia'}>
+							Más pertinentes
+						</option>
+					{/if}
+					<option value="recientes" selected={ordenMostrado === 'recientes'}>Más recientes</option>
+					<option value="antiguos" selected={ordenMostrado === 'antiguos'}>Más antiguos</option>
+					<option value="movimiento" selected={ordenMostrado === 'movimiento'}>
+						Con movimiento reciente
+					</option>
+				</select>
+				<button class="boton secundario" type="submit">Ordenar</button>
+			</form>
+			<p class="descarga">
+				<span
+					>Descargar {numero.format(data.total)}
+					{data.total === 1 ? 'proyecto' : 'proyectos'}:</span
+				>
+				<a href={enlaceDatos('csv')} download>CSV</a>
+				<a href={enlaceDatos('json')} download>JSON</a>
+			</p>
+		</div>
+	{/if}
+
+	{#if data.total === 0}
+		<div class="vacio">
+			<h3>No hay proyectos con esos criterios</h3>
+			<ul>
+				{#if f.autor}
+					<li>
+						Revisa que el nombre del autor sea uno de la lista del campo «Autor o autora».
+						<a href={enlaceSinAutor}>Quitar el autor</a>.
+					</li>
+				{/if}
+				<li>Prueba con menos palabras; no hace falta escribir los acentos.</li>
+				<li>Si buscas un boletín, escríbelo con su guion, por ejemplo 11077-07.</li>
+			</ul>
+		</div>
+	{:else}
+		<ol class="lista">
+			{#each data.filas as p (p.boletin)}
+				<li class="fila {claseEstado(p.estado)}">
+					<div class="fila-meta">
+						<span class="boletin">Boletín {p.boletin}</span>
+						{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
+						{#if p.grupo === 'debil'}<span
+								class="relacion-debil"
+								title={NIVELES_RELACION.debil.explicacion}>Relación débil</span
+							>{/if}
+					</div>
+					<h3 class="titulo"><a href="/boletin/{p.boletin}">{p.titulo}</a></h3>
+					<p class="datos">
+						{#if p.iniciativa}<span
+								>{p.iniciativa}{p.camara_origen ? `, ${p.camara_origen}` : ''}</span
+							>{/if}
+						{#if p.fecha_ingreso}<span>Ingreso {fechaCorta(p.fecha_ingreso)}</span>{/if}
+						{#if p.ultimo_tramite}<span>Último trámite {fechaCorta(p.ultimo_tramite)}</span>{/if}
+						{#if p.ley_numero}<span class="ley">{p.ley_numero}</span>{/if}
+					</p>
+				</li>
+			{/each}
+		</ol>
+
+		{#if data.paginas > 1}
+			<nav class="paginacion" aria-label="Páginas de resultados">
+				<a
+					class="boton secundario"
+					href={f.pagina > 1 ? enlacePagina(f.pagina - 1) : undefined}
+					aria-disabled={f.pagina <= 1 ? 'true' : undefined}
+					rel="prev">Anterior</a
+				>
+				<span>Página {f.pagina} de {numero.format(data.paginas)}</span>
+				<a
+					class="boton secundario"
+					href={f.pagina < data.paginas ? enlacePagina(f.pagina + 1) : undefined}
+					aria-disabled={f.pagina >= data.paginas ? 'true' : undefined}
+					rel="next">Siguiente</a
+				>
+			</nav>
+		{/if}
+	{/if}
+</div>
+
+<style>
+	.franja {
+		background: var(--franja);
+		color: var(--franja-texto);
+		padding: 2rem 0 2.25rem;
+	}
+	h1 {
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: clamp(1.9rem, 4.6vw, 2.9rem);
+		line-height: 1.08;
+		letter-spacing: -0.01em;
+		margin: 0 0 0.7rem;
+	}
+	.bajada {
+		max-width: 62ch;
+		margin: 0 0 0.75rem;
+		font-size: 1.05rem;
+		color: var(--franja-suave);
+	}
+	.filtros {
+		position: relative;
+		display: grid;
+		gap: 1.1rem;
+		margin: -0.75rem 0 2rem;
+		padding: 1.25rem;
+		background: var(--superficie);
+		border: 1px solid var(--borde);
+		border-radius: var(--radio-grande);
+		box-shadow: var(--sombra);
+	}
+	@media (min-width: 48rem) {
+		.filtros {
+			padding: 1.5rem 1.75rem;
+		}
+	}
+	label {
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.opcional,
+	.ayuda {
+		font-weight: 400;
+		color: var(--tinta-suave);
+		font-size: 0.88rem;
+	}
+	.ayuda {
+		margin: 0.35rem 0 0;
+	}
+	.busqueda-fila {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.35rem;
+	}
+	input[type='search'],
+	select {
+		font: inherit;
+		min-height: 48px;
+		padding: 0.5rem 0.8rem;
+		border: 1px solid var(--borde-fuerte);
+		border-radius: var(--radio);
+		background: var(--papel);
+		color: var(--tinta);
+		width: 100%;
+		min-width: 0;
+	}
+	input[type='search'] {
+		font-size: 1.05rem;
+	}
+	input[type='search']:hover,
+	select:hover {
+		border-color: var(--violeta-medio);
+	}
+	.ayuda.error {
+		color: var(--aviso);
+		font-weight: 500;
+	}
+	.herramientas {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
+		justify-content: space-between;
+		gap: 0.75rem 1.5rem;
+		padding: 0.9rem 0;
+		border-bottom: 1px solid var(--borde);
+	}
+	.campo-orden {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem 0.6rem;
+	}
+	.campo-orden select {
+		width: auto;
+		min-width: 13rem;
+	}
+	.descarga {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.25rem 0.9rem;
+		margin: 0;
+		font-size: 0.95rem;
+	}
+	.descarga a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		padding: 0 0.4rem;
+		font-weight: 600;
+	}
+	input[type='text'] {
+		font: inherit;
+		min-height: 48px;
+		padding: 0.5rem 0.8rem;
+		border: 1px solid var(--borde-fuerte);
+		border-radius: var(--radio);
+		background: var(--papel);
+		color: var(--tinta);
+		width: 100%;
+		min-width: 0;
+	}
+	input[type='text']:hover {
+		border-color: var(--violeta-medio);
+	}
+	.campo-autor {
+		grid-column: 1 / -1;
+		max-width: 34rem;
+	}
+	.selectores {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
+		gap: 1rem;
+		align-items: end;
+	}
+	.campo {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		min-width: 0;
+	}
+	.acciones {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1.25rem;
+	}
+	.limpiar {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+	}
+	.resultados-cabecera {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.25rem 1rem;
+		border-bottom: 2px solid var(--tinta);
+		padding-bottom: 0.5rem;
+	}
+	.resumen {
+		font-family: var(--serif);
+		font-size: 1.6rem;
+		font-weight: 500;
+		margin: 0;
+	}
+	.suave {
+		color: var(--tinta-suave);
+		font-size: 0.95rem;
+		margin: 0;
+	}
+	.resumen .suave {
+		font-size: inherit;
+	}
+	.lista {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+	.fila {
+		position: relative;
+		padding: 1.1rem 0 1.15rem 1.1rem;
+		border-bottom: 1px solid var(--borde);
+	}
+	.fila::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 1.2rem;
+		bottom: 1.2rem;
+		width: 3px;
+		border-radius: 2px;
+		background: var(--cerrado);
+		opacity: 0.5;
+	}
+	.fila.publicado::before {
+		background: var(--verde);
+		opacity: 1;
+	}
+	.fila.tramitacion::before {
+		background: var(--violeta-medio);
+		opacity: 1;
+	}
+	.relacion-debil {
+		display: inline-block;
+		padding: 0.05rem 0.55rem;
+		border: 1px solid var(--aviso);
+		border-radius: 999px;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--aviso);
+		background: var(--aviso-suave);
+		white-space: nowrap;
+	}
+	.fila-meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.3rem 0.9rem;
+	}
+	.boletin {
+		font-variant-numeric: tabular-nums;
+		font-size: 0.86rem;
+		font-weight: 600;
+		color: var(--tinta-suave);
+	}
+	.titulo {
+		font-family: var(--serif);
+		font-size: 1.22rem;
+		font-weight: 500;
+		line-height: 1.3;
+		margin: 0.3rem 0 0.4rem;
+		max-width: 62ch;
+		overflow-wrap: anywhere;
+	}
+	.titulo a {
+		color: var(--tinta);
+		text-decoration: none;
+	}
+	.titulo a:hover {
+		color: var(--violeta-medio);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+	}
+	.datos {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.15rem 1.1rem;
+		margin: 0;
+		font-size: 0.88rem;
+		color: var(--tinta-suave);
+		font-variant-numeric: tabular-nums;
+	}
+	.datos .ley {
+		color: var(--verde);
+		font-weight: 600;
+	}
+	.vacio {
+		margin-top: 1.5rem;
+		padding: 1.25rem 1.5rem;
+		background: var(--superficie);
+		border: 1px dashed var(--borde-fuerte);
+		border-radius: 10px;
+	}
+	.vacio h3 {
+		margin-top: 0;
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: 1.3rem;
+	}
+	.paginacion {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+</style>

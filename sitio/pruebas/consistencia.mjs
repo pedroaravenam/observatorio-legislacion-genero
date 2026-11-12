@@ -201,7 +201,7 @@ const temas = await p.$$eval('[data-cifra="tema"]', (els) =>
 );
 for (const t of temas) {
 	comparar(`tema ${t.clave}`, 'valor visible = atributo', t.total, primerNumero(t.visible));
-	await p.goto(`${BASE}/?tema=${t.clave}`);
+	await p.goto(`${BASE}/proyectos?tema=${t.clave}`);
 	comparar(
 		`tema ${t.clave}`,
 		'portada con ?tema=',
@@ -210,7 +210,7 @@ for (const t of temas) {
 	);
 	const json = await (await p.request.get(`${BASE}/datos/proyectos.json?tema=${t.clave}`)).json();
 	comparar(`tema ${t.clave}`, 'descarga JSON', t.total, json.total);
-	await p.goto(`${BASE}/?tema=${t.clave}&estado=Publicado`);
+	await p.goto(`${BASE}/proyectos?tema=${t.clave}&estado=Publicado`);
 	comparar(
 		`tema ${t.clave}`,
 		'leyes (portada con estado=Publicado)',
@@ -220,7 +220,7 @@ for (const t of temas) {
 }
 
 // Portada y descargas: la selección completa.
-await p.goto(BASE + '/');
+await p.goto(BASE + '/proyectos');
 comparar('portada', 'total de la selección', total, primerNumero(await p.textContent('.resumen')));
 const csv = await (await p.request.get(BASE + '/datos/proyectos.csv')).text();
 comparar('descarga', 'filas del CSV', total, csv.split('\r\n').filter(Boolean).length - 1);
@@ -299,7 +299,7 @@ while (muestraFuera.size < 10) muestraFuera.add(fuera[Math.floor(azar() * fuera.
 for (const b of [...muestraFuera].sort()) {
 	const resp = await p.goto(`${BASE}/boletin/${b}`);
 	comparar(`fuera ${b}`, 'la ficha responde 404', 404, resp.status());
-	await p.goto(`${BASE}/?q=${encodeURIComponent(b)}`);
+	await p.goto(`${BASE}/proyectos?q=${encodeURIComponent(b)}`);
 	comparar(
 		`fuera ${b}`,
 		'la búsqueda por número no lo muestra',

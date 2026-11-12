@@ -4,6 +4,17 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<script>
+			// Antes de pintar: aplica el tema elegido (si lo hay) y marca que hay JavaScript, para mostrar el selector.
+			(function () {
+				var raiz = document.documentElement;
+				raiz.classList.add('con-js');
+				try {
+					var tema = localStorage.getItem('tema');
+					if (tema === 'light' || tema === 'dark') raiz.dataset.theme = tema;
+				} catch (e) {}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

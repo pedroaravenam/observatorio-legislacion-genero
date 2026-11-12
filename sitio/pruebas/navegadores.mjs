@@ -62,7 +62,7 @@ for (const motor of motores) {
 		}
 
 		// Filtro: elegir un tema y aplicar reduce el total.
-		await p.goto(BASE + '/');
+		await p.goto(BASE + '/proyectos');
 		const antes = primerNumero(await p.textContent('.resumen'));
 		await p.selectOption('#tema', 'violencia');
 		await Promise.all([
@@ -79,7 +79,7 @@ for (const motor of motores) {
 		);
 
 		// Autor: el campo tiene su lista de nombres.
-		await p.goto(BASE + '/');
+		await p.goto(BASE + '/proyectos');
 		const nombres = await p.locator('#autores option').count();
 		const enlazado = await p.getAttribute('#autor', 'list');
 		registrar(
@@ -91,7 +91,7 @@ for (const motor of motores) {
 		);
 
 		// Una búsqueda nueva ordena por pertinencia: el formulario no debe arrastrar un orden por fecha.
-		await p.goto(BASE + '/');
+		await p.goto(BASE + '/proyectos');
 		await p.fill('#q', 'sala cuna');
 		await Promise.all([p.waitForURL(/q=sala/), p.click('.busqueda-fila button')]);
 		registrar(
@@ -103,7 +103,7 @@ for (const motor of motores) {
 		);
 
 		// Orden: cambiar el selector reenvía el formulario y conserva los filtros.
-		await p.goto(BASE + '/?q=sala+cuna&camara=Senado');
+		await p.goto(BASE + '/proyectos?q=sala+cuna&camara=Senado');
 		await p.selectOption('#orden', 'antiguos');
 		await Promise.all([p.waitForURL(/orden=antiguos/), p.click('.campo-orden button')]);
 		const u = p.url();
@@ -116,7 +116,7 @@ for (const motor of motores) {
 		);
 
 		// Paginación: «Siguiente» avanza a otra página con otros proyectos.
-		await p.goto(BASE + '/');
+		await p.goto(BASE + '/proyectos');
 		const primero = await p.textContent('.fila .boletin');
 		await Promise.all([p.waitForURL(/pagina=2/), p.click('a[rel="next"]')]);
 		const segundo = await p.textContent('.fila .boletin');
@@ -129,7 +129,7 @@ for (const motor of motores) {
 		);
 
 		// Descarga: el enlace CSV baja un archivo con nombre y contenido.
-		await p.goto(BASE + '/?tema=violencia');
+		await p.goto(BASE + '/proyectos?tema=violencia');
 		const [descarga] = await Promise.all([
 			p.waitForEvent('download'),
 			p.click('.descarga a:has-text("CSV")')
@@ -145,12 +145,40 @@ for (const motor of motores) {
 			`${nombreArchivo}, ${statSync(ruta).size} bytes`
 		);
 
-		// Gráfico anual y panorama.
+		// Los enlaces antiguos al buscador, que vivía en la portada, llegan a /proyectos con sus filtros.
+		await p.goto(BASE + '/?tema=violencia&estado=Publicado');
+		registrar(
+			motor,
+			ancho,
+			'enlace antiguo de la portada redirige al buscador',
+			/\/proyectos\?tema=violencia&estado=Publicado$/.test(p.url()),
+			p.url().replace(BASE, '')
+		);
+
+		// Tema: el botón alterna entre claro y oscuro, cambia el fondo y se recuerda al recargar.
 		await p.goto(BASE + '/');
-		const barras = await p.locator('.barras li').count();
+		const fondo = () => p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+		const fondoAntes = await fondo();
+		await p.click('button.tema');
+		const temaElegido = await p.evaluate(() => document.documentElement.dataset.theme);
+		const fondoDespues = await fondo();
+		await p.reload();
+		const temaRecordado = await p.evaluate(() => document.documentElement.dataset.theme);
+		registrar(
+			motor,
+			ancho,
+			'selector de tema cambia el fondo y se recuerda',
+			fondoAntes !== fondoDespues && Boolean(temaElegido) && temaRecordado === temaElegido,
+			`${fondoAntes} → ${fondoDespues}; ${temaElegido}`
+		);
+		await p.evaluate(() => localStorage.removeItem('tema'));
+
+		// Gráfico anual y panorama.
+		await p.goto(BASE + '/panorama');
+		const barras = await p.locator('.grafico .barras li').count();
 		const alto0 = await p.evaluate(() =>
 			Math.max(
-				...[...document.querySelectorAll('.barras .columna')].map(
+				...[...document.querySelectorAll('.grafico .barras .columna')].map(
 					(e) => e.getBoundingClientRect().height
 				)
 			)

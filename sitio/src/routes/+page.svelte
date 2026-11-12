@@ -1,587 +1,697 @@
 <script lang="ts">
+	import Autoria from '../lib/Autoria.svelte';
 	import GraficoAnual from '../lib/GraficoAnual.svelte';
-	import { claseEstado, fechaCorta, NIVELES_RELACION, parametrosFiltros } from '#lib/formato';
-	import { TEMAS } from '#lib/temas';
+	import { fechaLarga } from '#lib/formato';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	const f = $derived(data.filtros);
-	// Con bind:value, lo que alguien escribe antes de que cargue el JavaScript se conserva al hidratar.
-	// Son derivados asignables: los enlaces de navegación siguen actualizando los campos.
-	let texto = $derived(f.texto);
-	let autor = $derived(f.autor ?? '');
-	const hayFiltros = $derived(
-		Boolean(
-			f.texto || f.anno || f.estado || f.iniciativa || f.tema || f.camara || f.autor || f.autoria
-		)
-	);
-	const totales = $derived(
-		data.resumen.reduce((a, r) => ({ total: a.total + r.total, leyes: a.leyes + r.leyes }), {
-			total: 0,
-			leyes: 0
+	const d = $derived(data.panorama);
+	const numero = new Intl.NumberFormat('es-CL');
+	const decimal = new Intl.NumberFormat('es-CL', { maximumFractionDigits: 1 });
+	const n = (x: number) => numero.format(x);
+	const pct = (parte: number, total: number) => (total ? Math.round((parte / total) * 100) : 0);
+
+	const desde = $derived(data.resumen[0]?.anno ?? 1990);
+	const ultimo = $derived(data.resumen.at(-1)?.anno ?? desde);
+	const mayor = $derived(data.resumen.reduce((a, r) => (r.total > a.total ? r : a)));
+	const primero = $derived(data.resumen[0]);
+	const actualizado = $derived(fechaLarga(data.senadoConsultado));
+
+	// Promedio anual de cada período, sobre los años que de verdad tienen datos.
+	const periodos = $derived(
+		d.periodos.map((p) => {
+			const annos = Math.min(p.hasta, ultimo) - p.desde + 1;
+			return { ...p, annos, promedio: annos > 0 ? p.total / annos : 0 };
 		})
 	);
-	const desde = $derived(data.resumen[0]?.anno ?? 1990);
+	const reciente = $derived(periodos.at(-1)!);
 
-	function enlacePagina(n: number): string {
-		const s = parametrosFiltros(f, { pagina: n }).toString();
-		return s ? `/?${s}` : '/';
-	}
+	const mensaje = $derived(d.origen.find((o) => o.iniciativa === 'Mensaje')!);
+	const mocion = $derived(d.origen.find((o) => o.iniciativa === 'Moción')!);
+	const g = $derived(d.autoria.global);
+	const temas = $derived(d.temas.slice(0, 6));
+	const maxTema = $derived(Math.max(1, ...temas.map((t) => t.total)));
+	const maxNivel = $derived(Math.max(1, ...d.niveles.map((x) => x.total)));
+	const t = $derived(d.enTramite);
 
-	const enlaceSinAutor = $derived.by(() => {
-		const q = parametrosFiltros({ ...f, autor: null }, { pagina: 1 }).toString();
-		return q ? `/?${q}` : '/';
-	});
+	const NIVELES = {
+		tema_central: 'El género es el tema central',
+		componente: 'El género es una parte del proyecto',
+		debil: 'Relación débil'
+	} as const;
 
-	/** Enlace de descarga con los filtros vigentes, sin página: se baja todo lo que cumple. */
-	function enlaceDatos(formato: 'csv' | 'json'): string {
-		const s = parametrosFiltros(f, { pagina: 1 }).toString();
-		return `/datos/proyectos.${formato}${s ? `?${s}` : ''}`;
-	}
-
-	/** Filtros vigentes como campos ocultos del formulario de orden; el orden mismo lo elige el selector. */
-	const camposOcultos = $derived(
-		[...parametrosFiltros(f, { pagina: 1 })].filter(([nombre]) => nombre !== 'orden')
-	);
-
-	// La pertinencia solo existe cuando hay palabras que buscar.
-	const ordenMostrado = $derived(f.orden === 'pertinencia' && !f.texto ? 'recientes' : f.orden);
-
-	const numero = new Intl.NumberFormat('es-CL');
+	const INDICE = [
+		['que-es', 'Qué cuenta como legislación de género'],
+		['cuanto', 'Cuánto se legisla'],
+		['hitos', 'Leyes que marcaron el período'],
+		['quien', 'Quién presenta y qué prospera'],
+		['temas', 'De qué tratan'],
+		['hoy', 'En qué están hoy'],
+		['proyecto', 'Quién hace este sitio']
+	] as const;
 </script>
 
 <svelte:head>
-	<title>{f.texto ? `«${f.texto}» · ` : ''}Proyectos · Observatorio de Legislación de Género</title>
+	<title>Observatorio de Legislación de Género · Chile, desde {desde}</title>
 	<meta
 		name="description"
-		content="Busca proyectos de ley relacionados con género en Chile desde 1990, con su tramitación y enlace a la fuente oficial."
+		content="Qué se ha legislado sobre género en Chile desde 1990: cuántos proyectos se presentan, quién los impulsa, de qué tratan y cuáles llegan a ser ley."
 	/>
 </svelte:head>
 
+{#snippet fuente()}
+	<p class="fuente">
+		Fuente: servicio de tramitación del Senado de Chile.{#if actualizado}{' '}Datos al {actualizado}.{/if}
+	</p>
+{/snippet}
+
 <section class="franja" aria-labelledby="titulo">
 	<div class="contenedor">
-		<h1 id="titulo">Proyectos de ley sobre género en Chile, desde {desde}</h1>
+		<h1 id="titulo">Más de tres décadas de legislación de género en Chile</h1>
 		<p class="bajada">
-			Desde {desde} se han presentado {numero.format(totales.total)} proyectos de ley que tratan temas
-			de género, y {numero.format(totales.leyes)} ya son ley. Aquí puedes buscarlos, ver en qué etapa
-			está cada uno y abrir sus documentos en el Senado y en la Biblioteca del Congreso.
+			Desde {desde}, el Congreso ha recibido {n(d.total)} proyectos de ley que tratan temas de género.
+			{n(d.leyes)} ya son ley, {n(d.enTramitacion)} siguen en tramitación y {n(d.cerrados)} se archivaron,
+			se retiraron o fueron rechazados. Aquí se explica qué se ha legislado, quién lo impulsa y qué llega
+			a aprobarse.
 		</p>
-		<GraficoAnual resumen={data.resumen} seleccionado={f.anno} />
+		<p class="acciones">
+			<a class="boton sobre-franja" href="/proyectos">Buscar proyectos</a>
+			<a class="seguir" href="/panorama">Ver el panorama completo</a>
+		</p>
+		<nav class="indice" aria-labelledby="indice-titulo">
+			<h2 id="indice-titulo">En esta página</h2>
+			<ol>
+				{#each INDICE as [ancla, nombre] (ancla)}
+					<li><a href="#{ancla}">{nombre}</a></li>
+				{/each}
+			</ol>
+		</nav>
 	</div>
 </section>
 
-<div class="contenedor">
-	<form
-		id="filtros"
-		method="GET"
-		action="/"
-		class="filtros"
-		role="search"
-		aria-label="Buscar proyectos"
-	>
-		<div class="busqueda">
-			<label for="q">Buscar <span class="opcional">(opcional)</span></label>
-			<div class="busqueda-fila">
-				<input
-					id="q"
-					name="q"
-					type="search"
-					bind:value={texto}
-					maxlength="200"
-					placeholder="Palabras o número de boletín"
-					aria-describedby="q-ayuda"
-					enterkeyhint="search"
-				/>
-				<button class="boton" type="submit">Buscar</button>
-			</div>
-			<p id="q-ayuda" class="ayuda">
-				Escribe palabras, como «sala cuna», o un número de boletín, como 11077-07. La búsqueda
-				revisa títulos, materias y autores.
+<div class="contenedor ensayo">
+	<section class="tramo" id="que-es" aria-labelledby="que-es-titulo">
+		<div class="texto">
+			<h2 id="que-es-titulo">Qué cuenta como legislación de género</h2>
+			<p>
+				No basta con que un proyecto mencione a las mujeres para considerarlo de género. El
+				Observatorio mira qué regula cada proyecto y a quién afecta, y con eso lo ubica en uno de
+				tres niveles: los proyectos donde el género es el tema central, aquellos donde es una parte
+				de lo que se regula y aquellos donde la relación es lateral o dudosa. Estos últimos se
+				incluyen, pero quedan marcados como relación débil.
 			</p>
-		</div>
-
-		<div class="selectores">
-			<div class="campo">
-				<label for="tema">Tema</label>
-				<select id="tema" name="tema">
-					<option value="">Todos</option>
-					{#each TEMAS as t (t.clave)}
-						<option value={t.clave} selected={f.tema === t.clave}>{t.nombre}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="campo">
-				<label for="anno">Año de ingreso</label>
-				<select id="anno" name="anno">
-					<option value="">Todos</option>
-					{#each data.opciones.annos as a (a)}
-						<option value={a} selected={f.anno === a}>{a}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="campo">
-				<label for="estado">Estado</label>
-				<select id="estado" name="estado">
-					<option value="">Todos</option>
-					{#each data.opciones.estados as e (e)}
-						<option value={e} selected={f.estado === e}>{e}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="campo">
-				<label for="iniciativa">Origen</label>
-				<select id="iniciativa" name="iniciativa">
-					<option value="">Todos</option>
-					{#each data.opciones.iniciativas as i (i)}
-						<option value={i} selected={f.iniciativa === i}>
-							{i === 'Mensaje' ? 'Mensaje (Presidencia)' : 'Moción (parlamentarios)'}
-						</option>
-					{/each}
-				</select>
-			</div>
-			<div class="campo">
-				<label for="camara">Cámara de origen</label>
-				<select id="camara" name="camara">
-					<option value="">Todas</option>
-					{#each data.opciones.camaras as c (c)}
-						<option value={c} selected={f.camara === c}>{c}</option>
-					{/each}
-				</select>
-			</div>
-			<div class="campo">
-				<label for="autoria">Autoría de las mociones</label>
-				<select id="autoria" name="autoria" aria-describedby="autoria-ayuda">
-					<option value="">Todas</option>
-					{#each data.opciones.autorias as a (a.clave)}
-						<option value={a.clave} selected={f.autoria === a.clave}>{a.nombre}</option>
-					{/each}
-				</select>
-				<p id="autoria-ayuda" class="ayuda">
-					Según el sexo de quienes firman. Los mensajes de la Presidencia no tienen autoría
-					parlamentaria.
-				</p>
-			</div>
-			<div class="campo campo-autor">
-				<label for="autor">Autor o autora <span class="opcional">(opcional)</span></label>
-				<input
-					id="autor"
-					name="autor"
-					type="text"
-					list="autores"
-					bind:value={autor}
-					maxlength="120"
-					autocomplete="off"
-					placeholder="Empieza a escribir un apellido"
-					aria-describedby="autor-ayuda"
-					aria-invalid={data.autorDesconocido ? 'true' : undefined}
-				/>
-				<datalist id="autores">
-					{#each data.opciones.autores as a (a)}<option value={a}></option>{/each}
-				</datalist>
-				<p id="autor-ayuda" class="ayuda" class:error={data.autorDesconocido}>
-					{#if data.autorDesconocido}
-						No hay una persona con ese nombre. Elígelo de la lista que aparece al escribir; los
-						nombres están escritos como «Apellidos, Nombre».
-					{:else}
-						Elige un nombre de la lista; están escritos como «Apellidos, Nombre».
-					{/if}
-				</p>
-			</div>
-		</div>
-
-		<div class="acciones">
-			<button class="boton secundario" type="submit">Aplicar filtros</button>
-			{#if hayFiltros}
-				<a class="limpiar" href="/">Quitar filtros</a>
-			{/if}
-		</div>
-	</form>
-
-	<div class="resultados-cabecera">
-		<h2 class="resumen" role="status">
-			{#if data.total === 0}
-				Sin resultados
-			{:else}
-				{numero.format(data.total)}
-				{data.total === 1 ? 'proyecto' : 'proyectos'}
-				{#if f.anno}<span class="suave">de {f.anno}</span>{/if}
-			{/if}
-		</h2>
-		{#if data.paginas > 1}
-			<p class="suave">Página {f.pagina} de {numero.format(data.paginas)}</p>
-		{/if}
-	</div>
-
-	{#if data.total > 0}
-		<div class="herramientas">
-			<!-- Formulario propio: así una búsqueda nueva no arrastra el orden anterior y conserva el que corresponde. -->
-			<form class="campo-orden" method="GET" action="/" aria-label="Ordenar resultados">
-				{#each camposOcultos as [nombre, valor] (nombre)}
-					<input type="hidden" name={nombre} value={valor} />
-				{/each}
-				<label for="orden">Ordenar por</label>
-				<select id="orden" name="orden">
-					{#if f.texto}
-						<option value="pertinencia" selected={ordenMostrado === 'pertinencia'}>
-							Más pertinentes
-						</option>
-					{/if}
-					<option value="recientes" selected={ordenMostrado === 'recientes'}>Más recientes</option>
-					<option value="antiguos" selected={ordenMostrado === 'antiguos'}>Más antiguos</option>
-					<option value="movimiento" selected={ordenMostrado === 'movimiento'}>
-						Con movimiento reciente
-					</option>
-				</select>
-				<button class="boton secundario" type="submit">Ordenar</button>
-			</form>
-			<p class="descarga">
-				<span
-					>Descargar {numero.format(data.total)}
-					{data.total === 1 ? 'proyecto' : 'proyectos'}:</span
-				>
-				<a href={enlaceDatos('csv')} download>CSV</a>
-				<a href={enlaceDatos('json')} download>JSON</a>
+			<p>
+				Con ese criterio, de los {n(data.totalBoletines)} boletines que el Observatorio ha cargado desde
+				el servicio del Senado, {n(d.total)} forman la selección: {decimal.format(
+					(d.total / data.totalBoletines) * 100
+				)} de cada cien.
 			</p>
+			<p><a class="seguir" href="/acerca#criterio">Leer el criterio completo</a></p>
 		</div>
-	{/if}
-
-	{#if data.total === 0}
-		<div class="vacio">
-			<h3>No hay proyectos con esos criterios</h3>
-			<ul>
-				{#if f.autor}
+		<aside class="margen" aria-label="La selección según su relación con el género">
+			<p class="cifra">
+				<span class="numero">{n(d.total)}</span>
+				<span class="rotulo">proyectos en la selección, de {n(data.totalBoletines)} boletines</span>
+			</p>
+			<ul class="barras">
+				{#each d.niveles as x (x.clave)}
 					<li>
-						Revisa que el nombre del autor sea uno de la lista del campo «Autor o autora».
-						<a href={enlaceSinAutor}>Quitar el autor</a>.
+						<span class="b-nombre">{NIVELES[x.clave]}</span>
+						<span class="b-valor">{n(x.total)}</span>
+						<span class="b-pista" aria-hidden="true">
+							<span class="b-total" style="width: {(x.total / maxNivel) * 100}%"></span>
+						</span>
 					</li>
-				{/if}
-				<li>Prueba con menos palabras; no hace falta escribir los acentos.</li>
-				<li>Si buscas un boletín, escríbelo con su guion, por ejemplo 11077-07.</li>
+				{/each}
 			</ul>
-		</div>
-	{:else}
-		<ol class="lista">
-			{#each data.filas as p (p.boletin)}
-				<li class="fila {claseEstado(p.estado)}">
-					<div class="fila-meta">
-						<span class="boletin">Boletín {p.boletin}</span>
-						{#if p.estado}<span class="estado {claseEstado(p.estado)}">{p.estado}</span>{/if}
-						{#if p.grupo === 'debil'}<span
-								class="relacion-debil"
-								title={NIVELES_RELACION.debil.explicacion}>Relación débil</span
-							>{/if}
-					</div>
-					<h3 class="titulo"><a href="/boletin/{p.boletin}">{p.titulo}</a></h3>
-					<p class="datos">
-						{#if p.iniciativa}<span
-								>{p.iniciativa}{p.camara_origen ? `, ${p.camara_origen}` : ''}</span
-							>{/if}
-						{#if p.fecha_ingreso}<span>Ingreso {fechaCorta(p.fecha_ingreso)}</span>{/if}
-						{#if p.ultimo_tramite}<span>Último trámite {fechaCorta(p.ultimo_tramite)}</span>{/if}
-						{#if p.ley_numero}<span class="ley">{p.ley_numero}</span>{/if}
-					</p>
-				</li>
-			{/each}
-		</ol>
+		</aside>
+	</section>
 
-		{#if data.paginas > 1}
-			<nav class="paginacion" aria-label="Páginas de resultados">
-				<a
-					class="boton secundario"
-					href={f.pagina > 1 ? enlacePagina(f.pagina - 1) : undefined}
-					aria-disabled={f.pagina <= 1 ? 'true' : undefined}
-					rel="prev">Anterior</a
+	<section class="tramo" id="cuanto" aria-labelledby="cuanto-titulo">
+		<div class="texto">
+			<h2 id="cuanto-titulo">Cada vez se presentan más proyectos</h2>
+			<p>
+				En {primero.anno} ingresaron {n(primero.total)} proyectos de género. En {mayor.anno}, el año
+				con más ingresos, fueron {n(mayor.total)}. El aumento no fue parejo: durante la década de
+				1990 el promedio era de {decimal.format(periodos[0].promedio)} proyectos al año, entre 2000 y
+				2009 subió a {decimal.format(periodos[1].promedio)} y entre 2010 y 2017 llegó a
+				{decimal.format(periodos[2].promedio)}.
+			</p>
+			<p>
+				El cambio más marcado viene después. Desde {reciente.desde}, el año de las movilizaciones
+				feministas, el promedio es de {decimal.format(reciente.promedio)} proyectos al año, y ese período
+				reúne {n(reciente.total)} de los {n(d.total)} proyectos de toda la selección.
+			</p>
+			<p>
+				Que se presenten más proyectos no significa que se aprueben más. De los ingresados desde
+				{reciente.desde}, {n(reciente.leyes)} ya son ley; muchos de los más recientes siguen en tramitación
+				y todavía pueden serlo.
+			</p>
+		</div>
+		<aside class="margen" aria-label="Proyectos por período">
+			<table class="tabla-margen">
+				<caption>Proyectos presentados por período</caption>
+				<thead>
+					<tr>
+						<th scope="col">Período</th>
+						<th scope="col" class="num">Proyectos</th>
+						<th scope="col" class="num">Por año</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each periodos as p (p.nombre)}
+						<tr>
+							<th scope="row">{p.nombre}</th>
+							<td class="num">{n(p.total)}</td>
+							<td class="num">{decimal.format(p.promedio)}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+			<p class="nota">{ultimo} es el año en curso y todavía no termina.</p>
+		</aside>
+		<div class="lamina">
+			<GraficoAnual resumen={data.resumen} seleccionado={null} />
+		</div>
+		<div class="bajo-lamina">{@render fuente()}</div>
+	</section>
+
+	<section class="tramo" id="hitos" aria-labelledby="hitos-titulo">
+		<div class="texto">
+			<h2 id="hitos-titulo">Leyes que marcaron el período</h2>
+			<p>
+				De los {n(d.total)} proyectos, {n(d.leyes)} terminaron publicados como ley. Entre ellos hay reajustes
+				y modificaciones acotadas, pero también leyes que cambiaron las reglas, como la primera ley de
+				violencia intrafamiliar, la que incorporó el femicidio al Código Penal o la que permitió el matrimonio
+				entre personas del mismo sexo.
+			</p>
+			<p>
+				La lista que sigue es una selección del Observatorio, no un registro oficial. Cada ley
+				enlaza a la tramitación completa del proyecto que le dio origen.
+			</p>
+			<ol class="hilo">
+				{#each data.hitos as h (h.boletin)}
+					<li>
+						<span class="h-anno">{h.anno}</span>
+						<a class="h-nombre" href="/boletin/{h.boletin}">{h.nombre}</a>
+						<span class="h-ley">{h.ley}, publicada el {fechaLarga(h.publicada)}</span>
+					</li>
+				{/each}
+			</ol>
+		</div>
+		<aside class="margen" aria-label="Proyectos que son ley">
+			<p class="cifra">
+				<span class="numero ley">{pct(d.leyes, d.total)} %</span>
+				<span class="rotulo"
+					>de los proyectos de la selección ya es ley: {n(d.leyes)} de {n(d.total)}</span
 				>
-				<span>Página {f.pagina} de {numero.format(data.paginas)}</span>
-				<a
-					class="boton secundario"
-					href={f.pagina < data.paginas ? enlacePagina(f.pagina + 1) : undefined}
-					aria-disabled={f.pagina >= data.paginas ? 'true' : undefined}
-					rel="next">Siguiente</a
-				>
-			</nav>
-		{/if}
-	{/if}
+			</p>
+		</aside>
+	</section>
+
+	<section class="tramo" id="quien" aria-labelledby="quien-titulo">
+		<div class="texto">
+			<h2 id="quien-titulo">Quién presenta los proyectos y cuáles prosperan</h2>
+			<p>
+				Un proyecto puede nacer como mensaje, cuando lo envía la Presidencia de la República, o como
+				moción, cuando lo presentan diputadas, diputados, senadoras o senadores. Las mociones son
+				amplia mayoría: {n(mocion.total)} contra {n(mensaje.total)} mensajes. Pero el {pct(
+					mensaje.leyes,
+					mensaje.total
+				)} % de los mensajes llegó a ser ley, frente al {pct(mocion.leyes, mocion.total)} % de las mociones,
+				en parte porque el Ejecutivo puede darles urgencia y fijar la agenda del Congreso.
+			</p>
+			<p>
+				Las mociones también dicen algo sobre quién legisla. De las {n(g.total)} mociones de la selección,
+				el {pct(g.mixta, g.total)} % lleva firmas de mujeres y hombres a la vez, el {pct(
+					g.hombres,
+					g.total
+				)} % solo de hombres y el {pct(g.mujeres, g.total)} % solo de mujeres.
+			</p>
+			<p><a class="seguir" href="/panorama#origen">Ver el detalle por período</a></p>
+		</div>
+		<aside class="margen" aria-label="Proyectos que llegaron a ser ley según su origen">
+			<p class="rotulo-fuerte">Llegaron a ser ley</p>
+			<ul class="barras">
+				<li>
+					<span class="b-nombre">Mensajes de la Presidencia</span>
+					<span class="b-valor">{pct(mensaje.leyes, mensaje.total)} %</span>
+					<span class="b-pista" aria-hidden="true">
+						<span class="b-total ley" style="width: {pct(mensaje.leyes, mensaje.total)}%"></span>
+					</span>
+					<span class="b-detalle">{n(mensaje.leyes)} de {n(mensaje.total)}</span>
+				</li>
+				<li>
+					<span class="b-nombre">Mociones parlamentarias</span>
+					<span class="b-valor">{pct(mocion.leyes, mocion.total)} %</span>
+					<span class="b-pista" aria-hidden="true">
+						<span class="b-total ley" style="width: {pct(mocion.leyes, mocion.total)}%"></span>
+					</span>
+					<span class="b-detalle">{n(mocion.leyes)} de {n(mocion.total)}</span>
+				</li>
+			</ul>
+		</aside>
+	</section>
+
+	<section class="tramo" id="temas" aria-labelledby="temas-titulo">
+		<div class="texto">
+			<h2 id="temas-titulo">De qué tratan</h2>
+			<p>
+				Cada proyecto se asigna a los temas que nombra su título, de modo que uno puede contar en
+				varios. {temas[0].nombre} es el tema más frecuente, con {n(temas[0].total)} proyectos; le siguen
+				{temas[1].nombre.toLowerCase()}, con {n(temas[1].total)}, y {temas[2].nombre.toLowerCase()},
+				con
+				{n(temas[2].total)}.
+			</p>
+			<p>
+				Otros {n(d.sinTemaEnTitulo)} proyectos no tienen tema en su título, porque entraron a la selección
+				por su texto o por el de la ley.
+			</p>
+			<p><a class="seguir" href="/panorama#temas">Ver todos los temas y cómo han cambiado</a></p>
+		</div>
+		<aside class="margen" aria-label="Temas más frecuentes">
+			<p class="rotulo-fuerte">Temas más frecuentes</p>
+			<ul class="barras">
+				{#each temas as x (x.clave)}
+					<li>
+						<a class="b-nombre" href="/proyectos?tema={x.clave}">{x.nombre}</a>
+						<span class="b-valor">{n(x.total)}</span>
+						<span class="b-pista" aria-hidden="true">
+							<span class="b-total" style="width: {(x.total / maxTema) * 100}%"></span>
+						</span>
+					</li>
+				{/each}
+			</ul>
+		</aside>
+	</section>
+
+	<section class="tramo" id="hoy" aria-labelledby="hoy-titulo">
+		<div class="texto">
+			<h2 id="hoy-titulo">En qué están hoy</h2>
+			<p>
+				{n(d.enTramitacion)} proyectos siguen abiertos. De ellos, {n(t.primerTramite)} ({pct(
+					t.primerTramite,
+					t.total
+				)} %) están todavía en su primer trámite constitucional, es decir, en la cámara donde se presentaron.
+			</p>
+			<p>
+				Seguir en tramitación no siempre significa avanzar: {n(t.movimiento.antiguo)} de esos proyectos
+				no registran ningún trámite hace más de tres años, aunque formalmente siguen abiertos. En cambio,
+				{n(t.movimiento.reciente)} tuvieron algún movimiento durante el último año.
+			</p>
+			<p class="salidas">
+				<a class="seguir" href="/actualidad">Ver lo que se movió estos días</a>
+				<a class="seguir" href="/proyectos?estado=En+tramitaci%C3%B3n">Proyectos en tramitación</a>
+			</p>
+		</div>
+		<aside class="margen" aria-label="Estado de los proyectos">
+			<p class="rotulo-fuerte">Estado de los {n(d.total)} proyectos</p>
+			<div class="estados" aria-hidden="true">
+				<span class="e-ley" style="flex-grow: {d.leyes}"></span>
+				<span class="e-tramitacion" style="flex-grow: {d.enTramitacion}"></span>
+				<span class="e-cerrado" style="flex-grow: {d.cerrados}"></span>
+			</div>
+			<ul class="leyenda">
+				<li><span class="clave e-ley"></span>Ley publicada <strong>{n(d.leyes)}</strong></li>
+				<li>
+					<span class="clave e-tramitacion"></span>En tramitación
+					<strong>{n(d.enTramitacion)}</strong>
+				</li>
+				<li>
+					<span class="clave e-cerrado"></span>Cerrado sin ser ley <strong>{n(d.cerrados)}</strong>
+				</li>
+			</ul>
+		</aside>
+	</section>
+
+	<section class="tramo final" id="proyecto" aria-labelledby="proyecto-titulo">
+		<h2 id="proyecto-titulo">Quién hace este sitio</h2>
+		<Autoria />
+	</section>
 </div>
 
 <style>
+	/* Apertura */
 	.franja {
 		background: var(--franja);
 		color: var(--franja-texto);
-		padding: 2.25rem 0 1.75rem;
+		padding: clamp(2.25rem, 6vw, 4rem) 0 clamp(1.75rem, 4vw, 2.5rem);
 	}
 	h1 {
 		font-family: var(--serif);
 		font-weight: 500;
-		font-size: clamp(2rem, 5.2vw, 3.4rem);
-		line-height: 1.05;
-		letter-spacing: -0.01em;
-		max-width: 20ch;
-		margin: 0 0 0.9rem;
+		font-size: clamp(2.2rem, 6vw, 4rem);
+		line-height: 1.03;
+		letter-spacing: -0.015em;
+		max-width: 17ch;
+		margin: 0 0 1.1rem;
 	}
 	.bajada {
-		max-width: 60ch;
-		margin: 0 0 2rem;
-		font-size: 1.05rem;
+		max-width: 62ch;
+		margin: 0 0 1.5rem;
+		font-size: clamp(1.05rem, 1.6vw, 1.18rem);
 		color: var(--franja-suave);
-	}
-	.filtros {
-		position: relative;
-		display: grid;
-		gap: 1.1rem;
-		margin: -0.75rem 0 2rem;
-		padding: 1.25rem;
-		background: var(--superficie);
-		border: 1px solid var(--borde);
-		border-radius: 10px;
-		box-shadow: 0 10px 30px -18px rgb(43 23 72 / 0.45);
-	}
-	@media (min-width: 48rem) {
-		.filtros {
-			padding: 1.5rem 1.75rem;
-		}
-	}
-	label {
-		font-weight: 600;
-		font-size: 0.95rem;
-	}
-	.opcional,
-	.ayuda {
-		font-weight: 400;
-		color: var(--tinta-suave);
-		font-size: 0.88rem;
-	}
-	.ayuda {
-		margin: 0.35rem 0 0;
-	}
-	.busqueda-fila {
-		display: flex;
-		gap: 0.5rem;
-		margin-top: 0.35rem;
-	}
-	input[type='search'],
-	select {
-		font: inherit;
-		min-height: 48px;
-		padding: 0.5rem 0.8rem;
-		border: 1px solid var(--borde-fuerte);
-		border-radius: var(--radio);
-		background: var(--papel);
-		color: var(--tinta);
-		width: 100%;
-		min-width: 0;
-	}
-	input[type='search'] {
-		font-size: 1.05rem;
-	}
-	input[type='search']:hover,
-	select:hover {
-		border-color: var(--violeta-medio);
-	}
-	.ayuda.error {
-		color: var(--aviso);
-		font-weight: 500;
-	}
-	.herramientas {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: end;
-		justify-content: space-between;
-		gap: 0.75rem 1.5rem;
-		padding: 0.9rem 0;
-		border-bottom: 1px solid var(--borde);
-	}
-	.campo-orden {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.4rem 0.6rem;
-	}
-	.campo-orden select {
-		width: auto;
-		min-width: 13rem;
-	}
-	.descarga {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.25rem 0.9rem;
-		margin: 0;
-		font-size: 0.95rem;
-	}
-	.descarga a {
-		display: inline-flex;
-		align-items: center;
-		min-height: 44px;
-		padding: 0 0.4rem;
-		font-weight: 600;
-	}
-	input[type='text'] {
-		font: inherit;
-		min-height: 48px;
-		padding: 0.5rem 0.8rem;
-		border: 1px solid var(--borde-fuerte);
-		border-radius: var(--radio);
-		background: var(--papel);
-		color: var(--tinta);
-		width: 100%;
-		min-width: 0;
-	}
-	input[type='text']:hover {
-		border-color: var(--violeta-medio);
-	}
-	.campo-autor {
-		grid-column: 1 / -1;
-		max-width: 34rem;
-	}
-	.selectores {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
-		gap: 1rem;
-		align-items: end;
-	}
-	.campo {
-		display: flex;
-		flex-direction: column;
-		gap: 0.35rem;
-		min-width: 0;
 	}
 	.acciones {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.5rem 1.25rem;
+		gap: 0.5rem 1.5rem;
+		margin: 0 0 2.25rem;
 	}
-	.limpiar {
-		display: inline-flex;
+	.boton.sobre-franja {
+		background: var(--franja-texto);
+		border-color: var(--franja-texto);
+		color: var(--franja);
+	}
+	.boton.sobre-franja:hover {
+		background: #ffffff;
+		border-color: #ffffff;
+	}
+	.acciones .seguir {
+		color: var(--franja-texto);
+	}
+	.indice {
+		border-top: 1px solid var(--franja-linea);
+		padding-top: 1.1rem;
+	}
+	.indice h2 {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--franja-suave);
+		margin: 0 0 0.4rem;
+	}
+	.indice ol {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0 2rem;
+	}
+	@media (min-width: 40rem) {
+		.indice ol {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (min-width: 62rem) {
+		.indice ol {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
+	.indice a {
+		display: flex;
 		align-items: center;
 		min-height: 44px;
+		color: var(--franja-texto);
+		text-decoration-color: var(--franja-linea);
 	}
-	.resultados-cabecera {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 0.25rem 1rem;
-		border-bottom: 2px solid var(--tinta);
-		padding-bottom: 0.5rem;
+	.indice a:hover {
+		text-decoration-color: currentColor;
 	}
-	.resumen {
-		font-family: var(--serif);
-		font-size: 1.6rem;
-		font-weight: 500;
-		margin: 0;
-	}
-	.suave {
-		color: var(--tinta-suave);
-		font-size: 0.95rem;
-		margin: 0;
-	}
-	.resumen .suave {
-		font-size: inherit;
-	}
-	.lista {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	.fila {
-		position: relative;
-		padding: 1.1rem 0 1.15rem 1.1rem;
+
+	/* Ensayo: texto a la izquierda, cifras al margen */
+	.tramo {
+		display: grid;
+		gap: 1.5rem 4rem;
+		padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3.25rem);
 		border-bottom: 1px solid var(--borde);
 	}
-	.fila::before {
+	.tramo.final {
+		border-bottom: 0;
+		gap: 1.25rem;
+	}
+	@media (min-width: 62rem) {
+		.tramo {
+			grid-template-columns: minmax(0, 38rem) minmax(0, 22rem);
+			align-items: start;
+		}
+		.tramo.final {
+			grid-template-columns: 1fr;
+		}
+		.lamina,
+		.bajo-lamina {
+			grid-column: 1 / -1;
+		}
+	}
+	h2 {
+		font-family: var(--serif);
+		font-weight: 600;
+		font-size: clamp(1.55rem, 3.4vw, 2.1rem);
+		line-height: 1.12;
+		letter-spacing: -0.01em;
+		margin: 0 0 1rem;
+	}
+	.texto p {
+		font-size: 1.08rem;
+		line-height: 1.62;
+		margin: 0 0 1.05rem;
+		max-width: 68ch;
+	}
+	.texto p:last-child {
+		margin-bottom: 0;
+	}
+	.salidas {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 2rem;
+	}
+
+	/* Margen */
+	.margen {
+		padding-top: 0.35rem;
+		border-top: 2px solid var(--violeta-medio);
+	}
+	@media (min-width: 62rem) {
+		.margen {
+			margin-top: 0.6rem;
+		}
+	}
+	.cifra {
+		display: grid;
+		gap: 0.2rem;
+		margin: 0.6rem 0 1.25rem;
+	}
+	.numero {
+		font-family: var(--serif);
+		font-weight: 500;
+		font-size: clamp(2.6rem, 6vw, 3.4rem);
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+		color: var(--violeta);
+	}
+	.numero.ley {
+		color: var(--verde);
+	}
+	.rotulo,
+	.nota,
+	.fuente {
+		font-size: 0.9rem;
+		color: var(--tinta-suave);
+	}
+	.rotulo-fuerte {
+		margin: 0.7rem 0 0.6rem;
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.nota {
+		margin: 0.6rem 0 0;
+	}
+	.fuente {
+		margin: 0;
+	}
+	.barras {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.85rem;
+	}
+	.barras li {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: 0.3rem 1rem;
+		align-items: baseline;
+		font-size: 0.95rem;
+	}
+	.b-nombre {
+		font-weight: 500;
+	}
+	a.b-nombre {
+		color: var(--tinta);
+		text-decoration-color: var(--borde-fuerte);
+		padding: 0.35rem 0;
+	}
+	a.b-nombre:hover {
+		color: var(--violeta-medio);
+	}
+	.b-valor {
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+	.b-pista {
+		grid-column: 1 / -1;
+		height: 8px;
+		border-radius: 4px;
+		background: var(--violeta-suave);
+		overflow: hidden;
+	}
+	.b-total {
+		display: block;
+		height: 100%;
+		border-radius: 4px;
+		background: var(--violeta-medio);
+	}
+	.b-total.ley {
+		background: var(--verde);
+	}
+	.b-detalle {
+		grid-column: 1 / -1;
+		font-size: 0.85rem;
+		color: var(--tinta-suave);
+	}
+	.tabla-margen {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.95rem;
+		margin-top: 0.5rem;
+	}
+	.tabla-margen caption {
+		text-align: left;
+		font-weight: 600;
+		padding: 0.2rem 0 0.5rem;
+	}
+	.tabla-margen th,
+	.tabla-margen td {
+		padding: 0.5rem 0;
+		border-bottom: 1px solid var(--borde);
+		text-align: left;
+		font-weight: 400;
+	}
+	.tabla-margen thead th {
+		font-size: 0.85rem;
+		color: var(--tinta-suave);
+	}
+	.tabla-margen .num {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+		padding-left: 1rem;
+	}
+	.tabla-margen tbody .num:last-child {
+		font-weight: 600;
+	}
+
+	/* Lámina del gráfico anual */
+	.lamina {
+		margin-top: 0.75rem;
+		padding: clamp(1.1rem, 3vw, 2rem);
+		border-radius: var(--radio-grande);
+		background: var(--franja);
+		color: var(--franja-texto);
+		box-shadow: var(--sombra);
+	}
+
+	/* Hitos: un hilo continuo con un nudo verde por cada ley */
+	.hilo {
+		list-style: none;
+		margin: 1.75rem 0 0;
+		padding: 0;
+	}
+	.hilo li {
+		position: relative;
+		display: grid;
+		grid-template-columns: 3.4rem 1fr;
+		gap: 0 1rem;
+		padding: 0 0 1.35rem 1.6rem;
+	}
+	.hilo li:last-child {
+		padding-bottom: 0;
+	}
+	.hilo li::before {
+		content: '';
+		position: absolute;
+		left: 0.3rem;
+		top: 0.55rem;
+		bottom: -0.55rem;
+		width: 2px;
+		background: var(--borde-fuerte);
+	}
+	.hilo li:last-child::before {
+		display: none;
+	}
+	.hilo li::after {
 		content: '';
 		position: absolute;
 		left: 0;
-		top: 1.2rem;
-		bottom: 1.2rem;
-		width: 3px;
-		border-radius: 2px;
-		background: var(--cerrado);
-		opacity: 0.5;
-	}
-	.fila.publicado::before {
+		top: 0.4rem;
+		width: 0.75rem;
+		height: 0.75rem;
+		border-radius: 50%;
 		background: var(--verde);
-		opacity: 1;
+		box-shadow: 0 0 0 3px var(--papel);
 	}
-	.fila.tramitacion::before {
-		background: var(--violeta-medio);
-		opacity: 1;
-	}
-	.relacion-debil {
-		display: inline-block;
-		padding: 0.05rem 0.55rem;
-		border: 1px solid var(--aviso);
-		border-radius: 999px;
-		font-size: 0.8rem;
-		font-weight: 600;
-		color: var(--aviso);
-		background: var(--aviso-suave);
-		white-space: nowrap;
-	}
-	.fila-meta {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.3rem 0.9rem;
-	}
-	.boletin {
-		font-variant-numeric: tabular-nums;
-		font-size: 0.86rem;
-		font-weight: 600;
-		color: var(--tinta-suave);
-	}
-	.titulo {
+	.h-anno {
+		grid-row: span 2;
 		font-family: var(--serif);
-		font-size: 1.22rem;
-		font-weight: 500;
+		font-size: 1.2rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
 		line-height: 1.3;
-		margin: 0.3rem 0 0.4rem;
-		max-width: 62ch;
-		overflow-wrap: anywhere;
 	}
-	.titulo a {
+	.h-nombre {
+		font-weight: 600;
 		color: var(--tinta);
-		text-decoration: none;
+		text-decoration-color: var(--borde-fuerte);
 	}
-	.titulo a:hover {
+	.h-nombre:hover {
 		color: var(--violeta-medio);
-		text-decoration: underline;
-		text-decoration-thickness: 1px;
+		text-decoration-color: currentColor;
 	}
-	.datos {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.15rem 1.1rem;
-		margin: 0;
-		font-size: 0.88rem;
+	.h-ley {
+		font-size: 0.9rem;
 		color: var(--tinta-suave);
+	}
+
+	/* Estados */
+	.estados {
+		display: flex;
+		height: 14px;
+		gap: 2px;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+	.estados span {
+		flex-basis: 0;
+	}
+	.e-ley {
+		background: var(--verde);
+	}
+	.e-tramitacion {
+		background: var(--violeta-medio);
+	}
+	.e-cerrado {
+		background: var(--cerrado);
+	}
+	.leyenda {
+		list-style: none;
+		margin: 0.8rem 0 0;
+		padding: 0;
+		display: grid;
+		gap: 0.4rem;
+		font-size: 0.95rem;
+	}
+	.leyenda li {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.leyenda strong {
+		margin-left: auto;
 		font-variant-numeric: tabular-nums;
 	}
-	.datos .ley {
-		color: var(--verde);
-		font-weight: 600;
-	}
-	.vacio {
-		margin-top: 1.5rem;
-		padding: 1.25rem 1.5rem;
-		background: var(--superficie);
-		border: 1px dashed var(--borde-fuerte);
-		border-radius: 10px;
-	}
-	.vacio h3 {
-		margin-top: 0;
-		font-family: var(--serif);
-		font-weight: 500;
-		font-size: 1.3rem;
-	}
-	.paginacion {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-		margin-top: 2rem;
+	.clave {
+		flex: none;
+		width: 0.8rem;
+		height: 0.8rem;
+		border-radius: 2px;
 	}
 </style>

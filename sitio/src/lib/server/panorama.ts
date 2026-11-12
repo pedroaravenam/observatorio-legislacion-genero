@@ -8,6 +8,9 @@ interface FilaSeleccion {
 	iniciativa: string | null;
 	camara_origen: string | null;
 	estado: string | null;
+	etapa: string | null;
+	ultimo_tramite: string | null;
+	grupo: string | null;
 	fecha_ingreso: string | null;
 	diario_oficial: string | null;
 	autores: string;
@@ -30,6 +33,8 @@ export interface Periodo {
 	desde: number;
 	hasta: number;
 	total: number;
+	/** Proyectos del período que hoy son ley publicada. */
+	leyes: number;
 	porTema: Record<string, number>;
 }
 
@@ -56,6 +61,22 @@ export interface CifraAutoria {
 	sinAutores: number;
 }
 
+/** Proyectos según su nivel de relación con el género (ver NIVELES_RELACION). */
+export interface CifraNivel extends Conteo {
+	clave: 'tema_central' | 'componente' | 'debil';
+	enTramitacion: number;
+}
+
+/** Dónde están los proyectos que siguen en tramitación y hace cuánto se movieron por última vez. */
+export interface EnTramite {
+	total: number;
+	primerTramite: number;
+	segundoTramite: number;
+	otrasEtapas: number;
+	/** Último trámite hace menos de un año, entre uno y tres años, y más de tres años; `sinFecha` si no hay trámites. */
+	movimiento: { reciente: number; medio: number; antiguo: number; sinFecha: number };
+}
+
 export interface Panorama {
 	total: number;
 	leyes: number;
@@ -69,7 +90,14 @@ export interface Panorama {
 	autores: CifraAutor[];
 	totalAutores: number;
 	sinAutores: number;
-	autoria: { global: CifraAutoria; porPeriodo: CifraAutoria[] };
+	autoria: {
+		global: CifraAutoria;
+		porPeriodo: CifraAutoria[];
+		/** Mociones que ya son ley, según quiénes las firman. */
+		leyes: { mujeres: number; hombres: number; mixta: number };
+	};
+	niveles: CifraNivel[];
+	enTramite: EnTramite;
 	tiempoPorPeriodo: { nombre: string; leyes: number; medianaDias: number | null }[];
 }
 
@@ -93,11 +121,12 @@ function mediana(valores: number[]): number | null {
 
 const esLey = (f: FilaSeleccion) => f.estado === 'Publicado';
 
-export function panorama(db: Base): Panorama {
+/** `hoy` (AAAA-MM-DD) es la fecha contra la que se mide hace cuánto se movió un proyecto. */
+export function panorama(db: Base, hoy: string = new Date().toISOString().slice(0, 10)): Panorama {
 	const filas = db
 		.prepare(
-			`SELECT p.titulo, p.anno, p.iniciativa, p.camara_origen, p.estado, p.fecha_ingreso,
-			        p.diario_oficial, p.autores, p.autoria
+			`SELECT p.titulo, p.anno, p.iniciativa, p.camara_origen, p.estado, p.etapa, p.ultimo_tramite,
+			        g.grupo, p.fecha_ingreso, p.diario_oficial, p.autores, p.autoria
 			 FROM seleccion_genero g JOIN proyecto p ON p.boletin = g.boletin`
 		)
 		.all() as unknown as FilaSeleccion[];
@@ -126,7 +155,14 @@ export function panorama(db: Base): Panorama {
 		const porTema: Record<string, number> = {};
 		for (const t of TEMAS)
 			porTema[t.clave] = indices.filter((i) => temasPorFila[i].includes(t.clave)).length;
-		return { nombre, desde, hasta, total: indices.length, porTema };
+		return {
+			nombre,
+			desde,
+			hasta,
+			total: indices.length,
+			leyes: indices.filter((i) => esLey(filas[i])).length,
+			porTema
+		};
 	});
 
 	const origen = ['Mensaje', 'Moción'].map((iniciativa) => {
@@ -180,7 +216,43 @@ export function panorama(db: Base): Panorama {
 				nombre,
 				mociones.filter((f) => f.anno !== null && f.anno >= desde && f.anno <= hasta)
 			)
-		)
+		),
+		leyes: {
+			mujeres: mociones.filter((f) => f.autoria === 'mujeres' && esLey(f)).length,
+			hombres: mociones.filter((f) => f.autoria === 'hombres' && esLey(f)).length,
+			mixta: mociones.filter((f) => f.autoria === 'mixta' && esLey(f)).length
+		}
+	};
+
+	const niveles = (['tema_central', 'componente', 'debil'] as const).map((clave) => {
+		const c = filas.filter((f) => f.grupo === clave);
+		return {
+			clave,
+			total: c.length,
+			leyes: c.filter(esLey).length,
+			enTramitacion: c.filter((f) => f.estado === 'En tramitación').length
+		};
+	});
+
+	const abiertos = filas.filter((f) => f.estado === 'En tramitación');
+	const primer = abiertos.filter((f) => f.etapa?.startsWith('Primer trámite')).length;
+	const segundo = abiertos.filter((f) => f.etapa?.startsWith('Segundo trámite')).length;
+	const movimiento = { reciente: 0, medio: 0, antiguo: 0, sinFecha: 0 };
+	for (const f of abiertos) {
+		if (!f.ultimo_tramite) movimiento.sinFecha++;
+		else {
+			const d = dias(f.ultimo_tramite, hoy);
+			if (d < 365) movimiento.reciente++;
+			else if (d < 365 * 3) movimiento.medio++;
+			else movimiento.antiguo++;
+		}
+	}
+	const enTramite = {
+		total: abiertos.length,
+		primerTramite: primer,
+		segundoTramite: segundo,
+		otrasEtapas: abiertos.length - primer - segundo,
+		movimiento
 	};
 
 	const tiempoPorPeriodo = PERIODOS.map(([nombre, desde, hasta]) => {
@@ -205,6 +277,8 @@ export function panorama(db: Base): Panorama {
 		totalAutores: porAutor.size,
 		sinAutores,
 		autoria,
+		niveles,
+		enTramite,
 		tiempoPorPeriodo
 	};
 }

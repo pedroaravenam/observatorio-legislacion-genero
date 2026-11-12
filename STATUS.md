@@ -2,11 +2,19 @@
 
 ## Resumen
 
-Fecha: 2026-11-05. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). Última versión desplegada en el VPS: `19389e4`. Los cambios posteriores son scripts de esta máquina, el criterio del agente (`agente-05f93dc5`) y documentos; el sitio no cambió desde entonces.
+Fecha: 2026-11-12. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión desplegada es la del commit del rediseño del 12 de noviembre (ver [el historial](docs/history/HISTORIAL.md)).
 
-El sitio muestra la selección de género: **1.547 proyectos** de los 18.622 boletines del Senado (1990–2026). El 5 de noviembre se aceptó la revisión del agente sobre la lista v5 y la selección pasó de 2.170 a 1.547 (ver [el historial](docs/history/HISTORIAL.md) y [la lista de lo retirado](docs/mediciones/exclusiones-v5-aplicadas-2026-11-05.csv)). El listado tiene búsqueda de texto completo y filtros por tema, año, estado, origen, cámara de origen, autor y **autoría según el sexo de quienes firman**; cada ficha trae su tramitación, el sexo de los autores con enlace a su reseña de la BCN, el motivo y el nivel de relación con el género (alta, media o débil), y enlaces a la ficha del Senado, al texto y a la ley. «Panorama» muestra estados, origen, autoría por sexo, temas por período, tiempo hasta ser ley y los 15 parlamentarios con más proyectos. Las descargas CSV y JSON respetan los mismos filtros. La selección vive en la tabla `clasificacion_genero` del VPS y es el único universo del sitio; un boletín fuera de ella responde 404.
+El sitio muestra la selección de género: **1.589 proyectos** de los 18.659 boletines del Senado (1990–2026), al 12 de noviembre. Tiene cinco secciones:
 
-Los proyectos nuevos los decide un agente que aplica `despliegue/clasificador/criterio.md`. **El servicio de datos del Senado está caído desde el 4 de noviembre** (ver Riesgos): el sitio conserva los datos del 3 de noviembre y no entran proyectos nuevos.
+- **Inicio (`/`):** portada de contexto, un ensayo con cifras al margen (qué cuenta como legislación de género, cuánto se legisla, 16 leyes hito, quién presenta y qué prospera, temas, estado actual y quién hace el sitio). Los enlaces antiguos al buscador (`/?tema=…`) redirigen a `/proyectos`.
+- **Panorama:** estados, gráfico anual, niveles de relación con el género, origen, autoría por sexo, temas por período, proyectos en tramitación (etapa y último trámite), tiempo hasta ser ley y los 15 parlamentarios con más proyectos.
+- **Proyectos (`/proyectos`):** búsqueda de texto completo y filtros por tema, año, estado, origen, cámara de origen, autor y autoría según el sexo de quienes firman; descargas CSV y JSON con los mismos filtros. Cada ficha trae tramitación, autores con su reseña de la BCN, motivo y nivel de relación con el género, y enlaces a la ficha del Senado, al texto y a la ley.
+- **Actualidad:** últimos trámites, proyectos recién ingresados y últimas leyes; avisa si el Senado lleva más de 72 horas sin entregar datos.
+- **Cómo funciona:** criterio, fuentes, límites, autoría, contacto y apoyo.
+
+Modo claro y oscuro con selector en la cabecera (por defecto sigue al sistema). La selección vive en la tabla `clasificacion_genero` del VPS y es el único universo del sitio; un boletín fuera de ella responde 404. Los datos de autoría, contacto y canales de aporte están en `sitio/src/lib/sitio.ts`.
+
+Los proyectos nuevos los decide un agente que aplica `despliegue/clasificador/criterio.md`. El servicio de datos del Senado estuvo caído del 4 al 9 de noviembre y volvió el 10; la consulta diaria funciona desde entonces.
 
 Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observatorio` (PostgreSQL de ingesta, ingesta .NET, exportador a SQLite y sitio SvelteKit con Node detrás del Caddy compartido). Detalle en [docs/alojamiento.md](docs/alojamiento.md).
 
@@ -23,9 +31,11 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 
 ## Próximo paso exacto
 
-1. Mirar el correo de resumen de la noche del 6 de noviembre: casos de control con Claude y Codex (48 cada uno) y reevaluación de unas 731 decisiones del agente con el criterio `agente-05f93dc5`. Comprobar si volvieron proyectos a la selección.
-2. Guardar `~/.config/observatorio-genero/respaldo.clave` en el gestor de contraseñas: sin ella las copias de R2 no se pueden leer.
-3. Esperar al Senado. Si el servicio no vuelve, decidir qué hacer (ver Riesgos).
+1. Activar la recepción de `contacto@legislaciongenero.cl` (Resend o un registro MX): el sitio ya publica esa dirección y el dominio raíz no tenía MX el 12 de noviembre, así que hoy no recibe correo.
+2. Crear las cuentas de Mercado Pago, GitHub Sponsors y Ko-fi y poner sus direcciones en `sitio/src/lib/sitio.ts`; mientras estén vacías, el sitio dice que los canales se están habilitando.
+3. Escribir la reseña del autor (`AUTOR.resena` en el mismo archivo) y revisar los nombres de las 16 leyes hito (`sitio/src/lib/server/contexto.ts`).
+4. Mirar el correo de resumen de la noche del 6 de noviembre (casos de control y reevaluación con el criterio `agente-05f93dc5`), que quedó sin revisar.
+5. Guardar `~/.config/observatorio-genero/respaldo.clave` en el gestor de contraseñas: sin ella las copias de R2 no se pueden leer.
 
 ## Pendientes priorizados
 
@@ -37,7 +47,9 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 
 ## Riesgos activos
 
-- **Servicio de datos del Senado caído (desde el 4 de noviembre de 2026).** `wspublico/tramitacion.php` responde HTTP 200 con «No existe el número de boletín solicitado» **tras 30 segundos exactos**, para cualquier boletín (se probaron siete que ya estaban cargados) y desde esta máquina y el VPS. La web de tramitación, los documentos y senado.cl sí responden. La consulta diaria falla cada día y el sitio conserva los datos del 3 de noviembre. La carga completa volverá a intentarlo sola hacia el 14 de noviembre (según la regla del código, sin comprobar). Alternativas, a decidir: esperar, avisar al Senado, o un lector de la ficha web como respaldo (más trabajo y sin revisar sus términos de uso).
+- **El servicio de datos del Senado puede volver a caer.** Entre el 4 y el 9 de noviembre de 2026 `wspublico/tramitacion.php` respondió «No existe el número de boletín solicitado» tras 30 segundos; volvió el 10 sin aviso. Mientras falla, el sitio conserva los últimos datos, la alerta de atraso llega por correo y Actualidad lo avisa. No hay fuente de respaldo.
+- **El correo de contacto publicado no recibe mensajes** hasta que se active la recepción (ver Próximo paso).
+- El texto de la portada es interpretación del Observatorio sobre cifras calculadas; las pruebas de consistencia no cubren las cifras de la portada ni los bloques nuevos de Panorama (niveles, en tramitación, leyes por sexo de quienes firman).
 - VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados. El Caddy es de la plataforma educativa: si la recrea desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.
 - Las decisiones del agente sobre proyectos nuevos son automáticas. El desarrollador validó 24 casos el 5 de noviembre y coincidió con el agente en las 24 exclusiones, pero eso no mide el acierto total y no hay revisión sistemática de lo nuevo. Dependen de los CLI de Claude y de Codex y de la sesión iniciada en esta máquina: si está apagada, no se clasifica (a las 48 horas llega un aviso). Codex agotó su cupo el 5 de noviembre.
 - Cambiar `criterio.md` cambia su versión y hace que la pasada nocturna vuelva a evaluar cientos de decisiones (llamadas con costo): hay que detener `observatorio-noche.timer` antes de editarlo.

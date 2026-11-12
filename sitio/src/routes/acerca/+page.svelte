@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Autoria from '../../lib/Autoria.svelte';
+	import { CONTACTO } from '#lib/sitio';
 	import { TEMAS } from '#lib/temas';
 	import type { PageProps } from './$types';
 
@@ -37,6 +39,8 @@
 			<li><a href="#actualizacion">Cómo se actualizan</a></li>
 			<li><a href="#limites">Lo que todavía no cubre</a></li>
 			<li><a href="#descarga">Descargar los datos</a></li>
+			<li><a href="#correcciones">Código, datos y correcciones</a></li>
+			<li><a href="#quien">Quién hace este sitio, contacto y apoyo</a></li>
 		</ol>
 	</nav>
 
@@ -223,14 +227,14 @@
 	<h2 id="temas">Temas</h2>
 	<p>
 		Cada proyecto de la selección se asigna a uno o más temas según los términos de su título, y esa
-		clasificación es la que usan el filtro de la portada y el <a href="/panorama">panorama</a>. Por
-		lo tanto, un proyecto puede tener varios temas, pero también ninguno, cuando entró por su texto
-		o por su ley y el título no lo anticipa.
+		clasificación es la que usan el filtro del <a href="/proyectos">buscador de proyectos</a> y el
+		<a href="/panorama">panorama</a>. Por lo tanto, un proyecto puede tener varios temas, pero
+		también ninguno, cuando entró por su texto o por su ley y el título no lo anticipa.
 	</p>
 	<dl class="temas">
 		{#each TEMAS as t (t.clave)}
 			<div>
-				<dt><a href="/?tema={t.clave}">{t.nombre}</a></dt>
+				<dt><a href="/proyectos?tema={t.clave}">{t.nombre}</a></dt>
 				<dd>{t.descripcion}</dd>
 			</div>
 		{/each}
@@ -362,8 +366,9 @@
 
 	<h2 id="descarga">Descargar los datos</h2>
 	<p>
-		Cada búsqueda de la portada se puede bajar como tabla. Debajo del número de resultados aparecen
-		los enlaces <strong>CSV</strong>, que se abre en Excel o en cualquier planilla, y
+		Cada búsqueda de <a href="/proyectos">Proyectos</a> se puede bajar como tabla. Debajo del número
+		de resultados aparecen los enlaces <strong>CSV</strong>, que se abre en Excel o en cualquier
+		planilla, y
 		<strong>JSON</strong>, pensado para quien quiera usar los datos desde un programa. Ambos
 		respetan los filtros que tengas aplicados y entregan todos los proyectos que cumplen, no solo
 		los de la página que estás viendo. Si no filtras nada, bajas la selección completa.
@@ -377,14 +382,17 @@
 		última consulta aparece al pie de cada página.
 	</p>
 
-	<h2>Código, datos y correcciones</h2>
+	<h2 id="correcciones">Código, datos y correcciones</h2>
 	<p>
 		El código es abierto, con licencia AGPL-3.0, y está publicado en
-		<a href="https://github.com/pedroaravenam/observatorio-legislacion-genero">GitHub</a> junto con la
-		lista de proyectos seleccionados y la señal que incluyó a cada uno. Si encuentras un proyecto que
-		debería estar y no está, o uno que está de más, puedes avisarnos allí y lo revisaremos con este mismo
-		criterio.
+		<a href="https://github.com/pedroaravenam/observatorio-legislacion-genero">GitHub</a> junto con
+		la lista de proyectos seleccionados y la señal que incluyó a cada uno. Si encuentras un proyecto
+		que debería estar y no está, o uno que está de más, puedes avisarnos allí o escribir a
+		<a href="mailto:{CONTACTO}">{CONTACTO}</a>, y lo revisaremos con este mismo criterio.
 	</p>
+
+	<h2 id="quien">Quién hace este sitio</h2>
+	<div class="autoria-ancha"><Autoria /></div>
 </article>
 
 <style>
@@ -394,6 +402,9 @@
 	.texto > table,
 	.texto > .temas {
 		max-width: 56rem;
+	}
+	.texto > .autoria-ancha {
+		max-width: 64rem;
 	}
 	h1 {
 		font-family: var(--serif);

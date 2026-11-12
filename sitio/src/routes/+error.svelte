@@ -24,7 +24,10 @@
 			esté en mantención.
 		</p>
 	{/if}
-	<p><a class="boton" href="/">Ir a los proyectos</a></p>
+	<p>
+		<a class="boton" href="/">Ir al inicio</a>
+		<a class="boton secundario" href="/proyectos">Buscar proyectos</a>
+	</p>
 </section>
 
 <style>

@@ -46,7 +46,7 @@ for (const [ancho, alto] of [
 const ctx = await navegador.newContext({ viewport: { width: 1280, height: 900 } });
 const p = await ctx.newPage();
 const teclado = [];
-await p.goto(BASE + '/');
+await p.goto(BASE + '/proyectos');
 // El enlace «Saltar al buscador» evita tabular por las barras del gráfico anual.
 await p.keyboard.press('Tab');
 await p.keyboard.press('Tab');

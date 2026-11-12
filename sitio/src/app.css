@@ -2,11 +2,18 @@
  * Sistema visual del Observatorio.
  * Violeta y verde: los colores del movimiento feminista (8M y pañuelo verde; antes, el sufragismo).
  * Verde marca lo que llegó a ser ley; violeta, lo que sigue en tramitación y la identidad del sitio.
+ *
+ * Tema: por defecto sigue al sistema. El selector de la cabecera fija `data-theme="light"` o
+ * `data-theme="dark"` en <html>, y eso solo cambia `color-scheme`: cada color se declara una vez
+ * con light-dark(claro, oscuro).
  */
 :root {
 	color-scheme: light dark;
-	--papel: #f7f6fa;
+
+	/* Respaldo para navegadores sin light-dark(): solo modo claro. */
+	--papel: #f8f7fb;
 	--superficie: #ffffff;
+	--hundido: #f1eef6;
 	--tinta: #1d1527;
 	--tinta-suave: #5d5569;
 	--borde: #e1dce8;
@@ -25,44 +32,61 @@
 	--franja: #2b1748;
 	--franja-texto: #f3eefb;
 	--franja-suave: #cbbde3;
+	--franja-linea: rgb(255 255 255 / 0.14);
 	--barra: #a58fd6;
 	--barra-ley: #7fd3a5;
+	--seleccion: #d9c9f3;
+	--sombra-tono: rgb(43 23 72 / 0.28);
+	--sombra: 0 1px 2px rgb(29 21 39 / 0.05), 0 12px 28px -16px var(--sombra-tono);
 
 	--serif: 'Newsreader Variable', 'Iowan Old Style', Georgia, serif;
 	--sans: 'Public Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-	--radio: 6px;
+	--radio: 8px;
+	--radio-grande: 14px;
 	--ancho: 74rem;
+	--salida: cubic-bezier(0.16, 1, 0.3, 1);
 
 	font-family: var(--sans);
 	font-size: 17px;
 	line-height: 1.55;
 	font-variant-numeric: lining-nums;
+	accent-color: var(--violeta-medio);
+	caret-color: var(--violeta-medio);
+	scrollbar-color: var(--borde-fuerte) transparent;
 }
 
-@media (prefers-color-scheme: dark) {
+@supports (color: light-dark(#000, #fff)) {
 	:root {
-		--papel: #141019;
-		--superficie: #1c1723;
-		--tinta: #eeeaf3;
-		--tinta-suave: #b4abc0;
-		--borde: #332c3d;
-		--borde-fuerte: #4a4256;
-		--violeta: #c8b2ef;
-		--violeta-medio: #b59ae6;
-		--violeta-suave: #2a2238;
-		--verde: #7fd3a5;
-		--verde-suave: #183126;
-		--cerrado: #a59eae;
-		--cerrado-suave: #2a2530;
-		--aviso: #f1c46d;
-		--aviso-suave: #362b13;
-		--foco: #fb923c;
-		--sobre-violeta: #1d1027;
-		--franja: #21123a;
-		--franja-texto: #f3eefb;
-		--franja-suave: #c2b3dc;
-		--barra: #9a82cf;
-		--barra-ley: #79cf9f;
+		--papel: light-dark(#f8f7fb, #141019);
+		--superficie: light-dark(#ffffff, #1c1723);
+		--hundido: light-dark(#f1eef6, #100d15);
+		--tinta: light-dark(#1d1527, #eeeaf3);
+		--tinta-suave: light-dark(#5d5569, #b4abc0);
+		--borde: light-dark(#e1dce8, #332c3d);
+		--borde-fuerte: light-dark(#c9c1d4, #4a4256);
+		--violeta: light-dark(#3a1f63, #c8b2ef);
+		--violeta-medio: light-dark(#5b3a8e, #b59ae6);
+		--violeta-suave: light-dark(#efe9f7, #2a2238);
+		--verde: light-dark(#1f6e4a, #7fd3a5);
+		--verde-suave: light-dark(#e3f2ea, #183126);
+		--cerrado: light-dark(#6f6878, #a59eae);
+		--cerrado-suave: light-dark(#eeecf1, #2a2530);
+		--aviso: light-dark(#7a4b00, #f1c46d);
+		--aviso-suave: light-dark(#fcf1d8, #362b13);
+		--foco: light-dark(#c2410c, #fb923c);
+		--sobre-violeta: light-dark(#ffffff, #1d1027);
+		--franja: light-dark(#2b1748, #21123a);
+		--franja-suave: light-dark(#cbbde3, #c2b3dc);
+		--barra: light-dark(#a58fd6, #9a82cf);
+		--barra-ley: light-dark(#7fd3a5, #79cf9f);
+		--seleccion: light-dark(#d9c9f3, #4b3a73);
+		--sombra-tono: light-dark(rgb(43 23 72 / 0.28), rgb(0 0 0 / 0.6));
+	}
+	:root[data-theme='light'] {
+		color-scheme: light;
+	}
+	:root[data-theme='dark'] {
+		color-scheme: dark;
 	}
 }
 
@@ -72,11 +96,26 @@
 	box-sizing: border-box;
 }
 
+html {
+	scroll-padding-top: 5.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
 body {
 	margin: 0;
 	background: var(--papel);
 	color: var(--tinta);
 	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: var(--seleccion);
+	color: var(--tinta);
 }
 
 a {
@@ -101,6 +140,10 @@ h3 {
 	line-height: 1.2;
 	text-wrap: balance;
 	font-weight: 600;
+}
+
+p {
+	text-wrap: pretty;
 }
 
 .contenedor {
@@ -166,6 +209,34 @@ h3 {
 	pointer-events: none;
 }
 
+/* Enlace que invita a seguir leyendo en otra página; la flecha es parte del dibujo, no del texto. */
+.seguir {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	min-height: 44px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.seguir::after {
+	content: '';
+	width: 0.5rem;
+	height: 0.5rem;
+	border-top: 2px solid currentColor;
+	border-right: 2px solid currentColor;
+	transform: rotate(45deg);
+	transition: translate 200ms var(--salida);
+}
+
+.seguir:hover {
+	text-decoration: underline;
+}
+
+.seguir:hover::after {
+	translate: 0.2rem 0;
+}
+
 /* Estado de un proyecto: el texto siempre está presente; el color lo refuerza. */
 .estado {
 	display: inline-flex;
@@ -209,5 +280,11 @@ h3 {
 	border-radius: var(--radio);
 	background: var(--aviso-suave);
 	color: var(--tinta);
-	border-left: 4px solid var(--aviso);
+	border: 1px solid color-mix(in srgb, var(--aviso) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.seguir::after {
+		transition: none;
+	}
 }

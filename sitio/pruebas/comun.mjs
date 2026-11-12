@@ -11,16 +11,18 @@ export const AUTOR = 'Fernández Allende, Maya';
 
 /** Rutas que se recorren. `estado` es el código HTTP esperado y `espera` un selector que debe existir. */
 export const RUTAS = {
-	lista: { ruta: '/', espera: '.lista .fila' },
-	autor: { ruta: `/?autor=${encodeURIComponent(AUTOR)}`, espera: '.lista .fila' },
-	camaraOrden: { ruta: '/?camara=Senado&orden=antiguos', espera: '.lista .fila' },
-	autoria: { ruta: '/?autoria=mujeres', espera: '.lista .fila' },
-	pertinencia: { ruta: '/?q=sala+cuna&orden=pertinencia', espera: '.lista .fila' },
+	inicio: { ruta: '/', espera: '.hilo li' },
+	lista: { ruta: '/proyectos', espera: '.lista .fila' },
+	autor: { ruta: `/proyectos?autor=${encodeURIComponent(AUTOR)}`, espera: '.lista .fila' },
+	camaraOrden: { ruta: '/proyectos?camara=Senado&orden=antiguos', espera: '.lista .fila' },
+	autoria: { ruta: '/proyectos?autoria=mujeres', espera: '.lista .fila' },
+	pertinencia: { ruta: '/proyectos?q=sala+cuna&orden=pertinencia', espera: '.lista .fila' },
 	panorama: { ruta: '/panorama', espera: '[data-cifra="tema"]' },
 	acerca: { ruta: '/acerca', espera: 'h1' },
+	actualidad: { ruta: '/actualidad', espera: 'h1' },
 	ficha: { ruta: '/boletin/11077-07', espera: 'h1' },
 	// Un proyecto con relación débil (decisión manual del desarrollador): la lista lo marca y la ficha explica el nivel.
-	nivelDebil: { ruta: '/?q=monumento+Arica', espera: '.relacion-debil' },
+	nivelDebil: { ruta: '/proyectos?q=monumento+Arica', espera: '.relacion-debil' },
 	fichaDebil: { ruta: '/boletin/7000-24', espera: 'h1' },
 	error: { ruta: '/nada', espera: 'h1', estado: 404 }
 };

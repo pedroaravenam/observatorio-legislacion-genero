@@ -56,7 +56,7 @@
 		{#each resumen as r (r.anno)}
 			<li>
 				<a
-					href="/?anno={r.anno}"
+					href="/proyectos?anno={r.anno}"
 					aria-label={texto(r)}
 					aria-current={seleccionado === r.anno ? 'true' : undefined}
 					onmouseenter={() => (activo = r.anno)}
