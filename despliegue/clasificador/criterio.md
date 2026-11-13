@@ -18,6 +18,19 @@ Antes de mirar el conteo de términos o los fragmentos, responde una pregunta: *
 
 El conteo y los fragmentos solo sirven después de fijar el objeto, y nunca lo reemplazan.
 
+## Lo que ya resolvió el desarrollador
+
+El desarrollador validó a mano 41 casos límite el 12 y 13 de noviembre de 2026. De ahí salen estas reglas; aplícalas cuando el objeto del proyecto sea el mismo:
+
+- **Fuera aunque los fundamentos nombren violencia sexual, mujeres o madres:** infancia y protección de la niñez (derechos, penas por delitos contra niños, abuso infantil en plataformas), discapacidad, salud general, reforma política y constitucional, tratados comerciales, medidas económicas o de pandemia, personal del Estado (bonos de retiro, dietas), educación y libertad de enseñanza, duelo y otros permisos laborales sin relación con los cuidados de hijos. Esto incluye los permisos por la muerte de un hijo en gestación: es un asunto de salud y de duelo, no de igualdad de género.
+- **Materia penal:** rebajas de condena, cumplimiento de penas o libertad condicional para una lista de delitos graves quedan fuera aunque la lista incluya delitos sexuales. Entra como débil solo si el proyecto trata de un delito cuyas víctimas son sobre todo mujeres (por ejemplo, el robo con violación), y nunca como tema central.
+- **El embarazo no es por sí solo un tema de género:** lo es la maternidad, el rol de la mujer y los derechos que se derivan. Mencionar a las embarazadas en una lista de personas protegidas no basta.
+- **Cuidados con texto neutro:** permisos, seguros o teletrabajo para acompañar a hijos enfermos u hospitalizados (como el seguro Sanna) entran como **componente**, porque el trabajo de cuidados recae sobre todo en las mujeres. Una mención de paso al trabajo de cuidados no remunerado, en una ley sobre otra materia (por ejemplo, cuidado residencial de personas mayores), entra como **débil**.
+- **Pensiones:** una medida que ayuda a igualar la baja pensión de las mujeres, vinculada al trabajo no remunerado, entra como **débil**.
+- **Matrimonio y divorcio:** una ley general de matrimonio o de divorcio queda fuera, aunque diga «marido» y «mujer». Entra como **componente** si regula el pago de las pensiones alimenticias o la edad mínima para casarse, y como **débil** si afecta sobre todo a las mujeres sin ser ese su objeto (divorcio unilateral, disolución de la sociedad conyugal).
+- **Acoso:** el acoso laboral general queda fuera. Entran las normas que distinguen o protegen frente al acoso sexual o laboral de la Ley Karin (**componente**), y las que refuerzan un marco contra el acoso que incluye el acoso sexual (**débil**).
+- **Si no hay texto del proyecto** y el título solo sugiere una materia laboral o de seguridad social general, no decidas por el título: deja la decisión con confianza baja para que la valide el desarrollador.
+
 ## Reglas que debes respetar
 
 - **Por tema, no por postura.** Un proyecto que busca restringir el aborto o la identidad de género también se incluye, porque trata una materia de género. El Observatorio muestra el debate completo.

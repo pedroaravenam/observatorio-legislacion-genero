@@ -104,8 +104,8 @@
   "nota": "tema de género real (decisión del desarrollador/lectura)"
  },
  "14048-13": {
-  "esperado": "incluye",
-  "nota": "tema de género real (decisión del desarrollador/lectura)"
+  "esperado": "excluye",
+  "nota": "permiso por duelo (incluye la muerte de un hijo en gestación): tema de salud y duelo, no de igualdad de género; el desarrollador lo cambió de incluye a excluye el 13-11-2026"
  },
  "16863-07": {
   "esperado": "incluye",
