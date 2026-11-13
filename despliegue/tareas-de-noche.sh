@@ -52,8 +52,8 @@ for rev in "${trabajadores[@]}"; do puerta "$rev"; puede[$rev]=$?; done
 
 # 2. Proyectos nuevos y decisiones del agente con un criterio anterior (siempre con Claude, que es lo que pasa la puerta del criterio).
 if [[ ${puede[claude]:-9} == 0 ]]; then
-  # Lo decidido con un criterio anterior se repasa en tandas de TANDA_REPASO (50) por noche, primero lo publicado.
-  for modo in "pendientes" "pendientes --reclasificar --max ${TANDA_REPASO:-50}"; do
+  # Lo decidido con un criterio anterior se repasa en tandas de TANDA_REPASO (50) por noche, primero lo publicado, más MUESTRA_AZAR (15) proyectos al azar de la lista v5 (inclusiones y exclusiones por defecto).
+  for modo in "pendientes" "pendientes --reclasificar --max ${TANDA_REPASO:-50} --azar ${MUESTRA_AZAR:-15}"; do
     REVISOR=claude "${nodo[@]}" $modo >"$tmp/paso.log" 2>&1
     c=$?
     cat "$tmp/paso.log" >>"$registro"

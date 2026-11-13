@@ -213,3 +213,13 @@ test('el repaso por versión empieza por lo incluido y respeta la tanda', async 
 	assert.match(sql, /ORDER BY c\.incluye DESC, c\.boletin LIMIT 50;/);
 	assert.match(sql, /c\.codificador = 'agente'/);
 });
+
+test('la muestra al azar mezcla inclusiones y exclusiones de la lista v5 y valida el tamaño', async () => {
+	const { sqlMuestraAzar } = await import('./lib.mjs');
+	const sql = sqlMuestraAzar(8, 7);
+	assert.match(sql, /c\.incluye AND c\.codificador IN \('regla', 'claude'\) ORDER BY random\(\) LIMIT 8/);
+	assert.match(sql, /NOT c\.incluye AND c\.codificador = 'v5'.*LIMIT 7/s);
+	assert.throws(() => sqlMuestraAzar(-1, 3));
+	assert.throws(() => sqlMuestraAzar(300, 300));
+	assert.throws(() => sqlMuestraAzar('1; DROP', 3));
+});

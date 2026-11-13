@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Clasificador del Observatorio: aplica el criterio de selección de género a los proyectos nuevos con un agente
 // (Claude en modo sin interfaz) y guarda cada decisión, con su motivo, en la base de ingesta del VPS.
-//   node clasificar.mjs pendientes [--max N] [--simulacro]   clasifica lo que no tiene decisión y publica
+//   node clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar [--azar N]]   clasifica lo que no tiene decisión y publica
 //   node clasificar.mjs validar [--n 60]                      mide al agente contra la lista v5 (no escribe en la base)
 //   node clasificar.mjs sembrar                               carga una vez las decisiones de la lista v5
 //   node clasificar.mjs probar [--casos ruta]                 prueba al agente con casos de control (casos-control.json)
@@ -10,6 +10,7 @@
 //   node clasificar.mjs resolver --archivo veredictos.json [--aplicar]   registra lo que decidió el desarrollador (ensayo sin --aplicar)
 //   node clasificar.mjs encolar-publicados [--aplicar]       manda a la cola lo ya publicado como débil sin confianza alta (ensayo sin --aplicar)
 //   node clasificar.mjs evidencia --boletines a,b          muestra la evidencia del agente (texto y fragmentos) para validar a mano, sin agente
+//   node clasificar.mjs aplicar-resultados --archivo r.json  aplica decisiones ya calculadas por `pendientes --simulacro` (ensayo sin --aplicar --esperados N)
 //   node clasificar.mjs acuerdo                              coincidencia entre el agente y el desarrollador, y pendientes
 //   node clasificar.mjs informe-v5 [--archivo ruta.md]        resume esa segunda opinión por señal de la lista v5 (solo lee)
 // Variables: VPS (atendia-development), CLASIFICADOR_MODELO (sonnet), CONCURRENCIA (3), SALIDA (./clasificador-salida).
@@ -19,7 +20,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -282,7 +283,10 @@ async function pendientes() {
 		const l = opcion('boletines').split(',');
 		lista = await obtenerProyectos(l);
 	} else if (reclasificar) {
-		const viejas = leerCsv(await psql(sqlReclasificar(version, maximo)));
+		let viejas = leerCsv(await psql(sqlReclasificar(version, maximo)));
+		// --azar N: se suman N proyectos al azar (mitad inclusiones y mitad exclusiones de la lista v5) para repasarlos con el criterio vigente.
+		const azar = Number(opcion('azar', 0));
+		if (azar > 0) viejas = viejas.concat(leerCsv(await psql(sqlMuestraAzar(Math.ceil(azar / 2), Math.floor(azar / 2)))));
 		antes = new Map(viejas.map((v) => [v.boletin, v.incluye === 't']));
 		lista = viejas.length ? await obtenerProyectos(viejas.map((v) => v.boletin)) : [];
 	} else lista = (await obtenerProyectos()).slice(0, maximo);
@@ -632,6 +636,23 @@ async function evidencia() {
 	}
 }
 
+/** Aplica decisiones ya calculadas (el JSON que deja `pendientes --simulacro`), sin volver a llamar al agente. Ensayo por defecto. */
+async function aplicarResultados() {
+	const archivo = opcion('archivo', null);
+	if (!archivo) throw new Error('Falta --archivo con el JSON de resultados.');
+	const decididos = JSON.parse(readFileSync(archivo, 'utf8')).filter((r) => r && r.grupo);
+	const sacan = decididos.filter((d) => !d.incluye).length;
+	console.log(`Resultados: ${decididos.length} decisiones (excluye ${sacan}, incluye ${decididos.length - sacan}). Criterio con que se calcularon: el vigente (${version}) si el archivo es de hoy.`);
+	if (!args.includes('--aplicar')) return console.log(`Ensayo: no se cambió nada. Para aplicar: aplicar-resultados --archivo ${archivo} --aplicar --esperados ${decididos.length}`);
+	if (Number(opcion('esperados', NaN)) !== decididos.length) throw new Error(`Falta --esperados ${decididos.length}; no se aplica nada.`);
+	await guardar(decididos);
+	const limite = decididos.filter(esCasoLimite);
+	if (limite.length) await psql(sqlEncolar(decididos, version));
+	console.log(`Guardadas ${decididos.length} decisiones; a validación manual: ${limite.length}. Publicando la base del sitio...`);
+	await ssh('sudo /opt/observatorio/trabajo.sh publicar');
+	console.log('Aplicado y publicado.');
+}
+
 async function acuerdo() {
 	const validados = leerCsv(await psql(SQL_VALIDADOS));
 	const [p] = leerCsv(await psql(`SELECT count(*) AS n FROM validacion_genero WHERE estado = 'pendiente';`));
@@ -659,6 +680,7 @@ try {
 	else if (orden === 'encolar-publicados') await encolarPublicados();
 	else if (orden === 'acuerdo') await acuerdo();
 	else if (orden === 'evidencia') await evidencia();
+	else if (orden === 'aplicar-resultados') await aplicarResultados();
 	else if (orden === 'informe-v5') await informeV5();
 	else if (orden === 'cruzar-v5') await cruzarV5();
 	else if (orden === 'aplicar-v5') await aplicarV5();

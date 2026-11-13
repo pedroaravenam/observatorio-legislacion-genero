@@ -462,3 +462,16 @@ export function resumenAcuerdo(validados, pendientes) {
 	const coincide = [...meses.values()].reduce((s, m) => s + m.coincide, 0);
 	return { total, coincide, pendientes, porMes: [...meses].sort(([a], [b]) => a.localeCompare(b)).map(([mes, m]) => ({ mes, ...m })) };
 }
+
+/**
+ * Muestra al azar para repasar con el criterio vigente, además de lo decidido con un criterio anterior: algunas inclusiones de la lista
+ * v5 (hechas por regla o por Claude) y algunas exclusiones por defecto de proyectos desde 2018. Lo que el agente repasa queda con su
+ * decisión y su versión, así que no se repite en la muestra siguiente.
+ */
+export function sqlMuestraAzar(incluidas, excluidas) {
+	if (!Number.isInteger(incluidas) || !Number.isInteger(excluidas) || incluidas < 0 || excluidas < 0 || incluidas + excluidas > 500) throw new Error('Tamaño de muestra no válido.');
+	return `(SELECT c.boletin, c.incluye FROM clasificacion_genero c WHERE c.incluye AND c.codificador IN ('regla', 'claude') ORDER BY random() LIMIT ${incluidas})
+UNION ALL
+(SELECT c.boletin, c.incluye FROM clasificacion_genero c JOIN proyecto_ley p ON p.boletin = c.boletin
+ WHERE NOT c.incluye AND c.codificador = 'v5' AND p.fecha_ingreso >= '2018-01-01' ORDER BY random() LIMIT ${excluidas});`;
+}
