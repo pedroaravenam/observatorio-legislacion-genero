@@ -111,7 +111,7 @@ La selección de género ya no es una lista fija dentro de la imagen del exporta
 |---|---|
 | 1. Casos de control | Cada versión del criterio se prueba una sola vez por trabajador. Si uno acierta menos del 90 % no corre esa noche y llega un aviso |
 | 2. Proyectos nuevos | Claude clasifica lo que ingresó y reclasifica lo que decidió con un criterio anterior |
-| 3. Pasada sobre la lista original | **Claude (sonnet) y Codex (gpt-6-luna, razonamiento alto) en paralelo.** Cada uno sigue hasta terminar o hasta agotar su límite de uso, y lo hecho queda guardado para la noche siguiente |
+| 3. Pasada sobre la lista original | **Solo Claude (sonnet).** Sigue hasta terminar o hasta agotar su límite de uso, y lo hecho queda guardado para la noche siguiente. Codex quedó excluido el 13 de noviembre de 2026 (ver HISTORIAL) |
 | 4. Niveles y publicación | Los proyectos de la lista original que el agente mantiene reciben su nivel de relación con el género; si hubo cambios, se publica el sitio |
 | 5. Resumen | Un correo con lo hecho, solo si hubo novedades |
 

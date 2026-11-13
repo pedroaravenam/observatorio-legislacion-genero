@@ -142,7 +142,7 @@ function analizar(texto) {
  * Se puede cambiar con CODEX_MODELO=openai-codex/<modelo>:<esfuerzo>.
  */
 function modeloCodex() {
-	const rol = process.env.CODEX_MODELO || 'openai-codex/gpt-6-luna:high';
+	const rol = process.env.CODEX_MODELO || 'openai-codex/gpt-6.1-terra:high';
 	const [proveedor, resto] = rol.includes('/') ? rol.split('/') : ['openai-codex', rol];
 	if (proveedor !== 'openai-codex') throw new Error(`CODEX_MODELO debe ser de openai-codex, no «${proveedor}»`);
 	const [modelo, esfuerzo] = resto.split(':');

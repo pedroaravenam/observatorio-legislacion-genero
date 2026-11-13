@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Tareas de la noche del Observatorio (03:00, hora de Chile), pensadas para gastar los créditos de los agentes cuando
 # nadie trabaja. En orden:
-#   1. Casos de control: cada versión del criterio se prueba una vez por trabajador (Claude y Codex). Si uno no pasa, no corre.
+#   1. Casos de control: cada versión del criterio se prueba una vez con Claude. Si no pasa, no corre.
 #   2. Proyectos nuevos: el agente clasifica lo que ingresó y reclasifica lo decidido con un criterio anterior.
-#   3. (Solo con REVISAR_V5=1) Pasada sobre la lista v5, con Claude y Codex EN PARALELO. Reclaman tandas en la base y no se pisan. Cada uno sigue
+#   3. (Solo con REVISAR_V5=1) Pasada sobre la lista v5, con Con Claude. Sigue
 #      hasta terminar o hasta que se agote su límite de uso; lo hecho queda guardado y se retoma la noche siguiente.
 #   4. Niveles de relación con el género para los proyectos de la lista v5 que el agente mantiene, y publicación del sitio.
 #   5. Un correo con el resumen, si hubo novedades.
-# Se puede correr a mano. Variables: VPS, SOLO=claude|codex para usar un solo trabajador, SOLO=ninguno para un ensayo sin agentes.
+# Se puede correr a mano. Variables: VPS, SOLO=ninguno para un ensayo sin agentes.
 set -uo pipefail
 export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -23,8 +23,10 @@ hoy=$(TZ=America/Santiago date +%F)
 registro="$estado/noche-$hoy.log"
 resumen=()
 novedad=0
-trabajadores=(claude codex)
-[[ -n ${SOLO:-} ]] && trabajadores=("$SOLO")
+# Desde el 13 de noviembre de 2026 solo trabaja Claude (sonnet): en la comparación con los mismos casos, Codex (terra y sol) se equivocó
+# con confianza alta en casos que Sonnet dejaba en duda, y esas decisiones no pasarían por la validación manual.
+trabajadores=(claude)
+[[ ${SOLO:-} == codex ]] && { echo 'Codex está excluido de las tareas de la noche.' >&2; exit 2; }
 [[ ${SOLO:-} == ninguno ]] && trabajadores=()   # ensayo: prueba la lógica sin llamar a ningún agente
 
 anotar() { resumen+=("$1"); echo "$1" | tee -a "$registro"; }
