@@ -9,6 +9,7 @@
 //   node clasificar.mjs cola [--archivo ruta.json] [--contar]  casos límite pendientes de validación manual (no se publican hasta validarlos)
 //   node clasificar.mjs resolver --archivo veredictos.json [--aplicar]   registra lo que decidió el desarrollador (ensayo sin --aplicar)
 //   node clasificar.mjs encolar-publicados [--aplicar]       manda a la cola lo ya publicado como débil sin confianza alta (ensayo sin --aplicar)
+//   node clasificar.mjs evidencia --boletines a,b          muestra la evidencia del agente (texto y fragmentos) para validar a mano, sin agente
 //   node clasificar.mjs acuerdo                              coincidencia entre el agente y el desarrollador, y pendientes
 //   node clasificar.mjs informe-v5 [--archivo ruta.md]        resume esa segunda opinión por señal de la lista v5 (solo lee)
 // Variables: VPS (atendia-development), CLASIFICADOR_MODELO (sonnet), CONCURRENCIA (3), SALIDA (./clasificador-salida).
@@ -621,6 +622,16 @@ async function encolarPublicados() {
 	console.log('Aplicado y publicado.');
 }
 
+/** Muestra la evidencia que recibiría el agente (título, materias, inicio y fragmentos del texto), sin llamar a ningún agente. Sirve para validar a mano. */
+async function evidencia() {
+	const lista = (opcion('boletines', '') || '').split(',').filter(Boolean);
+	if (!lista.length) throw new Error('Falta --boletines a,b,c.');
+	for (const p of await obtenerProyectos(lista)) {
+		const { texto, motivo } = await obtenerTexto(p.url);
+		console.log(`\n===== ${p.boletin} =====\n${construirEvidencia(p, texto ? analizar(texto) : null)}${texto ? '' : `\n(sin texto: ${motivo})`}\nEnlace: ${p.url}`);
+	}
+}
+
 async function acuerdo() {
 	const validados = leerCsv(await psql(SQL_VALIDADOS));
 	const [p] = leerCsv(await psql(`SELECT count(*) AS n FROM validacion_genero WHERE estado = 'pendiente';`));
@@ -647,6 +658,7 @@ try {
 	else if (orden === 'resolver') await resolver();
 	else if (orden === 'encolar-publicados') await encolarPublicados();
 	else if (orden === 'acuerdo') await acuerdo();
+	else if (orden === 'evidencia') await evidencia();
 	else if (orden === 'informe-v5') await informeV5();
 	else if (orden === 'cruzar-v5') await cruzarV5();
 	else if (orden === 'aplicar-v5') await aplicarV5();
