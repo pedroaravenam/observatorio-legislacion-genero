@@ -98,9 +98,9 @@ if [[ ${actualizados:-0} -gt 0 ]]; then
     anotar "Niveles asignados a ${actualizados} proyectos de la lista v5 y sitio publicado." ||
     anotar "Se asignaron niveles a ${actualizados} proyectos, pero falló la publicación del sitio."
 fi
-# Casos límite que esperan la validación del desarrollador: se avisa siempre que haya, para que no queden olvidados.
+# Casos límite que esperan la validación del desarrollador: se avisa desde UMBRAL_COLA (20) casos, para revisarlos todos de una vez.
 en_cola=$("${nodo[@]}" cola --contar 2>/dev/null | tail -1)
-if [[ ${en_cola:-0} =~ ^[0-9]+$ ]] && ((en_cola > 0)); then
+if [[ ${en_cola:-0} =~ ^[0-9]+$ ]] && ((en_cola >= ${UMBRAL_COLA:-20})); then
   novedad=1
   anotar "Hay ${en_cola} casos límite pendientes de tu validación (no se publican hasta que los revises). Abre Claude Code en el proyecto y pide «revisemos los casos pendientes»."
 fi
