@@ -357,8 +357,8 @@
 				<td>Cada quince días, de madrugada</td>
 				<td>
 					Vuelve a consultar uno por uno los más de 18.000 boletines desde 1990, para recoger los
-					cambios que la consulta diaria no alcanza a ver. Tarda varias horas, porque las consultas
-					se espacian para no sobrecargar al Senado.
+					cambios que la consulta diaria no alcanza a ver y para completar lo que no se haya
+					descargado bien en una corrida anterior.
 				</td>
 			</tr>
 		</tbody>
