@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-14 — Aportes, reseña con nombre y cierre del sitio (commit de este avance)
+
+Se habilitaron los canales de aporte (Mercado Pago `link.mercadopago.cl/legislaciongenero` y Ko-fi `ko-fi.com/legislaciongenero`); GitHub Sponsors se descartó y no se incorporó el widget de Ko-fi para no cargar un script de un tercero. La reseña del autor parte con su nombre completo y el código admite una foto (`AUTOR.foto`, vacía). El aviso de casos pendientes de validación llega desde 20 en la cola. Se desplegó el commit bd37626. El desarrollador dio el sitio por finalizado; quedan solo tareas de operación.
+
 ## 2026-11-14 — El repaso nocturno prioriza las inclusiones de la lista v5 (commit de este avance)
 
 Quedaban 1.422 inclusiones de la lista v5 sin repasar con el criterio vigente; antes solo entraban por la muestra al azar. Ahora cada noche se repasan además 50 (`--prioridad`, variable `PRIORIDAD_V5`) en este orden: primero las 371 que el agente dudó en el repaso anterior (confianza media o baja), luego las 472 con confianza alta cuyo título toca temas con reglas nuevas (delitos sexuales, menores, penal, divorcio y matrimonio, cuidados, elecciones, entre otros) y al final las 579 restantes, que quedan sobre todo para la muestra al azar (que mide si ahí hay errores). Con la tanda de 50 y el azar de 15, son unas 115 llamadas por noche, con Sonnet; las dos primeras prioridades (843) se terminan en unas 17 noches. No cambia el criterio ni su versión, así que no hizo falta detener el temporizador.
