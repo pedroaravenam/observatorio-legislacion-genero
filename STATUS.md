@@ -2,9 +2,9 @@
 
 ## Resumen
 
-Fecha: 2026-11-12. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión desplegada es la del commit del rediseño del 12 de noviembre (ver [el historial](docs/history/HISTORIAL.md)).
+Fecha: 2026-11-14. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión desplegada es la del commit 8947295 (reseña del autor con LinkedIn y metodología ajustada) (ver [el historial](docs/history/HISTORIAL.md)).
 
-El sitio muestra la selección de género: **1.589 proyectos** de los 18.659 boletines del Senado (1990–2026), al 12 de noviembre. Tiene cinco secciones:
+El sitio muestra la selección de género: **1.467 proyectos** de los 18.666 boletines del Senado (1990–2026), al 14 de noviembre. Tiene cinco secciones:
 
 - **Inicio (`/`):** portada de contexto, un ensayo con cifras al margen (qué cuenta como legislación de género, cuánto se legisla, 16 leyes hito, quién presenta y qué prospera, temas, estado actual y quién hace el sitio). Los enlaces antiguos al buscador (`/?tema=…`) redirigen a `/proyectos`.
 - **Panorama:** estados, gráfico anual, niveles de relación con el género, origen, autoría por sexo, temas por período, proyectos en tramitación (etapa y último trámite), tiempo hasta ser ley y los 15 parlamentarios con más proyectos.
@@ -34,7 +34,7 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 
 0. **Clasificación (12–13 de noviembre):** en producción desde el 13 de noviembre: validación manual de casos límite (migración `0011`), criterio `agente-9140a81f` («objeto primero» más las reglas del desarrollador; los delitos sexuales contra menores quedan fuera) y `observatorio-noche.timer` activo (solo Claude; cada noche repasa 50 decisiones con criterio anterior, primero las incluidas, más 15 al azar de la lista v5: 8 incluidas y 7 excluidas desde 2018). Validados con Claude 59 casos; el agente coincidió en 25 (42 %, criterio anterior sobre casos límite). Queda 1 pendiente (1120-13: el Senado no publica su texto). El sitio muestra 1.496 proyectos (eran 1.589 antes de la validación). Falta: ver el correo de la noche y validar la cola que aparezca (`clasificar.mjs cola`, `evidencia`, `resolver`); medir si los casos pendientes bajan (`acuerdo`); decidir si Sol sirve de segunda opinión; revisar el 14891-04, que fallan los tres modelos. Casos de control: 49 de 50 con Sonnet; Codex excluido.
 1. Crear las cuentas de Mercado Pago, GitHub Sponsors y Ko-fi y poner sus direcciones en `sitio/src/lib/sitio.ts`; mientras estén vacías, el sitio dice que los canales se están habilitando.
-2. Escribir la reseña del autor (`AUTOR.resena` en el mismo archivo) y revisar los nombres de las 16 leyes hito (`sitio/src/lib/server/contexto.ts`).
+2. Revisar los nombres de las 16 leyes hito (`sitio/src/lib/server/contexto.ts`).
 3. Mirar el correo de resumen de la noche del 6 de noviembre (casos de control y reevaluación con el criterio `agente-05f93dc5`), que quedó sin revisar.
 4. Guardar `~/.config/observatorio-genero/respaldo.clave` en el gestor de contraseñas: sin ella las copias de R2 no se pueden leer.
 

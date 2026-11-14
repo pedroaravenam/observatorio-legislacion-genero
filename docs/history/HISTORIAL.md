@@ -1,5 +1,11 @@
 # Historial
 
+## 2026-11-14 — Salen los proyectos de menores, se valida la cola y se escribe la reseña del autor (commit de este avance)
+
+Tres proyectos que el criterio nuevo excluye (18875-07, 18442-07, 18081-17) seguían en Actualidad. Se revisaron 44 proyectos sobre delitos sexuales y menores con el agente y se aplicaron 43 decisiones, pero la publicación quedó esperando: la carga completa del Senado (`observatorio-completa`, cada 15 días) empezó a las 04:02 UTC, duró unas nueve horas y retiene el cerrojo de `trabajo.sh`. El comando local falló por el límite de 20 minutos del helper `ssh` de `clasificar.mjs` (las decisiones ya estaban guardadas en PostgreSQL); la publicación en cola corrió sola al terminar la carga. Lección: tras un `aplicar-resultados` que falla al publicar, revisar primero si hay una carga completa en curso.
+
+Después el desarrollador validó a mano 15 casos más (6 entran: 1 componente y 5 débiles; 9 quedan fuera, entre ellos 16313-24 y 18276-07) y la cola quedó en 0. La selección pasó a 1.467 proyectos. Se agregó la reseña del autor (sociólogo de la Universidad de Concepción, magíster en Desarrollo Humano de la FLACSO Argentina, con enlace a LinkedIn) y a la fila de «Revisión completa» de `/acerca` se le quitó la duración y se le sumó que repara descargas fallidas.
+
 ## 2026-11-14 — El correo de contacto recibe (commit de este avance)
 
 `contacto@legislaciongenero.cl` rebotaba: el dominio raíz no tenía registro MX y Resend solo envía (desde el subdominio `send`). El desarrollador recordaba un ruteo de correo, pero era el de `contacto@cercalabs.app`, otro dominio. Se activó Email Routing de Cloudflare en la zona con el token del proyecto (creó los MX `route1`, `route2` y `route3.mx.cloudflare.net` y el SPF del dominio raíz) y el desarrollador creó en el panel la regla que reenvía `contacto@` a su Gmail, porque el token no puede crear reglas. Cloudflare acepta la dirección y rechaza las inventadas del mismo dominio (comprobado hablando con su servidor SMTP). Una prueba desde Resend enviada justo después de crear los MX rebotó («Recipient not found») y Resend dejó la dirección en su lista de supresión; tras quitarla, el desarrollador confirmó que el correo llegó. Resend no se ve afectado. Se publicó además la versión `1cb3ab8` con «Cómo funciona» actualizada.
