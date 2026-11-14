@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-14 — El repaso nocturno prioriza las inclusiones de la lista v5 (commit de este avance)
+
+Quedaban 1.422 inclusiones de la lista v5 sin repasar con el criterio vigente; antes solo entraban por la muestra al azar. Ahora cada noche se repasan además 50 (`--prioridad`, variable `PRIORIDAD_V5`) en este orden: primero las 371 que el agente dudó en el repaso anterior (confianza media o baja), luego las 472 con confianza alta cuyo título toca temas con reglas nuevas (delitos sexuales, menores, penal, divorcio y matrimonio, cuidados, elecciones, entre otros) y al final las 579 restantes, que quedan sobre todo para la muestra al azar (que mide si ahí hay errores). Con la tanda de 50 y el azar de 15, son unas 115 llamadas por noche, con Sonnet; las dos primeras prioridades (843) se terminan en unas 17 noches. No cambia el criterio ni su versión, así que no hizo falta detener el temporizador.
+
 ## 2026-11-14 — La carga completa pasa a cada 21 días, a las 22:00 (commit de este avance)
 
 Se midió la carga completa del 14 de noviembre: leyó 18.668 de 18.670 boletines en unas nueve horas y encontró 8 proyectos con trámites que la consulta diaria no habría visto (9 trámites nuevos, 7 corregidos; solo uno, el 14043-07, está en la selección). Tampoco había sido inocua: retuvo el cerrojo de `trabajo.sh` y la consulta de las 9:00 corrió a las 10:08. Con eso el desarrollador decidió pasarla a cada 21 días (mínimo de 19 en fin de semana, tope de 21) y adelantar el temporizador a las 22:00 de Chile para que termine antes de la consulta diaria. Se dejó sin cambio que las publicaciones esperen mientras corre.

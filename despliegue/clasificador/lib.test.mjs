@@ -223,3 +223,13 @@ test('la muestra al azar mezcla inclusiones y exclusiones de la lista v5 y valid
 	assert.throws(() => sqlMuestraAzar(300, 300));
 	assert.throws(() => sqlMuestraAzar('1; DROP', 3));
 });
+
+test('sqlPrioridadV5 ordena por duda del agente y temas sensibles, y valida el máximo', async () => {
+	const { sqlPrioridadV5 } = await import('./lib.mjs');
+	const sql = sqlPrioridadV5(50);
+	assert.match(sql, /codificador IN \('regla', 'claude'\)/);
+	assert.match(sql, /<> 'alta' THEN 0/);
+	assert.match(sql, /LIMIT 50;/);
+	assert.throws(() => sqlPrioridadV5(-1));
+	assert.throws(() => sqlPrioridadV5(1.5));
+});

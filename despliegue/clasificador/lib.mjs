@@ -475,3 +475,20 @@ UNION ALL
 (SELECT c.boletin, c.incluye FROM clasificacion_genero c JOIN proyecto_ley p ON p.boletin = c.boletin
  WHERE NOT c.incluye AND c.codificador = 'v5' AND p.fecha_ingreso >= '2018-01-01' ORDER BY random() LIMIT ${excluidas});`;
 }
+
+/** Palabras del título que tocan las reglas que el desarrollador fijó después del primer repaso de la lista v5. */
+const TEMAS_SENSIBLES = 'sexual|violaci|abuso|pornogr|explotaci|acoso|menor|niñ|infan|adolesc|discapac|tratado|convenio|penal|presidio|pena |libertad condicional|elector|elecci|partido|divorcio|matrimonio|alimentos|cuidado|embarazo|maternidad|igualitari|protecci';
+
+/**
+ * Inclusiones de la lista v5 (aún sin repasar con el criterio vigente) en orden de prioridad:
+ * 0, el agente dudó en el repaso anterior (confianza media o baja); 1, confianza alta pero el título toca
+ * temas cuyas reglas cambiaron; 2, el resto. Al repasarse, su codificador pasa a 'agente' y salen de esta lista.
+ */
+export function sqlPrioridadV5(maximo) {
+	if (!Number.isInteger(maximo) || maximo < 0 || maximo > 500) throw new Error('El máximo debe ser un entero entre 0 y 500.');
+	return `SELECT c.boletin, c.incluye FROM clasificacion_genero c JOIN proyecto_ley p ON p.boletin = c.boletin
+LEFT JOIN revision_v5 r ON r.boletin = c.boletin
+WHERE c.incluye AND c.codificador IN ('regla', 'claude')
+ORDER BY CASE WHEN coalesce(r.confianza, 'baja') <> 'alta' THEN 0 WHEN lower(p.titulo) ~ '${TEMAS_SENSIBLES}' THEN 1 ELSE 2 END, c.boletin
+LIMIT ${maximo};`;
+}

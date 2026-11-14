@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Clasificador del Observatorio: aplica el criterio de selección de género a los proyectos nuevos con un agente
 // (Claude en modo sin interfaz) y guarda cada decisión, con su motivo, en la base de ingesta del VPS.
-//   node clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar [--azar N]]   clasifica lo que no tiene decisión y publica
+//   node clasificar.mjs pendientes [--max N] [--simulacro] [--reclasificar [--prioridad N] [--azar N]]   clasifica lo que no tiene decisión y publica
 //   node clasificar.mjs validar [--n 60]                      mide al agente contra la lista v5 (no escribe en la base)
 //   node clasificar.mjs sembrar                               carga una vez las decisiones de la lista v5
 //   node clasificar.mjs probar [--casos ruta]                 prueba al agente con casos de control (casos-control.json)
@@ -20,7 +20,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlPrioridadV5, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -287,6 +287,10 @@ async function pendientes() {
 		// --azar N: se suman N proyectos al azar (mitad inclusiones y mitad exclusiones de la lista v5) para repasarlos con el criterio vigente.
 		const azar = Number(opcion('azar', 0));
 		if (azar > 0) viejas = viejas.concat(leerCsv(await psql(sqlMuestraAzar(Math.ceil(azar / 2), Math.floor(azar / 2)))));
+		// --prioridad N: N inclusiones de la lista v5 por orden de prioridad (primero las que el agente dudó, luego las de temas cuyas reglas cambiaron).
+		const prioridad = Number(opcion('prioridad', 0));
+		if (prioridad > 0) viejas = viejas.concat(leerCsv(await psql(sqlPrioridadV5(prioridad))));
+		viejas = [...new Map(viejas.map((v) => [v.boletin, v])).values()];
 		antes = new Map(viejas.map((v) => [v.boletin, v.incluye === 't']));
 		lista = viejas.length ? await obtenerProyectos(viejas.map((v) => v.boletin)) : [];
 	} else lista = (await obtenerProyectos()).slice(0, maximo);
