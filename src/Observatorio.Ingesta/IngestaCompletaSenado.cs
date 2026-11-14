@@ -38,9 +38,9 @@ public sealed class IngestaCompletaSenado(
         if (pendiente is null)
         {
             var transcurrido = anterior?.Termino is null ? TimeSpan.MaxValue : reloj.GetUtcNow() - anterior.Termino.Value;
-            if (transcurrido < TimeSpan.FromDays(13)) return null;
+            if (transcurrido < TimeSpan.FromDays(19)) return null;
             var finDeSemana = ahoraChile.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
-            if (!finDeSemana && (anterior is null || transcurrido < TimeSpan.FromDays(15))) return null;
+            if (!finDeSemana && (anterior is null || transcurrido < TimeSpan.FromDays(21))) return null;
         }
 
         var boletines = await LeerCatalogoAsync(ct).ConfigureAwait(false);
@@ -109,11 +109,16 @@ public sealed class IngestaCompletaSenado(
         ejecucion.RegistrosInsertados = exitosas.Sum(x => x.RegistrosInsertados);
         ejecucion.RegistrosActualizados = exitosas.Sum(x => x.RegistrosActualizados);
         ejecucion.RegistrosSinCambio = exitosas.Sum(x => x.RegistrosSinCambio);
-        if (pendientes == 0)
+        // Unos pocos boletines que el Senado dejó de devolver no pueden mantener abierta la carga para siempre:
+        // sin esto se reintentan cada noche y nunca empieza el ciclo siguiente.
+        var omitidos = pendientes > 0 && pendientes * 1000 <= boletines.Count &&
+            reloj.GetUtcNow() - ejecucion.Inicio > TimeSpan.FromDays(3);
+        if (pendientes == 0 || omitidos)
         {
             ejecucion.Estado = EstadoEjecucion.Exitosa;
             ejecucion.Termino = reloj.GetUtcNow();
-            ejecucion.Detalle = $"Total {boletines.Count}; diferencias detectadas: " +
+            ejecucion.Detalle = (omitidos ? $"Omitidos {pendientes} que el Senado no devuelve; " : "") +
+                $"Total {boletines.Count}; diferencias detectadas: " +
                 await db.DesactualizacionesSenado.CountAsync(x => x.EjecucionId == ejecucion.Id, ct).ConfigureAwait(false);
             await EstadoFuenteSenado.RegistrarAsync(db, Proceso, ejecucion.Termino.Value, null, ct).ConfigureAwait(false);
         }

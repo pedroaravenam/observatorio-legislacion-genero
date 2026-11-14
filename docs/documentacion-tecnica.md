@@ -146,7 +146,7 @@ La tabla siguiente contrasta el mecanismo de detección de cada fuente con la re
 | Fuente | Detección de cambios | Restricción principal medida |
 |---|---|---|
 | Cámara | Huella de cada proyecto en la lista anual, y detalle solo de lo nuevo o distinto | Ninguna, a una consulta por segundo durante 8,7 horas. El puerto 80 queda colgado |
-| Senado | Consulta diaria por fecha con una ventana de 21 días, más una carga completa cada 15 días | La consulta por fecha omite trámites registrados con retraso. Cubrió 66 de 68 cambios en la prueba del 26 de octubre |
+| Senado | Consulta diaria por fecha con una ventana de 21 días, más una carga completa cada 21 días | La consulta por fecha omite trámites registrados con retraso. Cubrió 66 de 68 cambios en la prueba del 26 de octubre |
 | BCN | `fechaVersion` y huella del texto de cada ley, revisadas por orden de antigüedad | Respuestas 429 sin un ritmo que las evite, y cerca de 1,65 minutos por ley en el ensayo rápido |
 
 #### 5.5. Síntesis de factibilidad técnica
@@ -219,14 +219,14 @@ Dado que la consulta por fecha no basta como única vía de actualización, el 2
 |---|---|---|
 | Qué hace | Pide al Senado los proyectos con trámites fechados desde el día más antiguo que acepta. Como la respuesta ya trae la ficha completa de cada proyecto, basta compararla con lo guardado | Vuelve a descargar, uno por uno, los 18.519 boletines del catálogo histórico y los nuevos que ya están en la base, y los compara con lo guardado |
 | Cuándo se ejecuta | Todos los días | De noche y preferentemente en fin de semana |
-| Número de días que la describe | Ventana de 21 días hacia atrás, que es el máximo que el Senado acepta hoy | Intervalo de 15 días entre una carga completa y la siguiente |
+| Número de días que la describe | Ventana de 21 días hacia atrás, que es el máximo que el Senado acepta hoy | Intervalo de 21 días entre una carga completa y la siguiente |
 | Costo medido | Una consulta, de cerca de 2,3 MB en la prueba | La primera corrida procesó 18.622 boletines entre la 01:00 y las 09:44 del 31 de octubre, incluidas las pausas |
 | Qué detecta | Todo trámite cuya fecha esté dentro de los últimos 21 días, aunque se haya registrado tarde | Trámites registrados con más de 21 días de retraso, boletines archivados que se reactivan y cualquier otro cambio que la consulta diaria no vea |
 | Estado | Implementada y en operación | Implementada, con una primera corrida completa exitosa |
 
-Con esta combinación, un trámite registrado con más de 21 días de retraso escapa a la consulta diaria, pero aparece en la siguiente carga completa, siempre que esta termine correctamente. Por consiguiente, el intervalo de 15 días acota el tiempo adicional que ese dato puede permanecer desactualizado. Quedan fuera de esta cobertura solo los cambios que tampoco ve la carga completa, como una modificación que el Senado revierta entre dos cargas.
+Con esta combinación, un trámite registrado con más de 21 días de retraso escapa a la consulta diaria, pero aparece en la siguiente carga completa, siempre que esta termine correctamente. Por consiguiente, el intervalo de 21 días acota el tiempo adicional que ese dato puede permanecer desactualizado. Quedan fuera de esta cobertura solo los cambios que tampoco ve la carga completa, como una modificación que el Senado revierta entre dos cargas.
 
-El intervalo de 15 días se considera razonable porque los cambios observados se concentran en los boletines recientes y en tramitación. En la prueba del 26 de octubre, los 68 boletines modificados estaban en tramitación y eran de 2024 en adelante (45 de 2026, 8 de 2025 y 15 de 2024), mientras que los 300 boletines anteriores a 2024 no registraron ningún cambio. Este resultado no demuestra que los boletines antiguos nunca cambien, pero indica que el riesgo de una carga cada 15 días es bajo. Como referencia del tamaño de cada grupo, la línea base contiene 7.443 boletines en tramitación, 6.537 archivados, 4.051 publicados y cerca de 490 en otros estados. Si más adelante la duración de la carga completa resultara un problema, podría alternarse con una carga solo de los boletines en tramitación, que tomaría unas 2 horas, aunque esta alternativa no se adopta por ahora.
+El intervalo de 21 días se considera razonable porque los cambios observados se concentran en los boletines recientes y en tramitación. En la prueba del 26 de octubre, los 68 boletines modificados estaban en tramitación y eran de 2024 en adelante (45 de 2026, 8 de 2025 y 15 de 2024), mientras que los 300 boletines anteriores a 2024 no registraron ningún cambio. Este resultado no demuestra que los boletines antiguos nunca cambien, pero indica que el riesgo de una carga cada 21 días es bajo. Como referencia del tamaño de cada grupo, la línea base contiene 7.443 boletines en tramitación, 6.537 archivados, 4.051 publicados y cerca de 490 en otros estados. Si más adelante la duración de la carga completa resultara un problema, podría alternarse con una carga solo de los boletines en tramitación, que tomaría unas 2 horas, aunque esta alternativa no se adopta por ahora.
 
 ```mermaid
 flowchart TB
@@ -235,7 +235,7 @@ flowchart TB
     R -->|"Lista de proyectos"| U["Actualizar las fichas<br/>de los boletines listados"]
     R -->|"Página de error por fecha"| T["Reintentar con una fecha<br/>un día más reciente"]
     T --> Q
-    W["Cada 15 días,<br/>de noche y en fin de semana"] --> F["Carga completa del catálogo<br/>y de los boletines nuevos"]
+    W["Cada 21 días,<br/>de noche y en fin de semana"] --> F["Carga completa del catálogo<br/>y de los boletines nuevos"]
     F --> U
     U --> G["Registrar el primer día en que<br/>se vio cada trámite nuevo"]
 ```
@@ -706,7 +706,7 @@ El Senado responde con código 200 en todos los casos, incluidos los errores, y 
 | Cambio de etiquetas | Falta un campo obligatorio | `contrato_roto` | Detener la operación | Sí |
 | Límite de consultas | No se observó ningún 429 en 18.519 boletines a una consulta por segundo durante 8,7 horas, y no se probaron ritmos mayores | No aplica | Mantener una consulta por segundo, con las mismas reglas de pausa y corte | No aplica |
 
-La fila sobre la fecha antigua requiere una explicación, porque de ella depende la consulta diaria. La consulta por fecha no entrega solo lo ocurrido el día indicado, sino todos los proyectos con trámites fechados entre ese día y hoy. Así lo muestran las mediciones, en que la respuesta para el 8 de octubre traía 5 proyectos y estaba contenida en la del 1 de octubre, con 121, que a su vez estaba contenida en la del 12 de septiembre, con 234. Por esta razón la consulta diaria pide la fecha más antigua que el Senado acepta, hoy 21 días atrás, y la superposición entre consultas sucesivas cubre tanto una corrida perdida como los trámites registrados con retraso, siempre que su fecha caiga dentro de la ventana. No recupera, en cambio, un trámite registrado recientemente con una fecha anterior al inicio de la ventana, situación que afectó a 2 de los 68 boletines modificados en la prueba del 26 de octubre. Las secciones 7.2 y 7.3 del diseño de integración reconstruyen esos casos y explican por qué la consulta diaria se complementa con una carga completa cada 15 días.
+La fila sobre la fecha antigua requiere una explicación, porque de ella depende la consulta diaria. La consulta por fecha no entrega solo lo ocurrido el día indicado, sino todos los proyectos con trámites fechados entre ese día y hoy. Así lo muestran las mediciones, en que la respuesta para el 8 de octubre traía 5 proyectos y estaba contenida en la del 1 de octubre, con 121, que a su vez estaba contenida en la del 12 de septiembre, con 234. Por esta razón la consulta diaria pide la fecha más antigua que el Senado acepta, hoy 21 días atrás, y la superposición entre consultas sucesivas cubre tanto una corrida perdida como los trámites registrados con retraso, siempre que su fecha caiga dentro de la ventana. No recupera, en cambio, un trámite registrado recientemente con una fecha anterior al inicio de la ventana, situación que afectó a 2 de los 68 boletines modificados en la prueba del 26 de octubre. Las secciones 7.2 y 7.3 del diseño de integración reconstruyen esos casos y explican por qué la consulta diaria se complementa con una carga completa cada 21 días.
 
 ### 5. BCN, plataforma LeyChile
 

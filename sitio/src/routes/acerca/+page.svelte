@@ -354,7 +354,7 @@
 			</tr>
 			<tr>
 				<td>Revisión completa</td>
-				<td>Cada quince días, de madrugada</td>
+				<td>Cada tres semanas, de noche</td>
 				<td>
 					Vuelve a consultar uno por uno los más de 18.000 boletines desde 1990, para recoger los
 					cambios que la consulta diaria no alcanza a ver y para completar lo que no se haya

@@ -62,7 +62,7 @@ public class CargaCompletaSenadoPruebas : IAsyncLifetime
             Assert.Equal("al_dia", (await db.EstadosFuentes.SingleAsync()).Estado);
         }
 
-        reloj.Ahora = reloj.Ahora.AddDays(14);
+        reloj.Ahora = reloj.Ahora.AddDays(21);
         fuente.SegundaFicha = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(Fixtures.Senado("11929-13.xml"))
             .Replace("Ingreso de proyecto", "Ingreso corregido de proyecto", StringComparison.Ordinal));
         var segunda = await CorrerAsync(reloj, fuente);

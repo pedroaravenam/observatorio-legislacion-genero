@@ -1,5 +1,11 @@
 # Historial
 
+## 2026-11-14 — La carga completa pasa a cada 21 días, a las 22:00 (commit de este avance)
+
+Se midió la carga completa del 14 de noviembre: leyó 18.668 de 18.670 boletines en unas nueve horas y encontró 8 proyectos con trámites que la consulta diaria no habría visto (9 trámites nuevos, 7 corregidos; solo uno, el 14043-07, está en la selección). Tampoco había sido inocua: retuvo el cerrojo de `trabajo.sh` y la consulta de las 9:00 corrió a las 10:08. Con eso el desarrollador decidió pasarla a cada 21 días (mínimo de 19 en fin de semana, tope de 21) y adelantar el temporizador a las 22:00 de Chile para que termine antes de la consulta diaria. Se dejó sin cambio que las publicaciones esperen mientras corre.
+
+Se encontró además que la carga quedaba abierta (estado parcial) por dos boletines que el Senado ya no devuelve (273-06 y 4563-06): al reanudarse cada noche nunca llegaba a cerrar ni empezaba el ciclo siguiente. Ahora, pasados tres días, una carga con pendientes de hasta el 0,1 % del catálogo se cierra como exitosa y deja anotados los omitidos. Sin prueba propia: la cubren las existentes y la CI.
+
 ## 2026-11-14 — Salen los proyectos de menores, se valida la cola y se escribe la reseña del autor (commit de este avance)
 
 Tres proyectos que el criterio nuevo excluye (18875-07, 18442-07, 18081-17) seguían en Actualidad. Se revisaron 44 proyectos sobre delitos sexuales y menores con el agente y se aplicaron 43 decisiones, pero la publicación quedó esperando: la carga completa del Senado (`observatorio-completa`, cada 15 días) empezó a las 04:02 UTC, duró unas nueve horas y retiene el cerrojo de `trabajo.sh`. El comando local falló por el límite de 20 minutos del helper `ssh` de `clasificar.mjs` (las decisiones ya estaban guardadas en PostgreSQL); la publicación en cola corrió sola al terminar la carga. Lección: tras un `aplicar-resultados` que falla al publicar, revisar primero si hay una carga completa en curso.

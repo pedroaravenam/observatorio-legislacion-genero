@@ -24,7 +24,7 @@ public class OpcionesIngesta
     /// <summary>Ejecutar una consulta diaria por fecha del Senado. Se programa externamente.</summary>
     public bool FechaSenado { get; set; }
 
-    /// <summary>Carga histórica del Senado, reanudable y con cadencia quincenal.</summary>
+    /// <summary>Carga histórica del Senado, reanudable y con cadencia de 21 días.</summary>
     public bool CompletaSenado { get; set; }
 
     /// <summary>Cargar diputados y reseñas de la BCN, y enlazar con ellos a los autores de las fichas del Senado.</summary>
