@@ -23,6 +23,7 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 - VPS: `atendia-development` (116.203.181.6), `/opt/observatorio`. Las escrituras en la base de producción y la instalación de unidades las ejecuta el desarrollador (`! comando`).
 - VPS, temporizadores: `observatorio-fecha` (09:00), `observatorio-completa` (01:00), `observatorio-parlamentarios` (09:30, instalado el 5 de noviembre, primera ejecución el 6 a las 09:32) y `observatorio-atraso` (10:30), hora de Chile. `OnFailure=` envía correo por Resend desde `alertas@legislaciongenero.cl`.
 - Esta máquina, temporizadores de usuario: `observatorio-noche` (03:01: casos de control, proyectos nuevos, reevaluación; la pasada sobre la lista v5 solo con `REVISAR_V5=1`), `observatorio-respaldo` (06:03) y `observatorio-clasificar` (09:31). Siguen activos temporizadores de medición del proyecto anterior (disponibilidad, cobertura, cambio de Cámara y BCN, sondeo del VPS) y el ejecutor de CI del repositorio privado.
+- Correo: Resend envía (alertas desde `alertas@legislaciongenero.cl`, por el subdominio `send`). La recepción de `contacto@legislaciongenero.cl` es Cloudflare Email Routing: MX `route1-3.mx.cloudflare.net` en el dominio raíz y una regla que reenvía a Gmail; funciona desde el 14 de noviembre de 2026. El token de la zona solo lee el estado del enrutamiento; para ver reglas o el registro de actividad hace falta otro.
 - Respaldo: `despliegue/respaldar-ingesta.sh` trae cada día un `pg_dump` a `~/respaldos/observatorio/` (7 diarios y 4 domingos; exige 1,5 GB libres) y sube una copia **cifrada** al bucket privado `observatorio-respaldos` de Cloudflare R2 (30 días), con la sesión de `wrangler`. Último respaldo previo a cambios de selección: `ingesta-20261105-1137.dump`.
 - Monitor externo: `.github/workflows/monitor.yml` (cada 30 minutos) abre un issue si el sitio no responde o los datos pasan de 72 horas.
 - CI: `.github/workflows/ci.yml` en GitHub (.NET con PostgreSQL, sitio, exportador y clasificador).
@@ -32,11 +33,10 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 ## Próximo paso exacto
 
 0. **Clasificación (12–13 de noviembre):** en producción desde el 13 de noviembre: validación manual de casos límite (migración `0011`), criterio `agente-9140a81f` («objeto primero» más las reglas del desarrollador; los delitos sexuales contra menores quedan fuera) y `observatorio-noche.timer` activo (solo Claude; cada noche repasa 50 decisiones con criterio anterior, primero las incluidas, más 15 al azar de la lista v5: 8 incluidas y 7 excluidas desde 2018). Validados con Claude 59 casos; el agente coincidió en 25 (42 %, criterio anterior sobre casos límite). Queda 1 pendiente (1120-13: el Senado no publica su texto). El sitio muestra 1.496 proyectos (eran 1.589 antes de la validación). Falta: ver el correo de la noche y validar la cola que aparezca (`clasificar.mjs cola`, `evidencia`, `resolver`); medir si los casos pendientes bajan (`acuerdo`); decidir si Sol sirve de segunda opinión; revisar el 14891-04, que fallan los tres modelos. Casos de control: 49 de 50 con Sonnet; Codex excluido.
-1. Activar la recepción de `contacto@legislaciongenero.cl` (Resend o un registro MX): el sitio ya publica esa dirección y el dominio raíz no tenía MX el 12 de noviembre, así que hoy no recibe correo.
-2. Crear las cuentas de Mercado Pago, GitHub Sponsors y Ko-fi y poner sus direcciones en `sitio/src/lib/sitio.ts`; mientras estén vacías, el sitio dice que los canales se están habilitando.
-3. Escribir la reseña del autor (`AUTOR.resena` en el mismo archivo) y revisar los nombres de las 16 leyes hito (`sitio/src/lib/server/contexto.ts`).
-4. Mirar el correo de resumen de la noche del 6 de noviembre (casos de control y reevaluación con el criterio `agente-05f93dc5`), que quedó sin revisar.
-5. Guardar `~/.config/observatorio-genero/respaldo.clave` en el gestor de contraseñas: sin ella las copias de R2 no se pueden leer.
+1. Crear las cuentas de Mercado Pago, GitHub Sponsors y Ko-fi y poner sus direcciones en `sitio/src/lib/sitio.ts`; mientras estén vacías, el sitio dice que los canales se están habilitando.
+2. Escribir la reseña del autor (`AUTOR.resena` en el mismo archivo) y revisar los nombres de las 16 leyes hito (`sitio/src/lib/server/contexto.ts`).
+3. Mirar el correo de resumen de la noche del 6 de noviembre (casos de control y reevaluación con el criterio `agente-05f93dc5`), que quedó sin revisar.
+4. Guardar `~/.config/observatorio-genero/respaldo.clave` en el gestor de contraseñas: sin ella las copias de R2 no se pueden leer.
 
 ## Pendientes priorizados
 
@@ -49,7 +49,6 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 ## Riesgos activos
 
 - **El servicio de datos del Senado puede volver a caer.** Entre el 4 y el 9 de noviembre de 2026 `wspublico/tramitacion.php` respondió «No existe el número de boletín solicitado» tras 30 segundos; volvió el 10 sin aviso. Mientras falla, el sitio conserva los últimos datos, la alerta de atraso llega por correo y Actualidad lo avisa. No hay fuente de respaldo.
-- **El correo de contacto publicado no recibe mensajes** hasta que se active la recepción (ver Próximo paso).
 - El texto de la portada es interpretación del Observatorio sobre cifras calculadas; las pruebas de consistencia no cubren las cifras de la portada ni los bloques nuevos de Panorama (niveles, en tramitación, leyes por sexo de quienes firman).
 - VPS compartido con RAM justa (swap en uso) y con la firma electrónica de Centro Alma. Redes y volúmenes separados. El Caddy es de la plataforma educativa: si la recrea desde otra copia de su Compose, el observatorio pierde la red `observatorio-edge`.
 - Las decisiones del agente sobre proyectos nuevos son automáticas. El desarrollador validó 24 casos el 5 de noviembre y coincidió con el agente en las 24 exclusiones, pero eso no mide el acierto total y no hay revisión sistemática de lo nuevo. Dependen del CLI de Claude y de la sesión iniciada en esta máquina: si está apagada, no se clasifica (a las 48 horas llega un aviso). Codex quedó excluido el 13 de noviembre (sus errores salían con confianza alta).
