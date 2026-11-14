@@ -12,10 +12,13 @@
 			género en el Congreso de Chile y dejarlo al alcance de cualquier persona. No lo patrocinan ni
 			lo operan el Senado, la Cámara ni la Biblioteca del Congreso Nacional, que son sus fuentes.
 		</p>
+		{#if AUTOR.foto}
+			<img class="foto" src={AUTOR.foto} alt="Retrato de {AUTOR.nombre}" width="96" height="96" />
+		{/if}
 		{#if AUTOR.resena}
 			<p>
 				{AUTOR.resena}
-				<a href={AUTOR.linkedin} rel="noopener">{AUTOR.nombre} en LinkedIn</a>.
+				<a href={AUTOR.linkedin} rel="noopener">Su perfil en LinkedIn</a>.
 			</p>
 		{/if}
 		<p>
@@ -75,6 +78,15 @@
 	}
 	.quien p {
 		font-size: 1.05rem;
+	}
+	.foto {
+		display: block;
+		width: 6rem;
+		height: 6rem;
+		margin: 0 0 1rem;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 1px solid var(--borde);
 	}
 	.lado {
 		display: grid;
