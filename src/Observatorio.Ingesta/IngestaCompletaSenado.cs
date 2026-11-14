@@ -66,6 +66,7 @@ public sealed class IngestaCompletaSenado(
             .Select(x => x[8..]).ToHashSet(StringComparer.Ordinal);
         var fallas = 0;
         var seguidas = 0;
+        var cortada = false;
         foreach (var boletin in boletines)
         {
             ct.ThrowIfCancellationRequested();
@@ -85,7 +86,11 @@ public sealed class IngestaCompletaSenado(
                 fallas++;
                 seguidas++;
                 ejecucion.Detalle = $"Último fallo: {boletin}: {ex.Message}"[..Math.Min(4000, $"Último fallo: {boletin}: {ex.Message}".Length)];
-                if (seguidas >= Math.Max(1, opciones.Value.MaximoFallosSeguidos)) break;
+                if (seguidas >= Math.Max(1, opciones.Value.MaximoFallosSeguidos))
+                {
+                    cortada = true;
+                    break;
+                }
                 await Task.Delay(opciones.Value.PausaEntreConsultas, reloj, ct).ConfigureAwait(false);
                 continue;
             }
@@ -109,10 +114,10 @@ public sealed class IngestaCompletaSenado(
         ejecucion.RegistrosInsertados = exitosas.Sum(x => x.RegistrosInsertados);
         ejecucion.RegistrosActualizados = exitosas.Sum(x => x.RegistrosActualizados);
         ejecucion.RegistrosSinCambio = exitosas.Sum(x => x.RegistrosSinCambio);
-        // Unos pocos boletines que el Senado dejó de devolver no pueden mantener abierta la carga para siempre:
-        // sin esto se reintentan cada noche y nunca empieza el ciclo siguiente.
-        var omitidos = pendientes > 0 && pendientes * 1000 <= boletines.Count &&
-            reloj.GetUtcNow() - ejecucion.Inicio > TimeSpan.FromDays(3);
+        // Un boletín suelto que falla no se reintenta: la pasada sigue y se anota como omitido. Solo queda
+        // abierta (para reanudarla) si se cortó por fallos seguidos, que indican una caída del Senado, o si
+        // falló más de la mitad del catálogo.
+        var omitidos = pendientes > 0 && !cortada && fallas * 2 <= boletines.Count;
         if (pendientes == 0 || omitidos)
         {
             ejecucion.Estado = EstadoEjecucion.Exitosa;

@@ -4,7 +4,7 @@
 
 Se midió la carga completa del 14 de noviembre: leyó 18.668 de 18.670 boletines en unas nueve horas y encontró 8 proyectos con trámites que la consulta diaria no habría visto (9 trámites nuevos, 7 corregidos; solo uno, el 14043-07, está en la selección). Tampoco había sido inocua: retuvo el cerrojo de `trabajo.sh` y la consulta de las 9:00 corrió a las 10:08. Con eso el desarrollador decidió pasarla a cada 21 días (mínimo de 19 en fin de semana, tope de 21) y adelantar el temporizador a las 22:00 de Chile para que termine antes de la consulta diaria. Se dejó sin cambio que las publicaciones esperen mientras corre.
 
-Se encontró además que la carga quedaba abierta (estado parcial) por dos boletines que el Senado ya no devuelve (273-06 y 4563-06): al reanudarse cada noche nunca llegaba a cerrar ni empezaba el ciclo siguiente. Ahora, pasados tres días, una carga con pendientes de hasta el 0,1 % del catálogo se cierra como exitosa y deja anotados los omitidos. Sin prueba propia: la cubren las existentes y la CI.
+Se encontró además que la carga quedaba abierta (estado parcial) por dos boletines que el Senado ya no devuelve (273-06 y 4563-06): al reanudarse cada noche nunca llegaba a cerrar ni empezaba el ciclo siguiente. Por decisión del desarrollador, un boletín que falla no se reintenta: la pasada sigue, se cierra como exitosa y anota cuántos omitió. Solo queda abierta para reanudarse si se corta por fallos seguidos (caída del Senado) o si falla más de la mitad del catálogo. Sin prueba propia: la cubren las existentes y la CI.
 
 ## 2026-11-14 — Salen los proyectos de menores, se valida la cola y se escribe la reseña del autor (commit de este avance)
 
