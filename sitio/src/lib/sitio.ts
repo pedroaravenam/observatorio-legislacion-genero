@@ -24,19 +24,13 @@ export const APORTES: CanalAporte[] = [
 		clave: 'mercadopago',
 		nombre: 'Mercado Pago',
 		detalle: 'En pesos chilenos, con tarjeta o saldo.',
-		url: ''
-	},
-	{
-		clave: 'github',
-		nombre: 'GitHub Sponsors',
-		detalle: 'Aporte mensual o único, en dólares.',
-		url: ''
+		url: 'https://link.mercadopago.cl/legislaciongenero'
 	},
 	{
 		clave: 'kofi',
 		nombre: 'Ko-fi',
 		detalle: 'Aporte único con tarjeta, en dólares, sin crear una cuenta.',
-		url: ''
+		url: 'https://ko-fi.com/legislaciongenero'
 	}
 ];
 
