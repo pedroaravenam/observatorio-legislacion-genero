@@ -49,8 +49,9 @@
 		No basta con que un proyecto mencione a las mujeres para considerarlo de género. Lo que miramos
 		es su contenido, es decir, qué regula y a quién afecta. Con esa idea ordenamos los proyectos en
 		cuatro niveles de relación con el género: los tres primeros forman parte de la selección y el
-		cuarto queda fuera. Ante una duda razonable, el proyecto entra, pero queda marcado como relación
-		débil.
+		cuarto queda fuera. Ante una duda razonable sobre si el contenido es de género, el proyecto
+		entra, marcado como relación débil. Si quien duda es el agente que aplica el criterio, el
+		proyecto espera la revisión del desarrollador, como explicamos más abajo.
 	</p>
 	<table>
 		<caption class="visualmente-oculto">Grupos del criterio de selección</caption>
@@ -89,8 +90,9 @@
 				<td>Relación débil o dudosa</td>
 				<td>
 					El proyecto toca el género de forma lateral, o hay una duda razonable sobre si cumple el
-					criterio: una disposición aislada, un efecto que solo se deduce del contexto o una materia
-					vecina. Entra a la selección, marcado como relación débil.
+					criterio: un efecto sobre las mujeres que solo se deduce del contexto, o una materia
+					vecina, como un homenaje a las mujeres como grupo. Un artículo aislado en un proyecto que
+					trata de otra cosa no basta. Entra a la selección, marcado como relación débil.
 				</td>
 				<td>
 					Ley general contra la discriminación, un monumento a las mujeres de la Guerra del
@@ -119,37 +121,49 @@
 
 	<h2 id="seleccion">Cómo seleccionamos los proyectos</h2>
 	<p>
-		Aplicar ese criterio a mano sobre más de 18.000 proyectos no es posible, de modo que la
-		selección combina reglas automáticas con la lectura de los casos dudosos. Las reglas buscan los
-		términos de un léxico de género, con cerca de cuarenta entradas agrupadas por tema, como
-		«femicidio», «sala cuna», «identidad de género» o «pensión de alimentos». Los términos que casi
-		siempre indican un tema de género pesan más que los que pueden aparecer en otros contextos, y
-		las palabras demasiado generales, como «familia» o «menores», no bastan por sí solas.
+		Aplicar ese criterio a mano sobre más de 18.000 proyectos no es posible. El grueso de la
+		selección viene de una lista armada con reglas automáticas en octubre de 2026. Desde entonces,
+		un agente, es decir, un modelo de lenguaje que lee cada proyecto con instrucciones escritas a
+		partir de este criterio, decide sobre los proyectos nuevos y repasa de a poco los anteriores.
+		Cuando el agente duda, decide el desarrollador del sitio. Las instrucciones del agente están
+		publicadas completas en
+		<a
+			href="https://github.com/pedroaravenam/observatorio-legislacion-genero/blob/main/despliegue/clasificador/criterio.md"
+			>el repositorio</a
+		>.
 	</p>
 	<p>
-		Cada proyecto pasa por los pasos siguientes, en orden, y queda registrado el paso que lo
-		incluyó. Esa razón se muestra en su ficha.
+		Lo primero que se pregunta sobre cada proyecto es qué regula, y solo después se mira el
+		vocabulario. Un proyecto que concede la nacionalidad por gracia, regula el cuidado de animales
+		de compañía, crea un feriado o cambia un tributo queda fuera, aunque sus fundamentos hablen de
+		mujeres o de madres y aunque tenga un artículo suelto que roce el tema. Hay palabras que
+		engañan: «cuidado» puede referirse a una mascota, y «protección» o «igualitario» no siempre
+		tienen que ver con diferencias entre mujeres y hombres. En esos casos se lee el texto para
+		comprobar en qué sentido se usan.
+	</p>
+	<p>
+		Al revisar casos difíciles, el desarrollador ha ido fijando reglas que el agente aplica a los
+		proyectos parecidos. Quedan fuera, por ejemplo, los que tratan solo de infancia, de
+		discapacidad, de materia penal general o de reforma política, aunque sus fundamentos nombren a
+		las mujeres. Los delitos sexuales entran; los cometidos contra menores de edad, en cambio, se
+		consideran un asunto penal y de infancia, no de género. El embarazo por sí solo tampoco basta,
+		aunque sí entran la maternidad y los derechos que se derivan de ella. Y los permisos o seguros
+		para acompañar a hijos enfermos entran como un componente de género aunque su texto no nombre a
+		las mujeres, porque ese cuidado recae sobre todo en ellas.
+	</p>
+	<p>
+		Cada proyecto de la selección muestra en su ficha la vía por la que entró. Son tres, que
+		corresponden a tres momentos del método.
 	</p>
 	<ol class="pasos-metodo">
 		<li>
-			<h3>Título</h3>
+			<h3>La lista original</h3>
 			<p>
-				Si el título contiene un término claro del léxico, como «violencia contra la mujer», el
-				proyecto entra. También entra si contiene un término relacionado, como «maternidad»,
-				«discriminación» o «delitos sexuales». Por esta vía se incluyeron
-				<strong>{n('T1_titulo_estricto', 'T2_titulo_medio')}</strong> proyectos.
-			</p>
-		</li>
-		<li>
-			<h3>Texto del proyecto</h3>
-			<p>
-				Muchos proyectos tienen títulos técnicos que no anticipan su contenido. Por eso, en los
-				presentados desde 2020 contamos cuántas veces aparecen los términos del léxico por cada
-				10.000 caracteres de texto, unas tres páginas. Con 5 apariciones o más el proyecto entra,
-				porque a partir de esa cifra el tema suele estar presente aunque no sea el principal. Sin
-				embargo, en los textos muy largos, como los tratados comerciales, la proporción queda baja
-				aunque el tema esté, así que los que suman 5 términos o más se leyeron uno a uno. Por esta
-				vía se incluyeron
+				La primera selección, del 22 de octubre de 2026, se hizo con reglas que buscaban los
+				términos de un léxico de género, como «femicidio», «sala cuna» o «identidad de género». Por
+				su título entraron <strong>{n('T1_titulo_estricto', 'T2_titulo_medio')}</strong> proyectos.
+				Por la frecuencia de esos términos en el texto del proyecto, que se midió solo en los
+				presentados desde 2020, entraron
 				<strong
 					>{n(
 						'T3_cuerpo_firme',
@@ -157,58 +171,44 @@
 						'V2_conteo_absoluto',
 						'V_validado_densidad_baja'
 					)}</strong
-				> proyectos.
+				>; los textos muy largos con pocos términos, como los tratados comerciales, se leyeron uno a
+				uno. Otros <strong>{n('T5_materias')}</strong> entraron por las materias que les asignó el
+				Senado, y <strong>{n('L_texto_ley_fuera')}</strong> por el texto de la ley publicada, que se leyó
+				con apoyo de un modelo de lenguaje. Al final se retiraron falsos positivos conocidos, como los
+				reajustes de remuneraciones del sector público.
+			</p>
+			<p>
+				Esas reglas contaban palabras, y una palabra no siempre indica el tema: un proyecto sobre
+				los derechos de la Madre Tierra podía entrar por «madre». Por eso la lista original se está
+				repasando con el criterio actual.
 			</p>
 		</li>
 		<li>
-			<h3>Materias asignadas por el Senado</h3>
+			<h3>Proyectos nuevos y repaso de lo anterior</h3>
 			<p>
-				El Senado etiqueta parte de los proyectos con materias, como «violencia intrafamiliar». Si
-				esas materias corresponden al léxico, el proyecto entra aunque el título no lo diga. Así se
-				incluyeron <strong>{n('T5_materias')}</strong> proyectos. Esta vía tiene un alcance limitado,
-				porque desde 2020 casi ningún proyecto trae materias.
+				Desde el 22 de octubre de 2026, los proyectos que ingresan los lee el agente. Recibe el
+				título, las materias del Senado y el texto del proyecto con los pasajes donde aparecen
+				términos del léxico, pero esos términos solo le sirven después de fijar de qué trata el
+				proyecto. Decide en cuál de los cuatro niveles queda y deja una explicación breve con su
+				nivel de confianza, que se muestra en la ficha. Por esta vía se incluyeron
+				<strong>{n('A1_agente_tema_central', 'A2_agente_componente', 'A3_agente_debil')}</strong> proyectos.
+			</p>
+			<p>
+				Cada noche, además, el agente vuelve a revisar una tanda de proyectos: los que decidió con
+				una versión anterior del criterio y algunos de la lista original, elegidos al azar. Si con
+				el criterio actual la decisión es otra, la selección cambia. Y cada vez que el criterio
+				cambia, el agente tiene que resolver bien un conjunto de casos de control antes de seguir.
 			</p>
 		</li>
 		<li>
-			<h3>Texto de la ley</h3>
+			<h3>Casos dudosos</h3>
 			<p>
-				Cuando un proyecto se convierte en ley, revisamos también el texto publicado en la
-				Biblioteca del Congreso, que puede incluir disposiciones de género agregadas durante la
-				tramitación. Leímos las leyes que contenían al menos un término del léxico y que los pasos
-				anteriores habían dejado fuera, y agregamos las que cumplen el criterio. Esa lectura se hizo
-				con apoyo de un modelo de lenguaje, siguiendo los grupos descritos arriba, y por esta vía se
-				incluyeron <strong>{n('L_texto_ley_fuera')}</strong> proyectos.
-			</p>
-		</li>
-		<li>
-			<h3>Depuración</h3>
-			<p>
-				Por último, se retiran los falsos positivos conocidos. Por ejemplo, salen los reajustes de
-				remuneraciones del sector público, que nombran a las trabajadoras solo de paso, y los
-				proyectos que entraron por su texto pero cuya ley final no conserva ningún término de
-				género.
-			</p>
-		</li>
-		<li>
-			<h3>Proyectos nuevos</h3>
-			<p>
-				Desde la selección del 22 de octubre de 2026, los proyectos que ingresan se evalúan cada día
-				con un agente, es decir, un modelo de lenguaje al que le damos este mismo criterio. El
-				agente recibe el título, las materias del Senado y lo que dice el texto del proyecto
-				(cuántas veces aparecen los términos del léxico y los fragmentos donde aparecen), decide en
-				cuál de los cuatro niveles queda y deja una explicación breve con su nivel de confianza, que
-				se muestra en la ficha. Por esta vía se incluyeron
-				<strong>{n('A1_agente_tema_central', 'A2_agente_componente')}</strong> proyectos.
-			</p>
-			<p>
-				Estas decisiones son automáticas: ninguna persona las revisa antes de que se publiquen. Para
-				saber cuánto confiar en ellas, comparamos al agente con la selección anterior en una muestra
-				de 51 proyectos presentados desde 2018, y coincidieron en 39. El agente no incluyó ninguno
-				de los 21 proyectos que la selección anterior había dejado fuera. En los 12 casos distintos,
-				dejó fuera proyectos que la selección anterior había incluido por una palabra del léxico,
-				como «madre» en un proyecto sobre los derechos de la Madre Tierra, o «víctimas» en uno sobre
-				homenajes a violadores de derechos humanos. Esos casos nos llevan a revisar, más adelante,
-				si hay otros proyectos de la selección original que entraron por la misma razón.
+				Desde el 13 de noviembre de 2026, los casos en que el agente duda no se publican con su
+				decisión. Son los que incluye con relación débil sin estar del todo seguro y los que deja
+				fuera sin una confianza alta. Esos proyectos esperan a que el desarrollador los lea y
+				decida. Su decisión queda registrada como manual, con la razón, y el agente la recibe como
+				precedente cuando le toca un proyecto parecido. Por decisión del desarrollador se incluyeron
+				<strong>{n('M_decision_manual')}</strong> proyectos.
 			</p>
 		</li>
 	</ol>
@@ -218,10 +218,10 @@
 		aunque sí puedes encontrarlo en el sitio del Senado.
 	</p>
 	<p>
-		Para comprobar que las reglas no dejan fuera demasiados casos, leímos una muestra de 100 leyes
-		que no contenían ningún término del léxico, y ninguna resultó ser de género. Con ese resultado
-		podemos afirmar, con un 95 % de confianza, que menos del 3 % de las leyes sin términos del
-		léxico trata temas de género.
+		Para comprobar que las reglas de la lista original no dejaban fuera demasiados casos, leímos una
+		muestra de 100 leyes que no contenían ningún término del léxico, y ninguna resultó ser de
+		género. Con ese resultado podemos afirmar, con un 95 % de confianza, que menos del 3 % de las
+		leyes sin términos del léxico trata temas de género.
 	</p>
 
 	<h2 id="temas">Temas</h2>
@@ -322,7 +322,17 @@
 				<td>
 					Un agente lee los proyectos que ingresaron desde la última consulta, decide si cumplen el
 					criterio y, si hay cambios, actualiza el sitio. Si el texto de un proyecto aún no se puede
-					leer, espera hasta dos semanas antes de decidir solo con el título.
+					leer, espera hasta dos semanas antes de decidir solo con el título. Los casos dudosos
+					esperan la revisión del desarrollador.
+				</td>
+			</tr>
+			<tr>
+				<td>Repaso con el criterio vigente</td>
+				<td>Todas las noches, a las 3:00</td>
+				<td>
+					El agente vuelve a revisar una tanda de proyectos decididos con una versión anterior del
+					criterio y una muestra al azar de la lista original, y actualiza el sitio si alguna
+					decisión cambia.
 				</td>
 			</tr>
 			<tr>
@@ -346,15 +356,18 @@
 	<h2 id="limites">Lo que todavía no cubre</h2>
 	<ul>
 		<li>
-			Los proyectos anteriores a 2020 que no llegaron a ser ley se evaluaron solo por su título y
-			sus materias, porque las reglas sobre el texto se aplican desde ese año.
+			La lista original todavía no se repasa completa con el criterio actual. Hasta que eso termine,
+			puede haber proyectos que entraron por una palabra y que hoy quedarían fuera, y otros que
+			quedaron fuera y que hoy entrarían. En esa lista, los proyectos anteriores a 2020 que no
+			llegaron a ser ley se evaluaron solo por su título y sus materias, porque las reglas sobre el
+			texto se aplicaron desde ese año.
 		</li>
 		<li>
-			Los proyectos presentados después del 22 de octubre de 2026 los decide el agente, que puede
-			equivocarse y no distingue los matices que una persona detectaría al leer el proyecto
-			completo. Los que decidió el agente se vuelven a evaluar cuando se convierten en ley; los de
-			la lista inicial, no, aunque el texto final pueda incluir disposiciones de género que el
-			proyecto no tenía.
+			El agente puede equivocarse y no siempre distingue los matices que una persona detectaría al
+			leer el proyecto completo. Las decisiones que toma con seguridad se publican sin que nadie las
+			lea antes; solo los casos en que duda pasan por el desarrollador. Los que decidió el agente se
+			vuelven a evaluar cuando se convierten en ley; los de la lista original, no, aunque el texto
+			final pueda incluir disposiciones de género que el proyecto no tenía.
 		</li>
 		<li>
 			El sexo de senadoras y senadores, y de quienes no figuran en el servicio de la Cámara, es un
@@ -388,7 +401,9 @@
 		<a href="https://github.com/pedroaravenam/observatorio-legislacion-genero">GitHub</a> junto con
 		la lista de proyectos seleccionados y la señal que incluyó a cada uno. Si encuentras un proyecto
 		que debería estar y no está, o uno que está de más, puedes avisarnos allí o escribir a
-		<a href="mailto:{CONTACTO}">{CONTACTO}</a>, y lo revisaremos con este mismo criterio.
+		<a href="mailto:{CONTACTO}">{CONTACTO}</a>, y lo revisaremos con este mismo criterio. El
+		criterio lo decide el desarrollador del sitio, y las reglas que va fijando se suman a las
+		instrucciones publicadas del agente, de modo que también se pueden discutir.
 	</p>
 
 	<h2 id="quien">Quién hace este sitio</h2>
