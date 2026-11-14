@@ -13,7 +13,10 @@
 			lo operan el Senado, la Cámara ni la Biblioteca del Congreso Nacional, que son sus fuentes.
 		</p>
 		{#if AUTOR.resena}
-			<p>{AUTOR.resena}</p>
+			<p>
+				{AUTOR.resena}
+				<a href={AUTOR.linkedin} rel="noopener">{AUTOR.nombre} en LinkedIn</a>.
+			</p>
 		{/if}
 		<p>
 			El <a href={REPOSITORIO}>código es abierto</a> y el criterio con que se eligen los proyectos
