@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-15 — Diagnóstico visual y propuestas de refinamiento (commit de este avance)
+
+A pedido del desarrollador se revisaron Inicio, Panorama, Proyectos, fichas, Actualidad, Cómo funciona, vacío y 404. Solo diagnóstico y propuestas: se conservan la identidad y la selección y no se modifica el sitio. Chromium sin interfaz sobre una copia local con datos sintéticos: 64 vistas (cuatro anchos, claro/oscuro), sin desbordes ni excepciones; axe en 32 vistas, sin infracciones automáticas. Se midieron en móvil el inicio de los resultados a 1.440 px, las barras anuales de 7,6875 px y la desaparición de nombres de etapas en una ficha publicada. Se propone precisar textos causales, simplificar filtros, priorizar el último trámite, reorganizar metodología y usar entradas suaves con cifras finales estables. Diagnóstico y maqueta autónoma de seis pantallas, dos variantes de portada y movimiento en `docs/diseno/revision-2026-11-15/`. Capturas y datos de prueba solo en `/tmp/observatorio-diseno-20261115/`. La decisión y la implementación quedan pendientes; no se despliega ni se reescribe la base pública por esta revisión.
+
 ## 2026-11-14 — Versiones del logo y su guion en el repositorio (commit de este avance)
 
 El logo del hemiciclo quedó en `sitio/diseno/` con su guion (`generar-logo.mjs`) y 10 versiones en `diseno/logo/` (SVG y PNG transparente): sello redondeado y cuadrado, solo los arcos a dos colores para fondo claro y oscuro, en negro y en blanco, y horizontales con el nombre, con y sin sello. El guion también regenera el favicon, el ícono de teléfonos y la imagen para compartir; el favicon salió idéntico byte a byte. Sin cambios en el sitio publicado.
