@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-15 — Pulido publicado en legislaciongenero.cl (f12e2bd)
+
+Se desplegó f12e2bd con `despliegue/subir-version.sh` tras la CI en verde. El contenedor del sitio y PostgreSQL quedaron sanos. Verificación pública por HTTP de Inicio, Panorama, Proyectos, Actualidad, Cómo funciona y una ficha: las seis responden 200. La portada conserva exactamente su texto previo y 16 hitos; metodología entrega sus tres tablas desplazables. `/estado.json` no cambió: 18.666 boletines, 1.467 seleccionados y última consulta 2026-11-14T13:08:38Z. No se ejecutó ingesta, migración ni reexportación; se conservó la base pública y los datos sintéticos no se subieron. Este cierre solo registra la publicación, sin cambios funcionales posteriores al commit desplegado. Detalle en `docs/diseno/revision-2026-11-15/APLICACION.md`.
+
 ## 2026-11-15 — Se integra el pulido aprobado, con textos y gráficos íntegros (commit de este avance)
 
 El desarrollador aprobó la propuesta completa y pidió aplicarla. Se integraron los cambios en los componentes originales: apertura de Inicio en dos columnas, interlineado y espacios, cronología completa, títulos sin recorte, tablas de metodología desplazables con cabeceras y nombres de etapas visibles en móvil. La acción Svelte `animarGraficos` anima las barras originales una vez por navegación, se detiene al consultar con cursor/foco, respeta movimiento reducido y limpia observadores y animaciones. No se alteraron textos, los 16 hitos, la selección ni las consultas. Pruebas: tipos sin errores/advertencias, 16 unitarias, compilación, conservación textual en 58 vistas, 48 revisiones geométricas y 24 análisis axe sin infracciones, más hover/foco, navegación por año/hito, filtros, tablas con teclado y uso sin JavaScript. Evidencia en `docs/diseno/revision-2026-11-15/APLICACION.md`. En este commit queda pendiente CI y despliegue; la publicación se confirma al cerrar.

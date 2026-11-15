@@ -48,4 +48,16 @@ Capturas, datos sintéticos y guiones de verificación en `/tmp/observatorio-pul
 
 ## Publicación
 
-Este cambio solo necesita desplegar la aplicación; no cambia el esquema ni los datos publicados. Se usará `despliegue/subir-version.sh` después de CI en verde y se verificará por HTTP y por el estado del contenedor. No se ejecutan escrituras en PostgreSQL ni una reexportación innecesaria de SQLite. La confirmación del despliegue y su versión quedan en STATUS y el historial al cerrar.
+Se desplegó **f12e2bd** mediante `despliegue/subir-version.sh`, después de la [CI en verde](https://github.com/pedroaravenam/observatorio-legislacion-genero/actions/runs/43679977004). El contenedor `observatorio-sitio-1` ejecuta `observatorio-sitio:f12e2bd` y quedó sano; PostgreSQL continuó sano.
+
+Comprobación HTTP pública, sin navegador:
+
+- Inicio, Panorama, Proyectos, Actualidad, Cómo funciona y la ficha 11077-07 responden 200.
+- El texto normalizado de la portada es idéntico al guardado antes del despliegue; conserva sus 16 hitos.
+- Cómo funciona entrega las tres tablas desplazables desde el servidor.
+- `/estado.json` no cambió: 18.666 boletines, 1.467 seleccionados y última consulta `2026-11-14T13:08:38Z`.
+- No se ejecutó ingesta, migración ni reexportación; no se escribieron datos en producción. Los datos sintéticos permanecen solo en las pruebas locales y no se subieron al servidor.
+
+La comprobación HTTP con Python recibió 403; la comprobación normal con curl, que ya había respondido antes del despliegue, completó correctamente las seis rutas y la comparación. No se simuló un navegador ni se hizo revisión visual de producción.
+
+El cierre posterior solo actualiza documentación. La versión funcional publicada sigue siendo f12e2bd: no hay cambios adicionales en el código de la aplicación. Evidencia temporal en `/tmp/observatorio-pulido-aplicado/publicacion.json` y `despliegue.log`.

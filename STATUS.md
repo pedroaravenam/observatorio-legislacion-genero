@@ -2,7 +2,7 @@
 
 ## Resumen
 
-Fecha: 2026-11-15. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión desplegada es la del avance «logo del hemiciclo» (posterior a bd37626): sello nuevo, ícono para teléfonos e imagen para compartir en redes. El 15 de noviembre el desarrollador aprobó el pulido sobre la copia íntegra del sitio original. Se integraron composición, ritmo de lectura, tablas móviles y movimiento de las barras originales, conservando textos y 16 hitos. Pruebas locales completadas; este avance está pendiente de CI y despliegue. Ver [aplicación y verificación](docs/diseno/revision-2026-11-15/APLICACION.md). Continúa la operación: nocturno, cola de validación y carga completa cada 21 días (próxima, 5 de diciembre).
+Fecha: 2026-11-15. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión funcional desplegada es **f12e2bd**, «Aplica el pulido aprobado y anima los gráficos originales», con CI en verde y contenedor sano. Conserva el contenido y los 16 hitos; incorpora apertura en dos columnas, ritmo de lectura, tablas móviles y movimiento sobre las barras originales. El 15 de noviembre se verificaron por HTTP las seis páginas principales, portada con texto idéntico al previo y datos públicos sin cambios. Ver [aplicación y verificación](docs/diseno/revision-2026-11-15/APLICACION.md). Continúa la operación: nocturno, cola de validación y carga completa cada 21 días (próxima, 5 de diciembre).
 
 El sitio muestra la selección de género: **1.467 proyectos** de los 18.666 boletines del Senado (1990–2026), al 14 de noviembre. Tiene cinco secciones:
 
@@ -32,7 +32,7 @@ Arquitectura: todo en el VPS Hetzner compartido con Atendia, Compose `observator
 
 ## Próximo paso exacto
 
-**Diseño:** cerrar la publicación del pulido aprobado: CI en verde, `despliegue/subir-version.sh` y comprobar HTTP/contenedor. Se conserva la base pública existente; el cambio no modifica datos ni esquema.
+**Diseño:** pulido aprobado publicado. Revisar en un teléfono real el teclado virtual y, cuando sea posible, con lector de pantalla. Las propuestas editoriales siguen separadas; no se aplicaron recortes ni cambios de texto.
 
 0. **Clasificación (12–13 de noviembre):** en producción desde el 13 de noviembre: validación manual de casos límite (migración `0011`), criterio `agente-9140a81f` («objeto primero» más las reglas del desarrollador; los delitos sexuales contra menores quedan fuera) y `observatorio-noche.timer` activo (solo Claude; cada noche repasa 50 decisiones con criterio anterior, primero las incluidas, más 15 al azar de la lista v5: 8 incluidas y 7 excluidas desde 2018). Validados con Claude 59 casos; el agente coincidió en 25 (42 %, criterio anterior sobre casos límite). Queda 1 pendiente (1120-13: el Senado no publica su texto). El sitio muestra 1.496 proyectos (eran 1.589 antes de la validación). Falta: ver el correo de la noche y validar la cola que aparezca (`clasificar.mjs cola`, `evidencia`, `resolver`); medir si los casos pendientes bajan (`acuerdo`); decidir si Sol sirve de segunda opinión; revisar el 14891-04, que fallan los tres modelos. Casos de control: 49 de 50 con Sonnet; Codex excluido.
 1. Atender la cola de validación cuando llegue el aviso por correo (desde 20 casos).
