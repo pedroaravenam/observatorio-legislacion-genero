@@ -56,67 +56,74 @@
 		Entonces la decisión no se publica hasta que la revisa el desarrollador, como explicamos más
 		abajo.
 	</p>
-	<table>
-		<caption class="visualmente-oculto">Grupos del criterio de selección</caption>
-		<thead>
-			<tr
-				><th scope="col">Grupo</th><th scope="col">Qué incluye</th><th scope="col">Ejemplos</th></tr
+	<!-- El foco permite desplazar la tabla con teclado cuando no cabe en la pantalla. -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div class="tabla-lectura" role="region" aria-labelledby="tabla-metodologia-1" tabindex="0">
+		<table>
+			<caption id="tabla-metodologia-1" class="visualmente-oculto"
+				>Grupos del criterio de selección</caption
 			>
-		</thead>
-		<tbody>
-			<tr>
-				<td>El género es el tema central</td>
-				<td>
-					El objeto del proyecto es proteger o ampliar los derechos de las mujeres, prevenir o
-					sancionar la violencia y la discriminación por sexo o género, o reconocer derechos de las
-					personas por su orientación sexual o identidad de género.
-				</td>
-				<td>
-					Ley de femicidio, Ley Gabriela, identidad de género, tres causales, Ministerio de la
-					Mujer.
-				</td>
-			</tr>
-			<tr>
-				<td>Una parte del proyecto trata de género</td>
-				<td>
-					El proyecto regula un tema general, como trabajo, pensiones, salud o familia, pero
-					contiene al menos una disposición expresa sobre igualdad de género, protección de las
-					mujeres, maternidad o cuidados. También entran los casos en que el efecto sobre las
-					mujeres no se declara, pero se comprueba en el texto.
-				</td>
-				<td>
-					Postnatal parental, sala cuna, pensión de alimentos, acuerdos comerciales con un capítulo
-					de género.
-				</td>
-			</tr>
-			<tr>
-				<td>Relación débil o dudosa</td>
-				<td>
-					El proyecto toca el género de forma lateral, o hay una duda razonable sobre si cumple el
-					criterio. Ocurre, por ejemplo, cuando el efecto sobre las mujeres solo se deduce del
-					contexto o cuando la materia es vecina al género, como un homenaje a las mujeres como
-					grupo. Sin embargo, un artículo aislado en un proyecto que trata de otra cosa no basta. El
-					proyecto entra a la selección, marcado como relación débil.
-				</td>
-				<td>
-					Ley general contra la discriminación, un monumento a las mujeres de la Guerra del
-					Pacífico, cláusulas que discriminan a personas con VIH.
-				</td>
-			</tr>
-			<tr>
-				<td>Queda fuera</td>
-				<td>
-					Los términos aparecen solo de paso, como ocurre con “género” en el sentido de mercadería,
-					con mujeres nombradas en una lista de beneficiarios sin un trato distinto o con el sexo
-					mencionado dentro de una cláusula genérica de no discriminación.
-				</td>
-				<td>
-					Reajustes de remuneraciones, calles o feriados que honran a una mujer sin referirse a su
-					trayectoria como tal.
-				</td>
-			</tr>
-		</tbody>
-	</table>
+			<thead>
+				<tr
+					><th scope="col">Grupo</th><th scope="col">Qué incluye</th><th scope="col">Ejemplos</th
+					></tr
+				>
+			</thead>
+			<tbody>
+				<tr>
+					<td>El género es el tema central</td>
+					<td>
+						El objeto del proyecto es proteger o ampliar los derechos de las mujeres, prevenir o
+						sancionar la violencia y la discriminación por sexo o género, o reconocer derechos de
+						las personas por su orientación sexual o identidad de género.
+					</td>
+					<td>
+						Ley de femicidio, Ley Gabriela, identidad de género, tres causales, Ministerio de la
+						Mujer.
+					</td>
+				</tr>
+				<tr>
+					<td>Una parte del proyecto trata de género</td>
+					<td>
+						El proyecto regula un tema general, como trabajo, pensiones, salud o familia, pero
+						contiene al menos una disposición expresa sobre igualdad de género, protección de las
+						mujeres, maternidad o cuidados. También entran los casos en que el efecto sobre las
+						mujeres no se declara, pero se comprueba en el texto.
+					</td>
+					<td>
+						Postnatal parental, sala cuna, pensión de alimentos, acuerdos comerciales con un
+						capítulo de género.
+					</td>
+				</tr>
+				<tr>
+					<td>Relación débil o dudosa</td>
+					<td>
+						El proyecto toca el género de forma lateral, o hay una duda razonable sobre si cumple el
+						criterio. Ocurre, por ejemplo, cuando el efecto sobre las mujeres solo se deduce del
+						contexto o cuando la materia es vecina al género, como un homenaje a las mujeres como
+						grupo. Sin embargo, un artículo aislado en un proyecto que trata de otra cosa no basta.
+						El proyecto entra a la selección, marcado como relación débil.
+					</td>
+					<td>
+						Ley general contra la discriminación, un monumento a las mujeres de la Guerra del
+						Pacífico, cláusulas que discriminan a personas con VIH.
+					</td>
+				</tr>
+				<tr>
+					<td>Queda fuera</td>
+					<td>
+						Los términos aparecen solo de paso, como ocurre con “género” en el sentido de
+						mercadería, con mujeres nombradas en una lista de beneficiarios sin un trato distinto o
+						con el sexo mencionado dentro de una cláusula genérica de no discriminación.
+					</td>
+					<td>
+						Reajustes de remuneraciones, calles o feriados que honran a una mujer sin referirse a su
+						trayectoria como tal.
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	<p>
 		Además, clasificamos por tema y no por postura. Un proyecto que busca restringir el aborto o la
 		identidad de género también se incluye, porque trata una materia de género. Así, el Observatorio
@@ -257,35 +264,42 @@
 	</dl>
 
 	<h2 id="datos">De dónde vienen los datos</h2>
-	<table>
-		<caption class="visualmente-oculto">Fuentes de datos del Observatorio</caption>
-		<thead>
-			<tr><th scope="col">Fuente</th><th scope="col">Qué aporta</th></tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Senado de la República</td>
-				<td>
-					La ficha de cada proyecto: título, autores, materias, estado, etapa y tramitación completa
-					en ambas cámaras, además del enlace al texto original.
-				</td>
-			</tr>
-			<tr>
-				<td>Biblioteca del Congreso Nacional</td>
-				<td>
-					El texto de las leyes publicadas, que usamos en la selección y enlazamos desde cada ficha,
-					y las reseñas parlamentarias, de donde sale el sexo de quienes la Cámara no informa.
-				</td>
-			</tr>
-			<tr>
-				<td>Cámara de Diputadas y Diputados</td>
-				<td>
-					El servicio de diputados, que informa el sexo de cada diputada y diputado desde 1990.
-					Todavía no incorporamos su partido ni sus votaciones.
-				</td>
-			</tr>
-		</tbody>
-	</table>
+	<!-- El foco permite desplazar la tabla con teclado cuando no cabe en la pantalla. -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div class="tabla-lectura" role="region" aria-labelledby="tabla-metodologia-2" tabindex="0">
+		<table>
+			<caption id="tabla-metodologia-2" class="visualmente-oculto"
+				>Fuentes de datos del Observatorio</caption
+			>
+			<thead>
+				<tr><th scope="col">Fuente</th><th scope="col">Qué aporta</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Senado de la República</td>
+					<td>
+						La ficha de cada proyecto: título, autores, materias, estado, etapa y tramitación
+						completa en ambas cámaras, además del enlace al texto original.
+					</td>
+				</tr>
+				<tr>
+					<td>Biblioteca del Congreso Nacional</td>
+					<td>
+						El texto de las leyes publicadas, que usamos en la selección y enlazamos desde cada
+						ficha, y las reseñas parlamentarias, de donde sale el sexo de quienes la Cámara no
+						informa.
+					</td>
+				</tr>
+				<tr>
+					<td>Cámara de Diputadas y Diputados</td>
+					<td>
+						El servicio de diputados, que informa el sexo de cada diputada y diputado desde 1990.
+						Todavía no incorporamos su partido ni sus votaciones.
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	<p>
 		Los datos se obtienen del servicio web público de tramitación del Senado, que entrega la ficha
 		de cada boletín en formato XML. Guardamos cada respuesta tal como llega, con la fecha de
@@ -318,51 +332,58 @@
 	</p>
 
 	<h2 id="actualizacion">Cómo se actualizan</h2>
-	<table>
-		<caption class="visualmente-oculto">Procesos de actualización</caption>
-		<thead>
-			<tr><th scope="col">Proceso</th><th scope="col">Cuándo</th><th scope="col">Qué hace</th></tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Consulta diaria</td>
-				<td>Todos los días, a las 9:00</td>
-				<td>
-					Pregunta al Senado por los proyectos con movimiento en las últimas tres semanas. La
-					ventana es amplia a propósito, porque algunos trámites se registran con días de atraso.
-				</td>
-			</tr>
-			<tr>
-				<td>Clasificación de proyectos nuevos</td>
-				<td>Todos los días, a las 9:30</td>
-				<td>
-					El agente lee los proyectos que ingresaron desde la última consulta, decide si cumplen el
-					criterio y, si hay cambios, actualiza el sitio. Cuando el texto de un proyecto aún no está
-					disponible, espera hasta dos semanas antes de decidir solo con el título, porque el título
-					por sí solo dice menos sobre el contenido. Los casos dudosos esperan la revisión del
-					desarrollador.
-				</td>
-			</tr>
-			<tr>
-				<td>Repaso con el criterio vigente</td>
-				<td>Todas las noches, a las 3:00</td>
-				<td>
-					El agente vuelve a revisar una tanda de proyectos decididos con una versión anterior del
-					criterio y una muestra al azar de la lista original, y actualiza el sitio si alguna
-					decisión cambia.
-				</td>
-			</tr>
-			<tr>
-				<td>Revisión completa</td>
-				<td>Cada tres semanas, de noche</td>
-				<td>
-					Vuelve a consultar uno por uno los más de 18.000 boletines desde 1990, para recoger los
-					cambios que la consulta diaria no alcanza a ver y para completar lo que no se haya
-					descargado bien en una corrida anterior.
-				</td>
-			</tr>
-		</tbody>
-	</table>
+	<!-- El foco permite desplazar la tabla con teclado cuando no cabe en la pantalla. -->
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div class="tabla-lectura" role="region" aria-labelledby="tabla-metodologia-3" tabindex="0">
+		<table>
+			<caption id="tabla-metodologia-3" class="visualmente-oculto"
+				>Procesos de actualización</caption
+			>
+			<thead>
+				<tr><th scope="col">Proceso</th><th scope="col">Cuándo</th><th scope="col">Qué hace</th></tr
+				>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Consulta diaria</td>
+					<td>Todos los días, a las 9:00</td>
+					<td>
+						Pregunta al Senado por los proyectos con movimiento en las últimas tres semanas. La
+						ventana es amplia a propósito, porque algunos trámites se registran con días de atraso.
+					</td>
+				</tr>
+				<tr>
+					<td>Clasificación de proyectos nuevos</td>
+					<td>Todos los días, a las 9:30</td>
+					<td>
+						El agente lee los proyectos que ingresaron desde la última consulta, decide si cumplen
+						el criterio y, si hay cambios, actualiza el sitio. Cuando el texto de un proyecto aún no
+						está disponible, espera hasta dos semanas antes de decidir solo con el título, porque el
+						título por sí solo dice menos sobre el contenido. Los casos dudosos esperan la revisión
+						del desarrollador.
+					</td>
+				</tr>
+				<tr>
+					<td>Repaso con el criterio vigente</td>
+					<td>Todas las noches, a las 3:00</td>
+					<td>
+						El agente vuelve a revisar una tanda de proyectos decididos con una versión anterior del
+						criterio y una muestra al azar de la lista original, y actualiza el sitio si alguna
+						decisión cambia.
+					</td>
+				</tr>
+				<tr>
+					<td>Revisión completa</td>
+					<td>Cada tres semanas, de noche</td>
+					<td>
+						Vuelve a consultar uno por uno los más de 18.000 boletines desde 1990, para recoger los
+						cambios que la consulta diaria no alcanza a ver y para completar lo que no se haya
+						descargado bien en una corrida anterior.
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	<p>
 		Al terminar cada proceso se genera una nueva copia de los datos para el sitio. El sitio solo lee
 		esa copia y nunca consulta a las fuentes en el momento, de modo que, si el Senado no responde,
@@ -431,7 +452,7 @@
 	.texto > :global(*) {
 		max-width: 46rem;
 	}
-	.texto > table,
+	.texto > .tabla-lectura,
 	.texto > .temas {
 		max-width: 56rem;
 	}
@@ -471,7 +492,7 @@
 		font-family: var(--serif);
 		font-weight: 600;
 		font-size: 1.5rem;
-		margin-top: 2.75rem;
+		margin-top: 3.1rem;
 		padding-top: 1.25rem;
 		border-top: 1px solid var(--borde);
 		scroll-margin-top: 1rem;
@@ -501,24 +522,7 @@
 		font-weight: 600;
 		width: 26%;
 	}
-	@media (max-width: 40rem) {
-		thead {
-			display: none;
-		}
-		tr {
-			display: block;
-			padding: 0.8rem 0;
-			border-bottom: 1px solid var(--borde);
-		}
-		td {
-			display: block;
-			border: 0;
-			padding: 0.15rem 0;
-		}
-		td:first-child {
-			width: auto;
-		}
-	}
+
 	.pasos-metodo {
 		list-style: none;
 		counter-reset: paso;
@@ -578,5 +582,29 @@
 	}
 	ul li {
 		margin-bottom: 0.5rem;
+	}
+
+	.texto > p {
+		max-width: 70ch;
+	}
+	.texto :global(p) {
+		line-height: 1.75;
+	}
+	.tabla-lectura {
+		overflow-x: auto;
+		margin: 1.3rem 0;
+		scrollbar-width: thin;
+	}
+	.tabla-lectura table {
+		min-width: 36rem;
+	}
+	.tabla-lectura th,
+	.tabla-lectura td {
+		line-height: 1.65;
+	}
+	@media (min-width: 62rem) {
+		.indice {
+			padding: 1.3rem 1.5rem;
+		}
 	}
 </style>

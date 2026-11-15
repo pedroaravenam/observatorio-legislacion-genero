@@ -237,12 +237,6 @@
 	}
 	.compacta .titulo {
 		font-size: 1.02rem;
-		/* Los títulos del Senado pueden ser muy largos: en la columna lateral se cortan a tres líneas. */
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 3;
-		line-clamp: 3;
-		overflow: hidden;
 	}
 	.titulo:hover {
 		color: var(--violeta-medio);

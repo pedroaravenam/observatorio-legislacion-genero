@@ -412,8 +412,8 @@
 	/* Ensayo: texto a la izquierda, cifras al margen */
 	.tramo {
 		display: grid;
-		gap: 1.5rem 4rem;
-		padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3.25rem);
+		gap: 1.5rem 4.5rem;
+		padding-block: clamp(2.8rem, 6vw, 4.75rem);
 		border-bottom: 1px solid var(--borde);
 	}
 	.tramo.final {
@@ -443,8 +443,8 @@
 	}
 	.texto p {
 		font-size: 1.08rem;
-		line-height: 1.62;
-		margin: 0 0 1.05rem;
+		line-height: 1.75;
+		margin: 0 0 1.2rem;
 		max-width: 68ch;
 	}
 	.texto p:last-child {
@@ -458,12 +458,12 @@
 
 	/* Margen */
 	.margen {
-		padding-top: 0.35rem;
-		border-top: 2px solid var(--violeta-medio);
+		padding-top: 0.65rem;
+		border-top: 1px solid var(--violeta-medio);
 	}
 	@media (min-width: 62rem) {
 		.margen {
-			margin-top: 0.6rem;
+			margin-top: 0.35rem;
 		}
 	}
 	.cifra {
@@ -587,7 +587,7 @@
 		border-radius: var(--radio-grande);
 		background: var(--franja);
 		color: var(--franja-texto);
-		box-shadow: var(--sombra);
+		box-shadow: none;
 	}
 
 	/* Hitos: un hilo continuo con un nudo verde por cada ley */
@@ -601,7 +601,7 @@
 		display: grid;
 		grid-template-columns: 3.4rem 1fr;
 		gap: 0 1rem;
-		padding: 0 0 1.35rem 1.6rem;
+		padding: 0 0 1.6rem 1.6rem;
 	}
 	.hilo li:last-child {
 		padding-bottom: 0;
@@ -693,5 +693,52 @@
 		width: 0.8rem;
 		height: 0.8rem;
 		border-radius: 2px;
+	}
+
+	/* Composición aprobada: apertura editorial y contenido íntegro. */
+	.h-nombre {
+		line-height: 1.4;
+	}
+	.h-ley {
+		line-height: 1.65;
+		margin-top: 0.25rem;
+	}
+	@media (min-width: 62rem) {
+		.franja > .contenedor {
+			display: grid;
+			grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+			column-gap: 4.5rem;
+			align-items: start;
+		}
+		h1 {
+			grid-row: 1 / 3;
+			max-width: 18ch;
+			font-size: clamp(2.5rem, 4.8vw, 3.65rem);
+			margin-bottom: 0;
+		}
+		.bajada {
+			font-size: 1.08rem;
+			line-height: 1.8;
+			margin-bottom: 1.25rem;
+		}
+		.acciones {
+			grid-column: 2;
+			margin-bottom: 0;
+		}
+		.indice {
+			grid-column: 1 / -1;
+			margin-top: 2.6rem;
+		}
+		.hilo li {
+			grid-template-columns: 4.1rem 1fr;
+		}
+	}
+	@media (max-width: 40rem) {
+		.texto p {
+			font-size: 1.05rem;
+		}
+		.hilo li {
+			column-gap: 0.65rem;
+		}
 	}
 </style>

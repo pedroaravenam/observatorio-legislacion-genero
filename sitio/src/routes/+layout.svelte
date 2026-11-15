@@ -7,6 +7,7 @@
 	import { page, navigating } from '$app/state';
 	import { fechaHoraChile } from '#lib/formato';
 	import { AUTOR, CONTACTO, REPOSITORIO } from '#lib/sitio';
+	import { animarGraficos } from '#lib/animarGraficos';
 	import type { LayoutProps } from './$types';
 
 	let { children, data }: LayoutProps = $props();
@@ -129,7 +130,11 @@
 	</div>
 </header>
 
-<main id="contenido" aria-busy={navigating.to ? 'true' : 'false'}>
+<main
+	id="contenido"
+	aria-busy={navigating.to ? 'true' : 'false'}
+	use:animarGraficos={page.url.pathname + page.url.search}
+>
 	{@render children()}
 </main>
 

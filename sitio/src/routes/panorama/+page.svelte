@@ -615,7 +615,7 @@
 		border-radius: var(--radio-grande);
 		background: var(--franja);
 		color: var(--franja-texto);
-		box-shadow: var(--sombra);
+		box-shadow: none;
 	}
 	.fila-barra.estatica {
 		align-items: start;
@@ -682,7 +682,7 @@
 		padding-top: 0.5rem;
 	}
 	.bloque {
-		padding: clamp(2rem, 5vw, 3rem) 0 1.25rem;
+		padding-block: 2.8rem;
 		border-bottom: 1px solid var(--borde);
 	}
 	.bloque:last-of-type {
@@ -695,6 +695,7 @@
 		margin: 0 0 0.6rem;
 	}
 	.intro {
+		line-height: 1.75;
 		max-width: 66ch;
 		color: var(--tinta-suave);
 		margin: 0 0 1.25rem;

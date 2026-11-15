@@ -326,23 +326,16 @@
 		font-weight: 600;
 	}
 	@media (max-width: 40rem) {
-		.pasos .paso-nombre {
-			display: none;
-		}
-		.pasos li.actual .paso-nombre {
-			display: block;
-			position: absolute;
-			white-space: nowrap;
-			left: 0;
-		}
-		.pasos li:nth-child(n + 4).actual .paso-nombre {
-			left: auto;
-			right: 0;
-		}
 		.pasos {
-			padding-bottom: 1.2rem;
+			gap: 0.5rem;
+		}
+		.pasos .paso-nombre {
+			display: block;
+			font-size: 0.72rem;
+			line-height: 1.35;
 		}
 	}
+
 	.fuentes {
 		display: flex;
 		flex-wrap: wrap;
