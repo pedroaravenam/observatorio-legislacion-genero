@@ -59,6 +59,17 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	<meta property="og:site_name" content="Observatorio de Legislación de Género" />
+	<meta property="og:type" content="website" />
+	<meta property="og:image" content="https://legislaciongenero.cl/imagen-compartir.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta
+		property="og:image:alt"
+		content="Observatorio de Legislación de Género: los proyectos de ley sobre género en Chile, desde 1990."
+	/>
+	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="theme-color" content={oscuro ? '#1c1723' : '#ffffff'} />
 </svelte:head>
 
@@ -197,7 +208,6 @@
 	}
 	.sello {
 		flex: none;
-		border-radius: 7px;
 	}
 	.nombre {
 		display: flex;

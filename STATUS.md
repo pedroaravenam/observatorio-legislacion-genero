@@ -2,7 +2,7 @@
 
 ## Resumen
 
-Fecha: 2026-11-14. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión desplegada es la del commit bd37626 (reseña del autor, aportes por Mercado Pago y Ko-fi). El desarrollador dio el sitio por finalizado el 14 de noviembre: lo que sigue es operación (el nocturno, la cola de validación y la carga completa de cada 21 días, la próxima el 5 de diciembre) (ver [el historial](docs/history/HISTORIAL.md)).
+Fecha: 2026-11-14. **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión desplegada es la del avance «logo del hemiciclo» (posterior a bd37626): sello nuevo, ícono para teléfonos e imagen para compartir en redes. El desarrollador dio el sitio por finalizado el 14 de noviembre: lo que sigue es operación (el nocturno, la cola de validación y la carga completa de cada 21 días, la próxima el 5 de diciembre) (ver [el historial](docs/history/HISTORIAL.md)).
 
 El sitio muestra la selección de género: **1.467 proyectos** de los 18.666 boletines del Senado (1990–2026), al 14 de noviembre. Tiene cinco secciones:
 

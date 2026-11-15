@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-14 — Logo del hemiciclo e imagen para compartir (commit de este avance)
+
+El sello de las tres barras se reemplazó por un logo propio: tres arcos violeta, como los escaños del Congreso y la cúpula de un observatorio, con una franja verde por lo que llegó a ser ley. El desarrollador lo eligió entre cinco conceptos (hemiciclo, hemiciclo simple, lente, signo igual y monograma) comparados en una hoja con el sello en 180, 48, 32 y 16 px, suelto en claro y oscuro, y en la cabecera. Archivos: `sitio/src/lib/assets/favicon.svg` (ícono y sello de la cabecera), `sitio/static/apple-touch-icon.png` (180 px) y `sitio/static/imagen-compartir.png` (1.200 × 630). El sitio no tenía imagen para compartir: se agregaron las etiquetas `og:image`, `og:site_name`, `og:type` y `twitter:card` en la plantilla general. Las imágenes se generaron con Playwright sin interfaz y las tipografías del sitio; el guion no se versionó. Pruebas: tipos sin errores y 16 pruebas unitarias. No se midió cómo muestran la tarjeta WhatsApp, X ni LinkedIn. En 16 px la franja verde se distingue poco.
+
 ## 2026-11-14 — Aportes, reseña con nombre y cierre del sitio (commit de este avance)
 
 Se habilitaron los canales de aporte (Mercado Pago `link.mercadopago.cl/legislaciongenero` y Ko-fi `ko-fi.com/legislaciongenero`); GitHub Sponsors se descartó y no se incorporó el widget de Ko-fi para no cargar un script de un tercero. La reseña del autor parte con su nombre completo y el código admite una foto (`AUTOR.foto`, vacía). El aviso de casos pendientes de validación llega desde 20 en la cola. Se desplegó el commit bd37626. El desarrollador dio el sitio por finalizado; quedan solo tareas de operación.
