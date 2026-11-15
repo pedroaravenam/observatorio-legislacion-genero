@@ -33,3 +33,16 @@ El prototipo incorpora las fuentes Newsreader y Public Sans bajo SIL OFL 1.1; su
 `/tmp/observatorio-diseno-20261115/` conserva auditoría JSON, verificación de maqueta, guiones, base sintética y capturas. No se versionan imágenes ni bases de prueba. El servidor de desarrollo usado para las capturas terminó; no se dejan servicios instalados ni datos en producción.
 
 El cierre de este avance afecta documentación y propuesta. No requiere desplegar contenedores ni ejecutar `trabajo.sh publicar`: el sitio no cambió y su implementación queda a la espera de la elección del desarrollador.
+
+## Corrección de B: lectura y movimiento de barras
+
+Pruebas sobre el HTML autónomo corregido, a 390, 768 y 1440 px, en claro y oscuro (seis combinaciones):
+
+- Hover en 2019: 73 presentados y 14 leyes; foco en 2024: 69 y 9; flecha derecha: 2025; selector de 1991: 7 y 5. Todas las cifras corresponden al conjunto sintético.
+- La escala permanece entre 0 y 80. En 2026, la transformación vertical cambia de 0,975 (78/80) a 0,2125 (17/80) al mostrar solo leyes. Las mediciones intermedias estuvieron entre 0,2866 y 0,3188: se comprobó movimiento de las barras, no solo del bloque.
+- Repetición: alturas intermedias entre 0 y la final; termina en 0,975. Con movimiento reducido: cero animaciones activas.
+- Sin desborde horizontal ni infracciones axe WCAG 2.1 A/AA en las seis vistas.
+- Panorama: el selector de 2000 muestra 21 presentados y 4 leyes; la tabla contiene los 37 años.
+- Capturas de portada, detalle con hover y secuencia del dibujo en `/tmp/observatorio-diseno-20261115/revision-b/`. No se midió rendimiento en un dispositivo real ni se certifica accesibilidad con lector de pantalla.
+
+La maqueta continúa separada del sitio publicado.

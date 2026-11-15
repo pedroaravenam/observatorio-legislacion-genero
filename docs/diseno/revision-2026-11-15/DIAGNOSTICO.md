@@ -1,6 +1,6 @@
 # Revisión de diseño y textos, 15 de noviembre de 2026
 
-Estado: diagnóstico y propuestas para decidir con el desarrollador. **Ningún cambio aplicado al sitio.** Base revisada: `d9a30fc`. La selección de proyectos y las reglas del clasificador quedan fuera de este trabajo.
+Estado: diagnóstico y propuestas. El desarrollador prefirió B y pidió corregir la lectura y el movimiento de las barras. **Ningún cambio aplicado al sitio.** Base revisada: `d9a30fc`. La selección de proyectos y las reglas del clasificador quedan fuera de este trabajo.
 
 Abrir [la maqueta autónoma](propuestas.html) en un navegador: contiene seis páginas de muestra, dos variantes de portada, selector claro/oscuro y botones para repetir el movimiento. Incluye las fuentes locales y sus licencias; no requiere red. No es una implementación funcional: búsquedas, descargas y documentos no están conectados; algunos enlaces internos solo ilustran la ubicación futura. Los datos y proyectos son de demostración. Las pantallas representan los cambios principales, no reemplazan el contenido completo del sitio.
 
@@ -54,13 +54,13 @@ La revisión cubrió las familias anual, estados, relación con género, origen,
 
 ## Propuestas visuales
 
-### A. Afinar lo actual, recomendada
+### A. Afinar lo actual, alternativa inicial
 
 Conserva la apertura editorial. Título más directo, bajada breve, acciones claras e índice separado. El ensayo sigue siendo la entrada principal; las cifras mantienen su lugar al margen. En móvil el índice se despliega cuando hace falta.
 
-Es el ajuste más cercano a la preferencia expresada por el desarrollador. No requiere fotografía, nuevas fuentes, fondos decorativos ni nuevas librerías.
+Fue la recomendación inicial del agente. El desarrollador prefirió B. No requiere fotografía, nuevas fuentes, fondos decorativos ni nuevas librerías.
 
-### B. Dar más presencia al gráfico
+### B. Dar más presencia al gráfico, dirección elegida
 
 Conserva las mismas fuentes y colores, pero coloca el gráfico anual junto al título en escritorio y debajo en móvil. Comunica desde el inicio que el sitio permite explorar datos. En la implementación final, el gráfico se movería a esa posición: no debe duplicarse más abajo como ocurre para comparar en esta maqueta parcial.
 
@@ -70,16 +70,27 @@ Tiene más presencia visual, aunque ocupa más altura en teléfono. Conviene ele
 
 Las otras cinco pantallas de la maqueta presentan filtros secundarios desplegables, resumen del último trámite, verde consistente para leyes, títulos sin recorte y metodología con dos niveles de profundidad. Son muestras de jerarquía: el texto completo, autores, donaciones, descargas y todos los gráficos se conservan en una implementación posterior.
 
+## Corrección solicitada sobre B
+
+El desarrollador observó que la primera maqueta perdió el hover del sitio y que no permitía leer magnitudes; además, el efecto solo movía el bloque, no sus barras. Se corrigieron los tres gráficos anuales de la maqueta:
+
+- Escala vertical fija de 0 a 80 proyectos, con marcas cada 20 y líneas guía. El eje se mantiene al comparar vistas.
+- Año, presentados y los que hoy son ley visibles; el cursor, foco, clic o selector actualizan el detalle. Las flechas izquierda/derecha, Inicio y Fin recorren los años con teclado.
+- Selector nativo de año de 44 px para teléfono y tabla completa de 37 años. No se exige acertar a barras angostas.
+- Barras que crecen desde su base, con valores finales legibles en el detalle. La acción «Solo los que hoy son ley» reduce las alturas y «Presentados y leyes» las restaura; verde continúa siendo un subconjunto del total.
+- Botón de repetición y respeto de movimiento reducido. B abre seleccionada.
+- Las magnitudes de todos los gráficos anuales ahora provienen del mismo conjunto sintético: suman los 1.467 proyectos y 258 leyes que muestra la maqueta. No son cifras de producción.
+
 ## Movimiento propuesto
 
 | Actual | Propuesta | Motivo |
 |---|---|---|
-| Gráficos estáticos | Una entrada suave al entrar en la zona de lectura, con geometría final fija y una secuencia breve de opacidad y desplazamiento de 6 px | Guiar la atención hacia la comparación, sin dibujar cantidades intermedias. |
+| Solo entrada del bloque | Barras que crecen desde la base y cambian de altura al alternar ambas series o solo leyes, manteniendo la escala | El movimiento muestra las magnitudes y responde a la comparación. |
 | Cifras siempre iguales | Revelar los dígitos finales de una cifra destacada, sin contar desde cero; el valor accesible permanece estable | Dar presencia al dato sin simular una actualización. |
 | Flechas y cambios de tema | Transiciones breves y coherentes, sin demorar foco ni búsqueda | Confirmar una acción. |
 | Movimiento reducido | Presentación final inmediata, sin animaciones de entrada ni desplazamiento | Respetar la preferencia del sistema. |
 
-La maqueta demuestra la entrada del gráfico, la cifra de la selección y botones de repetición. La implementación debe hacer la entrada una sola vez por bloque, mantener contenido visible sin JavaScript y no reproducirla cada vez que el lector vuelve a subir. No se propone fijar el desplazamiento, parallax, bucles ni animar cada párrafo.
+La maqueta demuestra el crecimiento de las barras, la transición entre vistas, el detalle por año, la cifra de la selección y botones de repetición. La implementación debe hacer la entrada una sola vez por bloque, mantener contenido visible sin JavaScript y no reproducirla cada vez que el lector vuelve a subir. No se propone fijar el desplazamiento, parallax, bucles ni animar cada párrafo.
 
 CSS e IntersectionObserver bastan para esta propuesta. GSAP sería una opción si se aprueba después una secuencia más elaborada; no se instaló ninguna dependencia ni se midieron 60 fps.
 
@@ -111,4 +122,4 @@ La maqueta se revisa en los cuatro anchos, con capturas en claro y oscuro y prue
 - Móvil: sin desborde en la comprobación automática. Teclado virtual, uso con una mano y pantalla táctil real pendientes.
 - Accesibilidad: foco visible, contraste automático y movimiento reducido comprobados según VERIFICACION. Pendiente lector de pantalla, comprensión de las tablas y revisión del desarrollador.
 
-Siguiente decisión: elegir A o B y la intensidad del movimiento. Después implementar lo acordado, verificar todas las páginas con los datos adecuados y publicar según las reglas del proyecto. La entrega actual publica solo documentación y maqueta en GitHub; no despliega una nueva versión del sitio ni reescribe la base pública.
+Siguiente decisión: revisar la corrección de los gráficos y el movimiento de B, la dirección preferida por el desarrollador. Después implementar lo acordado, verificar todas las páginas con los datos adecuados y publicar según las reglas del proyecto. La entrega actual publica solo documentación y maqueta en GitHub; no despliega una nueva versión del sitio ni reescribe la base pública.
