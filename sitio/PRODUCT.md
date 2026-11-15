@@ -12,6 +12,8 @@ Personas que necesitan saber qué se ha legislado sobre género en Chile y en qu
 
 ## Product Purpose
 
+**Confirmado por el desarrollador el 15-11-2026:** es un sitio informativo y de análisis, con orientación académica. La profundidad, los argumentos, las explicaciones metodológicas y la cronología completa de leyes hito forman parte del producto. El refinamiento visual debe facilitar su lectura, sin recortar contenido sustantivo ni sustituir los gráficos originales por representaciones más complejas. Los recortes y reorganizaciones que oculten información requieren discusión específica.
+
 Mantener al día, de forma pública y gratuita, el seguimiento de los proyectos de ley sobre género presentados en el Congreso de Chile desde 1990: primero dar el contexto (cuánto se legisla, sobre qué, quién lo presenta y qué llega a ser ley) y después permitir buscar cada proyecto con su tramitación y sus fuentes oficiales.
 
 ## Positioning

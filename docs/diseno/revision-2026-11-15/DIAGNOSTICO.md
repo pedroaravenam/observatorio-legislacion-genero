@@ -1,5 +1,7 @@
 # Revisión de diseño y textos, 15 de noviembre de 2026
 
+**Propuesta anterior descartada por el desarrollador.** La simplificación y los gráficos alternativos de esta revisión no representan el objetivo académico del sitio. La referencia vigente es la [copia completa basada en el original](copia-completa/index.html) y su [explicación](copia-completa/README.md). Lo que sigue se conserva como registro de la evaluación inicial, no como plan aprobado.
+
 Estado: diagnóstico y propuestas. El desarrollador prefirió B y pidió corregir la lectura y el movimiento de las barras. **Ningún cambio aplicado al sitio.** Base revisada: `d9a30fc`. La selección de proyectos y las reglas del clasificador quedan fuera de este trabajo.
 
 Abrir [la maqueta autónoma](propuestas.html) en un navegador: contiene seis páginas de muestra, dos variantes de portada, selector claro/oscuro y botones para repetir el movimiento. Incluye las fuentes locales y sus licencias; no requiere red. No es una implementación funcional: búsquedas, descargas y documentos no están conectados; algunos enlaces internos solo ilustran la ubicación futura. Los datos y proyectos son de demostración. Las pantallas representan los cambios principales, no reemplazan el contenido completo del sitio.

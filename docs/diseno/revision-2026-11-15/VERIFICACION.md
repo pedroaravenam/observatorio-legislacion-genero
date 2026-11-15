@@ -46,3 +46,23 @@ Pruebas sobre el HTML autónomo corregido, a 390, 768 y 1440 px, en claro y oscu
 - Capturas de portada, detalle con hover y secuencia del dibujo en `/tmp/observatorio-diseno-20261115/revision-b/`. No se midió rendimiento en un dispositivo real ni se certifica accesibilidad con lector de pantalla.
 
 La maqueta continúa separada del sitio publicado.
+
+## Propuesta vigente: copia íntegra del original
+
+Las maquetas A/B anteriores se descartaron. Se verificó `copia-completa/index.html`, generada desde el servidor original local con datos sintéticos, con estos resultados:
+
+- **58 vistas con el mismo contenido textual que el original**: se comparó SHA-256 del texto normalizado de cada `main`. Incluye cinco secciones, dieciséis fichas de hitos y los 37 listados por año.
+- Inicio conserva sus 32 párrafos y 16 hitos; Cómo funciona conserva 28 párrafos y unas 3.266 palabras en esta base sintética. No se añadieron desplegables para ocultar información editorial.
+- **48 vistas geométricas**: seis páginas, cuatro anchos (390, 768, 1280 y 1440 px), claro/oscuro. Sin desborde horizontal.
+- **24 análisis axe**: seis páginas, móvil/escritorio y claro/oscuro. Sin infracciones WCAG 2.1 A/AA automáticas. Cero excepciones de página.
+- Gráfico original: hover de 2019 muestra 73 proyectos y 14 leyes; foco de 2024, 69 y 9; el enlace del año 2000 abre su listado de 21 proyectos. Todos son datos sintéticos.
+- El primer hito abre su ficha; la cronología conserva 16 entradas. Alternar Original/Pulido no modifica el texto de la metodología.
+- Movimiento: se midió `scaleY = 0,806618` durante el crecimiento de una barra original (entre 0 y su estado final 1). No es una traslación del bloque. Con movimiento reducido se midieron cero animaciones activas.
+- Inspección visual: portada completa de escritorio, hoja de las seis páginas en móvil y detalle del gráfico original con hover. Capturas de las seis páginas, ambos temas, en la carpeta temporal.
+- Impeccable detectó 44 advertencias heurísticas en el HTML exportado: dos de bordes, nueve de espaciado, 32 de texto pequeño y una sobre una frase repetida del conjunto sintético. Varias proceden de estilos originales y plantillas inertes repetidas. No se presentan como infracciones de accesibilidad ni se eliminó contenido para satisfacerlas; se requiere juicio de diseño para los rótulos pequeños y el espacio en una futura integración.
+
+La prueba inicial de navegación asumía incorrectamente qué hito aparecía primero en la base sintética; se corrigió para usar su enlace real. Se ajustó además el guion para sincronizar su navegación y se evitó reconstruir el contenido al saltar a un ancla de la misma página. La última ejecución terminó correctamente.
+
+Evidencia: `/tmp/observatorio-propuesta-completa/verificacion.json`, `contenido-original.json`, `matriz.json`, capturas y secuencia del gráfico. Sin capturas versionadas. El servidor local terminó; no se instalaron servicios ni se escribió en producción.
+
+Pendiente: lector de pantalla, teclado virtual, dispositivos táctiles reales y aprobación del desarrollador. La copia visual no reemplaza el buscador dinámico del sitio ni se despliega.
