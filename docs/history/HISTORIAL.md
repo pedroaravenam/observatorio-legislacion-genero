@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-18 — Cola de validación resuelta: 139 casos
+
+El desarrollador validó a mano los 139 casos de la cola desde una página de revisión: coincidió con el agente en 113 y discrepó en 26 (12 pasan a incluirse como `debil`, 14 salen del sitio). Respaldo previo `ingesta-20261118-1613.dump` (local y R2). `resolver --aplicar` dejó la cola en 0 y republicó la base. El sitio muestra 1.364 proyectos. Veredictos en `docs/mediciones/veredictos-cola-2026-11-18.json`. Los 12 incluidos quedaron todos como `debil` por defecto; no se les asignó otro grupo.
+
 ## 2026-11-15 — Pulido publicado en legislaciongenero.cl (f12e2bd)
 
 Se desplegó f12e2bd con `despliegue/subir-version.sh` tras la CI en verde. El contenedor del sitio y PostgreSQL quedaron sanos. Verificación pública por HTTP de Inicio, Panorama, Proyectos, Actualidad, Cómo funciona y una ficha: las seis responden 200. La portada conserva exactamente su texto previo y 16 hitos; metodología entrega sus tres tablas desplazables. `/estado.json` no cambió: 18.666 boletines, 1.467 seleccionados y última consulta 2026-11-14T13:08:38Z. No se ejecutó ingesta, migración ni reexportación; se conservó la base pública y los datos sintéticos no se subieron. Este cierre solo registra la publicación, sin cambios funcionales posteriores al commit desplegado. Detalle en `docs/diseno/revision-2026-11-15/APLICACION.md`.

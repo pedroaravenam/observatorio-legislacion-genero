@@ -1,0 +1,759 @@
+[
+ {
+  "boletin": "16592-25",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14696-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13853-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13773-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "1673-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "1611-10",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "1595-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "1517-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "1469-02",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "1318-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "1307-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "1060-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "115-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "18880-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "18878-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "18624-36",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "18406-02",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "18255-31",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "17350-11",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16810-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16729-06",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16681-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16658-36",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16623-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "16531-29",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16503-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16476-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16507-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16379-04",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16281-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16255-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16256-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16149-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16072-06",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "16019-14",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "16013-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15940-25",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15849-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15808-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15737-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15723-06",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15693-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15701-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15415-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15380-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15357-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15288-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15318-25",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "15271-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15266-04",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15248-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15235-06",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15180-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "15174-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15165-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15147-12",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15076-11",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15090-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15093-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15040-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15083-11",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15030-06",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15031-06",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15049-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "15046-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "15005-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14986-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14964-24",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14959-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14942-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14921-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "14866-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14876-14",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14848-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14812-03",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14781-11",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14638-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14609-05",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14606-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14608-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "14518-10",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14332-06",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14310-35",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14272-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14217-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14207-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14185-10",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14158-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14120-11",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14065-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "14066-04",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "14033-17",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13924-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "13888-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "13849-04",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "13802-03",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13735-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13681-10",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "13660-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13663-06",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "13596-29",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13558-15",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13460-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "13247-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "13248-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13224-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "13102-05",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "13041-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "13036-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "12967-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "12835-14",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "12759-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "12717-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "12588-11",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "12473-07",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "12002-13",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "11732-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "11581-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "11294-11",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "11100-11",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "11055-14",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "10778-05",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "10763-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "10588-18",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "10397-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "10136-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "10035-17",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "9676-06",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "8859-04",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "8140-11",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "6852-05",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "5567-18",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "4759-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): discrepa del agente."
+ },
+ {
+  "boletin": "2626-13",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "2226-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "1522-02",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "1374-05",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "1344-07",
+  "incluye": false,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente."
+ },
+ {
+  "boletin": "1240-11",
+  "incluye": true,
+  "razon": "Validación manual del desarrollador (18-11-2026): coincide con el agente.",
+  "grupo": "debil"
+ }
+]
