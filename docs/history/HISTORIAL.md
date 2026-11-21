@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-20 — Piloto de clasificación supervisada para priorizar la revisión
+
+Se comparó una regresión logística con solo títulos y con el texto de ingreso sobre los mismos 127 boletines ya validados. Agregar el texto mejoró el orden de revisión, con una precisión promedio de 0,552 a 0,640. En la mitad superior encontró 33 de 55 proyectos pertinentes, frente a 30 con títulos. Con los umbrales ilustrativos, el modelo con texto derivó los 127 a revisión. También se reutilizaron 26 veredictos humanos anteriores y los casos de control para una prueba retrospectiva. El piloto queda local y la selección pública sigue a cargo del flujo vigente. Para la siguiente evaluación se preparó una exportación de veredictos existentes de solo lectura. La muestra ciega de 100 boletines queda en reserva. Ver [método y resultados](../../despliegue/clasificador/piloto-ml/README.md).
+
 ## 2026-11-18 — Cola de validación resuelta: 139 casos
 
 El desarrollador validó a mano los 139 casos de la cola desde una página de revisión: coincidió con el agente en 113 y discrepó en 26 (12 pasan a incluirse como `debil`, 14 salen del sitio). Respaldo previo `ingesta-20261118-1613.dump` (local y R2). `resolver --aplicar` dejó la cola en 0 y republicó la base. El sitio muestra 1.364 proyectos. Veredictos en `docs/mediciones/veredictos-cola-2026-11-18.json`. Los 12 incluidos quedaron todos como `debil` por defecto; no se les asignó otro grupo.

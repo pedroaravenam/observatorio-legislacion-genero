@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es-CL">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisión ciega de boletines</title>
+<style>
+  body { font: 1rem/1.6 system-ui, sans-serif; color-scheme: light dark; margin: 2rem auto; padding: 0 1rem; max-width: 48rem; }
+  h1, h2 { line-height: 1.25; }
+  form { display: grid; gap: .8rem; }
+  button, select, textarea { font: inherit; padding: .3rem .6rem; }
+  textarea { resize: vertical; }
+  nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }
+  details { margin-block: 1rem; }
+  #extracto { max-height: 22rem; overflow: auto; padding: .75rem; border: 1px solid; }
+</style>
+<main>
+  <h1>Revisión ciega de boletines</h1>
+  <p>Marca «Sí» si el proyecto entra en la selección, incluso con relación débil. Usa «Dudoso» cuando la evidencia no te permita decidir.</p>
+  <p id="progreso" role="status"></p>
+  <nav aria-label="Navegación de la muestra">
+    <button id="anterior" type="button">Anterior</button>
+    <button id="siguiente" type="button">Siguiente</button>
+    <button id="pendiente" type="button">Ir al primero pendiente</button>
+    <button id="exportar" type="button">Guardar CSV</button>
+  </nav>
+  <article>
+    <h2 id="titulo" tabindex="-1"></h2>
+    <a id="ficha" target="_blank" rel="noopener noreferrer">Ficha del Senado</a>
+    <a id="documento" target="_blank" rel="noopener noreferrer">Documento de ingreso</a>
+    <p id="sin-extracto" hidden>Consulta la ficha oficial para buscar el texto de ingreso.</p>
+    <details id="evidencia">
+      <summary>Leer el comienzo del documento</summary>
+      <p id="extracto" tabindex="0"></p>
+    </details>
+    <form>
+      <label for="incluye">¿Entra en la selección?</label>
+      <select id="incluye">
+        <option value="">Pendiente</option>
+        <option value="sí">Sí</option>
+        <option value="no">No</option>
+        <option value="dudoso">Dudoso</option>
+      </select>
+      <label for="razon">Razón (opcional)</label>
+      <textarea id="razon" rows="3"></textarea>
+    </form>
+  </article>
+  <p id="guardado">El navegador guarda el avance en este equipo. Guarda el CSV si quieres conservar una copia.</p>
+</main>
+<script>
+  const filas = /* DATOS */[];
+  const porId = (id) => document.getElementById(id);
+  const clave = 'observatorio-revision-ciega:' + filas.map((fila) => fila.boletin).join(',');
+  const opciones = new Set(['', 'sí', 'no', 'dudoso']);
+  const guardadas = new Map();
+  let indice = 0;
+  try {
+    const anteriores = JSON.parse(localStorage.getItem(clave) || '[]');
+    for (const [boletin, decision] of anteriores) {
+      if (opciones.has(decision.incluye)) guardadas.set(boletin, decision);
+    }
+  } catch {
+    porId('guardado').textContent = 'No se pudo recuperar el guardado local. Guarda el CSV antes de cerrar.';
+  }
+  for (const fila of filas) {
+    if (!guardadas.has(fila.boletin)) {
+      guardadas.set(fila.boletin, {incluye: fila.incluye, razon: fila.razon});
+    }
+  }
+
+  function mostrarProgreso() {
+    const revisadas = filas.filter(({boletin}) => guardadas.get(boletin).incluye).length;
+    porId('progreso').textContent = `Boletín ${indice + 1} de ${filas.length}. Revisados ${revisadas}.`;
+    porId('pendiente').disabled = revisadas === filas.length;
+  }
+
+  function mostrar(enfocar = false) {
+    const fila = filas[indice];
+    const decision = guardadas.get(fila.boletin);
+    porId('titulo').textContent = `${fila.boletin} · ${fila.titulo}`;
+    porId('ficha').href = fila.ficha_senado;
+    porId('documento').href = fila.documento;
+    porId('documento').hidden = !fila.documento;
+    porId('evidencia').hidden = !fila.extracto;
+    porId('evidencia').open = false;
+    porId('sin-extracto').hidden = Boolean(fila.extracto);
+    porId('extracto').textContent = fila.extracto;
+    porId('incluye').value = decision.incluye;
+    porId('razon').value = decision.razon;
+    porId('anterior').disabled = indice === 0;
+    porId('siguiente').disabled = indice === filas.length - 1;
+    mostrarProgreso();
+    if (enfocar) porId('titulo').focus();
+  }
+
+  function guardar() {
+    guardadas.set(filas[indice].boletin, {incluye: porId('incluye').value, razon: porId('razon').value});
+    try {
+      localStorage.setItem(clave, JSON.stringify([...guardadas]));
+    } catch {
+      porId('guardado').textContent = 'El navegador no guardó el avance. Guarda el CSV antes de cerrar.';
+    }
+    mostrarProgreso();
+  }
+
+  porId('incluye').addEventListener('change', guardar);
+  porId('razon').addEventListener('input', guardar);
+  porId('anterior').addEventListener('click', () => { indice--; mostrar(true); });
+  porId('siguiente').addEventListener('click', () => { indice++; mostrar(true); });
+  porId('pendiente').addEventListener('click', () => {
+    const pendiente = filas.findIndex(({boletin}) => !guardadas.get(boletin).incluye);
+    if (pendiente !== -1) { indice = pendiente; mostrar(true); }
+  });
+  porId('exportar').addEventListener('click', () => {
+    const campos = ['boletin', 'anio', 'titulo', 'ficha_senado', 'incluye', 'razon'];
+    const celda = (valor) => '"' + String(valor).replaceAll('"', '""') + '"';
+    const csv = [campos.join(','), ...filas.map((fila) => {
+      const valores = {...fila, ...guardadas.get(fila.boletin)};
+      return campos.map((campo) => celda(valores[campo])).join(',');
+    })].join('\r\n');
+    const url = URL.createObjectURL(new Blob(['\uFEFF', csv], {type: 'text/csv;charset=utf-8'}));
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = 'muestra-revisada.csv';
+    enlace.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  mostrar();
+</script>
