@@ -2,6 +2,8 @@
 
 ## Resumen
 
+Usuario SSH recuperado del historial de Codex: `atendia`. El registro del chat «Configurar escritorio remoto RDP» contiene una autenticación exitosa con la misma huella pública y la ruta `/home/atendia/.ssh/authorized_keys`. Se corrige la cuenta y se solicita reintentar la publicación desde GitHub. No se accedió al computador del desarrollador: se leyeron únicamente registros de chats anteriores. Resultado pendiente.
+
 Diagnóstico SSH confirmado: GitHub sí alcanza el VPS. Las ejecuciones 45449566125 y 45449886703 rechazaron la llave para ubuntu, codex-admin y root antes de modificar el servidor. Las huellas públicas SHA256 de GitHub y Codex coinciden; no es una diferencia entre secretos. Para publicar falta confirmar una cuenta autorizada o revisar la autorización de la llave desde la consola web del VPS. No hubo construcción ni despliegue.
 
 Reintento del 24: el primer flujo de GitHub llegó al SSH del VPS pero recibió `Permission denied (publickey)` para `ubuntu`, antes de construir o modificar el servidor. La llave se pudo leer correctamente. Su comentario menciona `codex-admin`; se agrega comprobación acotada de autenticación con `ubuntu`, `codex-admin` y `root`, y solicitud explícita por archivo versionado para continuar desde GitHub sin pedir nuevos clics. Conexión y publicación aún pendientes de este reintento.

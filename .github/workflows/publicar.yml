@@ -50,7 +50,7 @@ jobs:
           clave.touch(mode=0o600)
           clave.chmod(0o600)
           clave.write_text('-----BEGIN ' + bloque[1] + '-----\n' + '\n'.join(cuerpo[i:i+64] for i in range(0, len(cuerpo), 64)) + '\n-----END ' + bloque[1] + '-----\n')
-          (carpeta / 'config').write_text('Host atendia-development\n  HostName 116.203.181.6\n  User ubuntu\n  Port 22\n  IdentityFile ~/.ssh/observatorio\n  IdentitiesOnly yes\n  BatchMode yes\n  ConnectTimeout 15\n  StrictHostKeyChecking accept-new\n  ServerAliveInterval 30\n  ServerAliveCountMax 3\n')
+          (carpeta / 'config').write_text('Host atendia-development\n  HostName 116.203.181.6\n  User atendia\n  Port 22\n  IdentityFile ~/.ssh/observatorio\n  IdentitiesOnly yes\n  BatchMode yes\n  ConnectTimeout 15\n  StrictHostKeyChecking accept-new\n  ServerAliveInterval 30\n  ServerAliveCountMax 3\n')
           (carpeta / 'config').chmod(0o600)
           PY
           ssh-keygen -y -P '' -f "$HOME/.ssh/observatorio" >/dev/null 2>&1 || {
@@ -61,20 +61,6 @@ jobs:
 
       - name: Comprobar acceso y permisos sin modificar el VPS
         run: |
-          usuario_elegido=''
-          for usuario in ubuntu codex-admin root; do
-            echo "Comprobando si la llave corresponde al usuario $usuario"
-            if ssh -o "User=$usuario" atendia-development 'true'; then
-              usuario_elegido=$usuario
-              break
-            fi
-          done
-          if [[ -z "$usuario_elegido" ]]; then
-            echo 'El VPS no acepta esta llave para ubuntu, codex-admin ni root.' >&2
-            exit 1
-          fi
-          sed -i "s/^  User .*/  User $usuario_elegido/" "$HOME/.ssh/config"
-          echo "Usuario autenticado: $usuario_elegido"
           ssh atendia-development 'id -un; test -f /opt/observatorio/compose.yaml && sudo -n test -f /opt/observatorio/.env && sudo -n docker compose version && sudo -n docker ps --filter name=observatorio --format "{{.Names}} {{.Image}} {{.Status}}"'
 
       - name: Exigir CI correcta para este mismo commit

@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Cuenta atendia recuperada del historial de una conexión exitosa
+
+Se consultó el historial de Codex, sin ejecutar comandos ni abrir archivos en el computador del desarrollador. El chat «Configurar escritorio remoto RDP» registra la autenticación exitosa de la misma llave (huella pública SHA256 coincidente) y `/home/atendia/.ssh/authorized_keys`. Se fija el usuario `atendia`, se eliminan las pruebas con cuentas supuestas y se solicita la publicación ya autorizada desde GitHub. Resultado de conexión y publicación pendiente.
+
 ## 2026-11-24 — Autenticación SSH rechazada desde GitHub
 
 El reintento 45449566125 llegó al VPS pero rechazó la misma llave para ubuntu, codex-admin y root. No se ejecutó construcción ni publicación. Se agrega al diagnóstico solo la huella pública SHA256 de la llave para compararla con la variable personal de Codex; no se imprime ni transfiere la llave privada. La ejecución 45449886703 confirmó que las huellas públicas de GitHub y Codex coinciden y volvió a recibir rechazo para las tres cuentas. Sigue pendiente confirmar una cuenta autorizada o revisar la autorización de la llave desde la consola web del VPS. No se modificó el servidor.
