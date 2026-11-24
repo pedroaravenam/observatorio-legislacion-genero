@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Comprobación del usuario SSH y reintento solicitado por commit
+
+El flujo 45449173148 alcanzó `116.203.181.6:22` desde GitHub y leyó la llave, pero falló al autenticar `ubuntu` (`Permission denied (publickey)`); no construyó imágenes ni modificó el VPS. El comentario de la llave identifica `codex-admin-atendia-development-2026-08-27`, sin demostrar por sí solo el usuario. Se agrega comprobación de autenticación para las tres cuentas administrativas plausibles (`ubuntu`, `codex-admin`, `root`), deteniéndose en la primera aceptada. La publicación autorizada se solicita cambiando `despliegue/solicitud-publicacion.txt` en `main`; los demás commits no la disparan. Se mantiene el inicio manual y la exigencia de CI correcta del mismo commit antes de construir y publicar. Resultado del reintento aún pendiente.
+
 ## 2026-11-24 — Despliegue manual desde un servidor de GitHub
 
 Ante la falta de salida TCP del entorno de Codex, se prepara `Publicar en el VPS` en Actions. Solo se activa a mano desde `main`: por defecto comprueba conexión y permisos sin modificar el VPS; la opción publicar exige CI correcta para el mismo commit, usa el guion de publicación y comprueba las páginas públicas. Requiere que el desarrollador agregue la llave en el secreto `VPS_SSH_PRIVATE_KEY` del repositorio; no se transfirió la variable personal de Codex a GitHub. Se normaliza la llave sin imprimirla y se elimina la copia temporal al terminar. El guion ahora usa etiquetas idénticas al construir y guardar (compatibilidad Docker/Podman), sudo sin interacción, detección de fallos del flujo de carga y espera de salud del sitio. Validación: actionlint, sintaxis Bash y simulación de tres imágenes, interrupción ante carga fallida y bloqueo de árboles con cambios. No se modificó el VPS: la conexión desde GitHub y la publicación siguen pendientes.

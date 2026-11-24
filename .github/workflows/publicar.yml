@@ -1,6 +1,9 @@
 name: Publicar en el VPS
 
 on:
+  push:
+    branches: [main]
+    paths: [despliegue/solicitud-publicacion.txt]
   workflow_dispatch:
     inputs:
       accion:
@@ -57,10 +60,24 @@ jobs:
 
       - name: Comprobar acceso y permisos sin modificar el VPS
         run: |
+          usuario_elegido=''
+          for usuario in ubuntu codex-admin root; do
+            echo "Comprobando si la llave corresponde al usuario $usuario"
+            if ssh -o "User=$usuario" atendia-development 'true'; then
+              usuario_elegido=$usuario
+              break
+            fi
+          done
+          if [[ -z "$usuario_elegido" ]]; then
+            echo 'El VPS no acepta esta llave para ubuntu, codex-admin ni root.' >&2
+            exit 1
+          fi
+          sed -i "s/^  User .*/  User $usuario_elegido/" "$HOME/.ssh/config"
+          echo "Usuario autenticado: $usuario_elegido"
           ssh atendia-development 'id -un; test -f /opt/observatorio/compose.yaml && sudo -n test -f /opt/observatorio/.env && sudo -n docker compose version && sudo -n docker ps --filter name=observatorio --format "{{.Names}} {{.Image}} {{.Status}}"'
 
       - name: Exigir CI correcta para este mismo commit
-        if: inputs.accion == 'publicar'
+        if: inputs.accion == 'publicar' || github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -77,11 +94,11 @@ jobs:
           exit 1
 
       - name: Construir y publicar la versión
-        if: inputs.accion == 'publicar'
+        if: inputs.accion == 'publicar' || github.event_name == 'push'
         run: bash despliegue/subir-version.sh
 
       - name: Comprobar las páginas públicas
-        if: inputs.accion == 'publicar'
+        if: inputs.accion == 'publicar' || github.event_name == 'push'
         run: |
           for ruta in / /acerca /panorama /proyectos /actualidad /pedro-aravena-medel.webp; do
             curl --fail --silent --show-error --retry 3 --retry-delay 3 --max-time 30 -o /dev/null "https://legislaciongenero.cl$ruta"
