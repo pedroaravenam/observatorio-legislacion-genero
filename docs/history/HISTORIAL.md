@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Foto y presentación publicadas en legislaciongenero.cl (51418bf)
+
+La cuenta `atendia`, recuperada del historial de una autenticación exitosa, permitió conectar y comprobar permisos desde GitHub. La CI 45453652888 terminó correctamente y el despliegue 45453652937 publicó la imagen `observatorio-sitio:51418bf`. El contenedor quedó sano. Respondieron correctamente por HTTP Inicio, Cómo funciona, Panorama, Proyectos, Actualidad y `/pedro-aravena-medel.webp`. No se ejecutaron ingesta, migraciones ni reexportación. No se iniciaron conexiones SSH desde el computador del desarrollador. Se agrega una verificación pública de solo lectura, ejecutada desde GitHub, que exige el texto en primera persona en ambas páginas, el enlace explícito al repositorio y la foto idéntica por SHA256 al archivo aprobado. Los últimos commits documentan el cierre y la comprobación; la versión funcional desplegada es 51418bf.
+
 ## 2026-11-24 — Cuenta atendia recuperada del historial de una conexión exitosa
 
 Se consultó el historial de Codex, sin ejecutar comandos ni abrir archivos en el computador del desarrollador. El chat «Configurar escritorio remoto RDP» registra la autenticación exitosa de la misma llave (huella pública SHA256 coincidente) y `/home/atendia/.ssh/authorized_keys`. Se fija el usuario `atendia`, se eliminan las pruebas con cuentas supuestas y se solicita la publicación ya autorizada desde GitHub. Resultado de conexión y publicación pendiente.

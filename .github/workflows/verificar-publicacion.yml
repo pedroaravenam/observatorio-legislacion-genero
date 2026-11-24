@@ -1,0 +1,40 @@
+name: Verificar presentación publicada
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/verificar-publicacion.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar texto, enlace a GitHub y foto servidos por el sitio
+        run: |
+          python3 - <<'PY'
+          import hashlib, html, pathlib, re, urllib.request
+          base = 'https://legislaciongenero.cl'
+          version = pathlib.Path('sitio/static/pedro-aravena-medel.webp').read_bytes()
+          cache = hashlib.sha256(version).hexdigest()[:16]
+          for ruta in ['/', '/acerca']:
+              with urllib.request.urlopen(base + ruta + '?verificar-autoria=' + cache, timeout=30) as respuesta:
+                  documento = respuesta.read().decode('utf-8')
+              texto = re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', documento)))
+              assert 'Soy Pedro Aravena Medel' in texto, f'Presentación ausente: {ruta}'
+              assert 'He trabajado en instituciones públicas y privadas' in texto, f'Reseña ausente: {ruta}'
+              assert 'repositorio público en GitHub' in texto, f'Enlace explícito ausente: {ruta}'
+              assert 'href="https://github.com/pedroaravenam/observatorio-legislacion-genero"' in documento, f'Destino GitHub ausente: {ruta}'
+              assert 'src="/pedro-aravena-medel.webp"' in documento, f'Foto ausente: {ruta}'
+              assert 'Pedro Aravena Medel es sociólogo' not in texto, f'Reseña anterior presente: {ruta}'
+              print(f'OK {ruta}: presentación en primera persona, repositorio explícito y foto')
+          with urllib.request.urlopen(base + '/pedro-aravena-medel.webp?verificar-autoria=' + cache, timeout=30) as respuesta:
+              foto = respuesta.read()
+          assert hashlib.sha256(foto).digest() == hashlib.sha256(version).digest(), 'La foto publicada difiere del archivo aprobado'
+          print('OK foto: SHA256 idéntico al archivo aprobado en el repositorio')
+          PY
