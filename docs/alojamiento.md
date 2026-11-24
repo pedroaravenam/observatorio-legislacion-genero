@@ -48,6 +48,18 @@ Caddy pertenece a la plataforma educativa (`/opt/plataforma-educativa/app/`). Pa
 
 Las imágenes se suben por separado porque `podman save` con varias imágenes generó un archivo en que las tres etiquetas apuntaban a la misma imagen.
 
+### Publicar desde GitHub Actions
+
+El flujo manual [Publicar en el VPS](https://github.com/pedroaravenam/observatorio-legislacion-genero/actions/workflows/publicar.yml) ejecuta la conexión SSH y la construcción en un servidor de GitHub. No usa SSH ni Docker en el computador del desarrollador. Solo admite la rama `main` y no se ejecuta automáticamente con cada cambio.
+
+1. Crear el secreto de Actions `VPS_SSH_PRIVATE_KEY` en los [secretos del repositorio](https://github.com/pedroaravenam/observatorio-legislacion-genero/settings/secrets/actions), con el bloque completo de la llave privada del usuario `ubuntu`. Este secreto es independiente del que pueda existir en Codex. El flujo normaliza los saltos de línea y no admite llaves que requieran una frase de paso.
+2. Abrir el flujo, elegir **Run workflow**, rama `main` y acción `comprobar`. Revisa SSH a `116.203.181.6:22`, permisos de sudo sin contraseña y estado de los contenedores; no modifica el VPS. SSH registra la identidad del servidor en el primer contacto de cada ejecución (`accept-new`).
+3. Ejecutar nuevamente con acción `publicar`. Exige que la CI del mismo commit termine correctamente, construye las tres imágenes mediante `subir-version.sh`, las carga en el VPS y espera que el sitio quede sano. Comprueba por HTTP las páginas principales y el retrato del autor. La llave temporal se elimina también cuando falla el flujo.
+
+Las etiquetas `localhost/observatorio-*` se usan tanto al construir como al guardar para que el guion funcione con Docker y con Podman. Los comandos remotos usan `sudo -n`: si faltan permisos, el trabajo falla sin esperar una contraseña. No se ejecutan ingesta, migraciones ni reexportación de la base pública en este flujo, porque esta publicación solo cambia presentación y archivos estáticos.
+
+El entorno de Codex usado el 24 de noviembre no tiene salida TCP autorizada ni VPN configurada; su conexión directa no permite diagnosticar el puerto SSH del VPS. El flujo de GitHub ofrece una comprobación desde otro servidor. Su conexión y despliegue deben verificarse antes de dar una versión por publicada.
+
 ## Alertas por correo
 
 Qué avisa, y cuándo:

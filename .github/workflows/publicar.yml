@@ -1,0 +1,93 @@
+name: Publicar en el VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: Comprobar solo revisa la conexión; publicar construye y despliega el commit seleccionado.
+        type: choice
+        options: [comprobar, publicar]
+        default: comprobar
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: publicar-vps
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar la conexión SSH en el servidor de GitHub
+        env:
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+        run: |
+          python3 - <<'PY'
+          import base64, os, pathlib, re
+          valor = os.environ.get('VPS_SSH_PRIVATE_KEY', '').strip()
+          bloque = re.search(r'-----BEGIN ([A-Z ]*PRIVATE KEY)-----([\s\S]*?)-----END \1-----', valor)
+          if not bloque:
+              raise SystemExit('Falta el secreto VPS_SSH_PRIVATE_KEY o su bloque de clave privada está incompleto.')
+          cuerpo = ''.join(bloque[2].split())
+          try:
+              base64.b64decode(cuerpo, validate=True)
+          except Exception:
+              raise SystemExit('El secreto no contiene una clave privada con base64 válido.')
+          carpeta = pathlib.Path.home() / '.ssh'
+          carpeta.mkdir(mode=0o700, exist_ok=True)
+          clave = carpeta / 'observatorio'
+          clave.touch(mode=0o600)
+          clave.chmod(0o600)
+          clave.write_text('-----BEGIN ' + bloque[1] + '-----\n' + '\n'.join(cuerpo[i:i+64] for i in range(0, len(cuerpo), 64)) + '\n-----END ' + bloque[1] + '-----\n')
+          (carpeta / 'config').write_text('Host atendia-development\n  HostName 116.203.181.6\n  User ubuntu\n  Port 22\n  IdentityFile ~/.ssh/observatorio\n  IdentitiesOnly yes\n  BatchMode yes\n  ConnectTimeout 15\n  StrictHostKeyChecking accept-new\n  ServerAliveInterval 30\n  ServerAliveCountMax 3\n')
+          (carpeta / 'config').chmod(0o600)
+          PY
+          ssh-keygen -y -P '' -f "$HOME/.ssh/observatorio" >/dev/null 2>&1 || {
+            echo 'La clave no es válida o requiere una frase de paso.' >&2
+            exit 1
+          }
+
+      - name: Comprobar acceso y permisos sin modificar el VPS
+        run: |
+          ssh atendia-development 'id -un; test -f /opt/observatorio/compose.yaml && sudo -n test -f /opt/observatorio/.env && sudo -n docker compose version && sudo -n docker ps --filter name=observatorio --format "{{.Names}} {{.Image}} {{.Status}}"'
+
+      - name: Exigir CI correcta para este mismo commit
+        if: inputs.accion == 'publicar'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for intento in {1..30}; do
+            resultado=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&event=push&per_page=1" --jq '.workflow_runs[0] | if .status == "completed" then .conclusion else "pendiente" end')
+            if [[ "$resultado" == success ]]; then exit 0; fi
+            if [[ "$resultado" != pendiente ]]; then
+              echo "La CI de este commit no terminó correctamente: $resultado" >&2
+              exit 1
+            fi
+            sleep 20
+          done
+          echo 'La CI sigue pendiente; no se publica.' >&2
+          exit 1
+
+      - name: Construir y publicar la versión
+        if: inputs.accion == 'publicar'
+        run: bash despliegue/subir-version.sh
+
+      - name: Comprobar las páginas públicas
+        if: inputs.accion == 'publicar'
+        run: |
+          for ruta in / /acerca /panorama /proyectos /actualidad /pedro-aravena-medel.webp; do
+            curl --fail --silent --show-error --retry 3 --retry-delay 3 --max-time 30 -o /dev/null "https://legislaciongenero.cl$ruta"
+            echo "OK $ruta"
+          done
+
+      - name: Eliminar la copia temporal de la llave
+        if: always()
+        run: rm -f "$HOME/.ssh/observatorio"

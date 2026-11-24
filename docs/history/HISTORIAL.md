@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Despliegue manual desde un servidor de GitHub
+
+Ante la falta de salida TCP del entorno de Codex, se prepara `Publicar en el VPS` en Actions. Solo se activa a mano desde `main`: por defecto comprueba conexión y permisos sin modificar el VPS; la opción publicar exige CI correcta para el mismo commit, usa el guion de publicación y comprueba las páginas públicas. Requiere que el desarrollador agregue la llave en el secreto `VPS_SSH_PRIVATE_KEY` del repositorio; no se transfirió la variable personal de Codex a GitHub. Se normaliza la llave sin imprimirla y se elimina la copia temporal al terminar. El guion ahora usa etiquetas idénticas al construir y guardar (compatibilidad Docker/Podman), sudo sin interacción, detección de fallos del flujo de carga y espera de salud del sitio. Validación: actionlint, sintaxis Bash y simulación de tres imágenes, interrupción ante carga fallida y bloqueo de árboles con cambios. No se modificó el VPS: la conexión desde GitHub y la publicación siguen pendientes.
+
 ## 2026-11-24 — Presentación en primera persona y foto del autor
 
 Se incorpora el texto aprobado por el desarrollador en «Quién hace este sitio», compartido entre Inicio y Cómo funciona: presentación y trayectoria en primera persona, independencia del proyecto y enlace explícito al repositorio público en GitHub. Se agrega el retrato aprobado con fondo natural, optimizado a WebP (640 × 800, 67 KB), con texto alternativo, dimensiones y carga diferida. El encuadre vertical se conserva en la interfaz. Verificación: tipos sin errores ni advertencias, 16 pruebas unitarias y compilación correctas. La publicación está pendiente: este entorno no tiene configuración ni credenciales SSH para el VPS; el alias `atendia-development` no se resuelve. No se modificaron datos ni selección de proyectos.
