@@ -1,2 +1,2 @@
-2026-11-24: publicar la presentación en primera persona y el retrato con fondo natural aprobados por Pedro.
-Usuario SSH atendia confirmado en el historial de una conexión exitosa con la misma huella pública de la llave.
+2026-11-24: reducir la foto del autor e integrarla al bloque completo de texto, con párrafos que la rodean según su altura y el ancho disponible.
+Publicar desde GitHub con la cuenta SSH atendia; sin usar el computador del desarrollador.

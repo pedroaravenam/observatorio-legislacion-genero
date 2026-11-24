@@ -2,6 +2,8 @@
 
 ## Resumen
 
+Ajuste solicitado el 24: retrato más pequeño y flotante a la izquierda dentro del bloque completo de autoría. Ancho de 8rem en escritorio y 6rem en pantallas de hasta 30rem (máximo 35 % del bloque); el texto fluye alrededor de la foto y recupera todo el ancho al superarla. Verificación local en Inicio y Cómo funciona a 320, 375, 768 y 1280 px: sin desbordes ni errores de navegador, foto contenida y texto a su lado; tipos, 16 pruebas y compilación correctos. Publicación solicitada desde GitHub, pendiente del flujo.
+
 Fecha: 2026-11-24. **Publicado:** https://legislaciongenero.cl. La versión funcional desplegada es **51418bf**: foto del autor con fondo natural, presentación en primera persona y enlace explícito al repositorio de GitHub, compartidos por Inicio y Cómo funciona. CI 45453652888 en verde y despliegue 45453652937 correcto; contenedor sano y seis comprobaciones públicas HTTP correctas (incluida la foto). Los últimos commits documentan el cierre y agregan una comprobación de solo lectura del texto público y de la foto por SHA256. No se modificaron datos ni selección.
 
 **Publicación desde GitHub:** la cuenta SSH correcta es `atendia`; se recuperó de un registro anterior con la misma huella pública. `.github/workflows/publicar.yml` se ejecuta a mano o con un cambio explícito en `despliegue/solicitud-publicacion.txt`, exige CI correcta para el mismo commit y usa el secreto `VPS_SSH_PRIVATE_KEY` del repositorio. La ejecución y la conexión SSH se hacen en el servidor de GitHub, sin usar el computador del desarrollador. Ver [alojamiento](docs/alojamiento.md).

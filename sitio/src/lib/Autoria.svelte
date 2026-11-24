@@ -85,18 +85,29 @@
 		margin: 0 0 1rem;
 		max-width: 68ch;
 	}
+	.quien {
+		display: flow-root;
+	}
 	.quien p {
 		font-size: 1.05rem;
 	}
 	.foto {
 		display: block;
-		width: min(100%, 16rem);
+		float: left;
+		width: 8rem;
+		max-width: 35%;
 		height: auto;
 		aspect-ratio: 4 / 5;
-		margin: 0 0 1rem;
+		margin: 0.25rem 1.1rem 0.75rem 0;
 		border-radius: var(--radio);
 		object-fit: cover;
 		border: 1px solid var(--borde);
+	}
+	@media (max-width: 30rem) {
+		.foto {
+			width: 6rem;
+			margin-right: 1rem;
+		}
 	}
 	.lado {
 		display: grid;

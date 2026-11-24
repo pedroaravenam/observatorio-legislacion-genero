@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Foto pequeña integrada al bloque de autoría
+
+A pedido del desarrollador se reduce el retrato de 16rem a 8rem (6rem en pantallas de hasta 30rem, con máximo de 35 %) y se hace flotar a la izquierda dentro del bloque completo de autoría. Los párrafos rodean la imagen mientras coinciden con su altura; luego ocupan todo el ancho. Se conserva el encuadre y se contiene la flotación con flow-root. No cambian textos ni imagen. Revisión con Chromium sin interfaz en ambas páginas a 320, 375, 768 y 1280 px: ocho vistas sin desbordes ni errores, texto al lado de la foto y cuatro párrafos conservados. Tipos sin errores/advertencias, 16 pruebas unitarias y compilación correctas. Publicación solicitada desde GitHub; resultado pendiente.
+
 ## 2026-11-24 — Foto y presentación publicadas en legislaciongenero.cl (51418bf)
 
 La cuenta `atendia`, recuperada del historial de una autenticación exitosa, permitió conectar y comprobar permisos desde GitHub. La CI 45453652888 terminó correctamente y el despliegue 45453652937 publicó la imagen `observatorio-sitio:51418bf`. El contenedor quedó sano. Respondieron correctamente por HTTP Inicio, Cómo funciona, Panorama, Proyectos, Actualidad y `/pedro-aravena-medel.webp`. No se ejecutaron ingesta, migraciones ni reexportación. No se iniciaron conexiones SSH desde el computador del desarrollador. Se agrega una verificación pública de solo lectura, ejecutada desde GitHub, que exige el texto en primera persona en ambas páginas, el enlace explícito al repositorio y la foto idéntica por SHA256 al archivo aprobado. Los últimos commits documentan el cierre y la comprobación; la versión funcional desplegada es 51418bf.
