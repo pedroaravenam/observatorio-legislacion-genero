@@ -2,7 +2,7 @@
 
 ## 2026-11-24 — Foto pequeña integrada al bloque de autoría
 
-A pedido del desarrollador se reduce el retrato de 16rem a 8rem (6rem en pantallas de hasta 30rem, con máximo de 35 %) y se hace flotar a la izquierda dentro del bloque completo de autoría. Los párrafos rodean la imagen mientras coinciden con su altura; luego ocupan todo el ancho. Se conserva el encuadre y se contiene la flotación con flow-root. No cambian textos ni imagen. Revisión con Chromium sin interfaz en ambas páginas a 320, 375, 768 y 1280 px: ocho vistas sin desbordes ni errores, texto al lado de la foto y cuatro párrafos conservados. Tipos sin errores/advertencias, 16 pruebas unitarias y compilación correctas. Publicación solicitada desde GitHub; resultado pendiente.
+A pedido del desarrollador se reduce el retrato de 16rem a 8rem (6rem en pantallas de hasta 30rem, con máximo de 35 %) y se hace flotar a la izquierda dentro del bloque completo de autoría. Los párrafos rodean la imagen mientras coinciden con su altura; luego ocupan todo el ancho. Se conserva el encuadre y se contiene la flotación con flow-root. No cambian textos ni imagen. Revisión con Chromium sin interfaz en ambas páginas a 320, 375, 768 y 1280 px: ocho vistas sin desbordes ni errores, texto al lado de la foto y cuatro párrafos conservados. Tipos sin errores/advertencias, 16 pruebas unitarias y compilación correctas. Publicado el commit f0397ed desde GitHub: CI 45456651610 y despliegue 45456651740 correctos, contenedor sano y comprobaciones públicas de las páginas y de la foto aprobadas. No se ejecutaron conexiones SSH desde el computador del desarrollador.
 
 ## 2026-11-24 — Foto y presentación publicadas en legislaciongenero.cl (51418bf)
 
