@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Autenticación SSH rechazada desde GitHub
+
+El reintento 45449566125 llegó al VPS pero rechazó la misma llave para ubuntu, codex-admin y root. No se ejecutó construcción ni publicación. Se agrega al diagnóstico solo la huella pública SHA256 de la llave para compararla con la variable personal de Codex; no se imprime ni transfiere la llave privada. Sigue pendiente obtener una identidad SSH autorizada.
+
 ## 2026-11-24 — Comprobación del usuario SSH y reintento solicitado por commit
 
 El flujo 45449173148 alcanzó `116.203.181.6:22` desde GitHub y leyó la llave, pero falló al autenticar `ubuntu` (`Permission denied (publickey)`); no construyó imágenes ni modificó el VPS. El comentario de la llave identifica `codex-admin-atendia-development-2026-08-27`, sin demostrar por sí solo el usuario. Se agrega comprobación de autenticación para las tres cuentas administrativas plausibles (`ubuntu`, `codex-admin`, `root`), deteniéndose en la primera aceptada. La publicación autorizada se solicita cambiando `despliegue/solicitud-publicacion.txt` en `main`; los demás commits no la disparan. Se mantiene el inicio manual y la exigencia de CI correcta del mismo commit antes de construir y publicar. Resultado del reintento aún pendiente.

@@ -1,2 +1,3 @@
 2026-11-24: publicar la presentación en primera persona y el retrato con fondo natural aprobados por Pedro.
 Reintento desde GitHub tras el rechazo de la llave para ubuntu; comprobar también la cuenta codex-admin indicada por el comentario de la llave y la cuenta administrativa root.
+Comprobar la huella pública de la llave de GitHub tras los rechazos de autenticación; no imprimir la llave privada.

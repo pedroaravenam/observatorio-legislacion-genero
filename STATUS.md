@@ -2,6 +2,8 @@
 
 ## Resumen
 
+Diagnóstico SSH: GitHub sí alcanza el VPS; la ejecución 45449566125 rechazó la llave para ubuntu, codex-admin y root antes de modificar el servidor. Se prepara comparación de huellas públicas entre el secreto de GitHub y el de Codex, para distinguir una llave distinta de una falta de autorización en el VPS. Publicación aún pendiente.
+
 Reintento del 24: el primer flujo de GitHub llegó al SSH del VPS pero recibió `Permission denied (publickey)` para `ubuntu`, antes de construir o modificar el servidor. La llave se pudo leer correctamente. Su comentario menciona `codex-admin`; se agrega comprobación acotada de autenticación con `ubuntu`, `codex-admin` y `root`, y solicitud explícita por archivo versionado para continuar desde GitHub sin pedir nuevos clics. Conexión y publicación aún pendientes de este reintento.
 
 Actualización 2026-11-24: autoría en primera persona y retrato con fondo natural aprobados por el desarrollador, incorporados en el componente compartido por Inicio y Cómo funciona. Tipos sin errores ni advertencias, 16 pruebas y compilación correctas. Publicación de este cambio pendiente: el entorno de nube no tiene la configuración ni las credenciales SSH del VPS `atendia-development`.
