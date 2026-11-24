@@ -6,25 +6,34 @@
 
 <div class="autoria">
 	<div class="quien">
-		<p>
-			El Observatorio de Legislación de Género es un proyecto independiente y sin fines de lucro,
-			desarrollado por {AUTOR.nombre}. Busca mantener al día el seguimiento de las iniciativas de
-			género en el Congreso de Chile y dejarlo al alcance de cualquier persona. No lo patrocinan ni
-			lo operan el Senado, la Cámara ni la Biblioteca del Congreso Nacional, que son sus fuentes.
-		</p>
 		{#if AUTOR.foto}
-			<img class="foto" src={AUTOR.foto} alt="Retrato de {AUTOR.nombre}" width="96" height="96" />
+			<img
+				class="foto"
+				src={AUTOR.foto}
+				alt="Retrato de {AUTOR.nombre}"
+				width="640"
+				height="800"
+				loading="lazy"
+			/>
 		{/if}
+		<p>{AUTOR.presentacion}</p>
 		{#if AUTOR.resena}
 			<p>
 				{AUTOR.resena}
-				<a href={AUTOR.linkedin} rel="noopener">Su perfil en LinkedIn</a>.
+				Puedes conocer más sobre mi trayectoria en
+				<a href={AUTOR.linkedin} rel="noopener">mi perfil de LinkedIn</a>.
 			</p>
 		{/if}
 		<p>
-			El <a href={REPOSITORIO}>código es abierto</a> y el criterio con que se eligen los proyectos
-			está publicado en <a href="/acerca">Cómo funciona</a>, para que cualquiera pueda revisarlo y
-			discutirlo.
+			El Observatorio es un proyecto independiente y sin fines de lucro. Utiliza información del
+			Senado, la Cámara de Diputadas y Diputados y la Biblioteca del Congreso Nacional, pero ninguna
+			de estas instituciones lo patrocina ni lo administra.
+		</p>
+		<p>
+			El código del sitio está disponible en un <strong
+				><a href={REPOSITORIO}>repositorio público en GitHub</a></strong
+			>. También puedes revisar los criterios de selección de los proyectos y la metodología en
+			<a href="/acerca">Cómo funciona</a>. Ambos están abiertos a revisión y discusión.
 		</p>
 	</div>
 
@@ -81,10 +90,11 @@
 	}
 	.foto {
 		display: block;
-		width: 6rem;
-		height: 6rem;
+		width: min(100%, 16rem);
+		height: auto;
+		aspect-ratio: 4 / 5;
 		margin: 0 0 1rem;
-		border-radius: 50%;
+		border-radius: var(--radio);
 		object-fit: cover;
 		border: 1px solid var(--borde);
 	}

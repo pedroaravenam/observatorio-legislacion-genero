@@ -5,11 +5,13 @@ export const REPOSITORIO = 'https://github.com/pedroaravenam/observatorio-legisl
 
 export const AUTOR = {
 	nombre: 'Pedro Aravena Medel',
+	presentacion:
+		'Soy Pedro Aravena Medel, sociólogo de la Universidad de Concepción y magíster en Desarrollo Humano por FLACSO Argentina. Creé el Observatorio de Legislación de Género para facilitar el seguimiento de las iniciativas de género en el Congreso de Chile y poner esa información al alcance de cualquier persona.',
 	/** Reseña breve de quien desarrolla el sitio. Mientras esté vacía, no se muestra. */
 	resena:
-		'Pedro Aravena Medel es sociólogo de la Universidad de Concepción y especialista en análisis de datos. Ha trabajado en diversas instituciones públicas y privadas, tanto en el ámbito local como en el central. Se formó en análisis espacial, diseño muestral y uso de herramientas de inteligencia artificial, y es magíster en Desarrollo Humano de la FLACSO Argentina. El Observatorio nace de ahí: de aplicar ese oficio a un tema que le importa, para que seguir la legislación de género no dependa de revisar boletín por boletín.',
-	/** Foto del autor, en `sitio/static/` (por ejemplo '/autor.jpg'). Mientras esté vacía, no se muestra. */
-	foto: '',
+		'He trabajado en instituciones públicas y privadas, en los ámbitos local y central, y me he especializado en análisis de datos, análisis espacial, diseño muestral y uso de herramientas de inteligencia artificial. Este sitio nace de combinar esa experiencia con un tema que me importa: que seguir la legislación de género sea más sencillo y no requiera revisar boletín por boletín.',
+	/** Foto del autor, en `sitio/static/`. Mientras esté vacía, no se muestra. */
+	foto: '/pedro-aravena-medel.webp',
 	linkedin: 'https://www.linkedin.com/in/pedro-aravena-medel-576b682b/'
 };
 

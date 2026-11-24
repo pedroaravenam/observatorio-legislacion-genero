@@ -2,6 +2,8 @@
 
 ## Resumen
 
+Actualización 2026-11-24: autoría en primera persona y retrato con fondo natural aprobados por el desarrollador, incorporados en el componente compartido por Inicio y Cómo funciona. Tipos sin errores ni advertencias, 16 pruebas y compilación correctas. Publicación de este cambio pendiente: el entorno de nube no tiene la configuración ni las credenciales SSH del VPS `atendia-development`.
+
 Fecha: 2026-11-18. El 18 se resolvió la cola de validación (139 casos, ahora 0; el sitio muestra 1.364 proyectos, ver HISTORIAL). **Publicado:** https://legislaciongenero.cl (la dirección sslip.io anterior redirige aquí). La versión funcional desplegada es **f12e2bd**, «Aplica el pulido aprobado y anima los gráficos originales», con CI en verde y contenedor sano. Conserva el contenido y los 16 hitos; incorpora apertura en dos columnas, ritmo de lectura, tablas móviles y movimiento sobre las barras originales. El 15 de noviembre se verificaron por HTTP las seis páginas principales, portada con texto idéntico al previo y datos públicos sin cambios. Ver [aplicación y verificación](docs/diseno/revision-2026-11-15/APLICACION.md). Continúa la operación: nocturno, cola de validación y carga completa cada 21 días (próxima, 5 de diciembre).
 
 El sitio muestra la selección de género: **1.467 proyectos** de los 18.666 boletines del Senado (1990–2026), al 14 de noviembre. Tiene cinco secciones:

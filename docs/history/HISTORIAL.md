@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-24 — Presentación en primera persona y foto del autor
+
+Se incorpora el texto aprobado por el desarrollador en «Quién hace este sitio», compartido entre Inicio y Cómo funciona: presentación y trayectoria en primera persona, independencia del proyecto y enlace explícito al repositorio público en GitHub. Se agrega el retrato aprobado con fondo natural, optimizado a WebP (640 × 800, 67 KB), con texto alternativo, dimensiones y carga diferida. El encuadre vertical se conserva en la interfaz. Verificación: tipos sin errores ni advertencias, 16 pruebas unitarias y compilación correctas. La publicación está pendiente: este entorno no tiene configuración ni credenciales SSH para el VPS; el alias `atendia-development` no se resuelve. No se modificaron datos ni selección de proyectos.
+
 ## 2026-11-18 — Cola de validación resuelta: 139 casos
 
 El desarrollador validó a mano los 139 casos de la cola desde una página de revisión: coincidió con el agente en 113 y discrepó en 26 (12 pasan a incluirse como `debil`, 14 salen del sitio). Respaldo previo `ingesta-20261118-1613.dump` (local y R2). `resolver --aplicar` dejó la cola en 0 y republicó la base. El sitio muestra 1.364 proyectos. Veredictos en `docs/mediciones/veredictos-cola-2026-11-18.json`. Los 12 incluidos quedaron todos como `debil` por defecto; no se les asignó otro grupo.
