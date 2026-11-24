@@ -18,13 +18,13 @@ jobs:
       - name: Verificar texto, enlace a GitHub y foto servidos por el sitio
         run: |
           python3 - <<'PY'
-          import hashlib, html, pathlib, re, urllib.request
+          import hashlib, html, pathlib, re, subprocess
           base = 'https://legislaciongenero.cl'
           version = pathlib.Path('sitio/static/pedro-aravena-medel.webp').read_bytes()
-          cache = hashlib.sha256(version).hexdigest()[:16]
+          def descargar(ruta):
+              return subprocess.check_output(['curl', '--fail', '--silent', '--show-error', '--retry', '3', '--max-time', '30', base + ruta], timeout=120)
           for ruta in ['/', '/acerca']:
-              with urllib.request.urlopen(base + ruta + '?verificar-autoria=' + cache, timeout=30) as respuesta:
-                  documento = respuesta.read().decode('utf-8')
+              documento = descargar(ruta).decode('utf-8')
               texto = re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', documento)))
               assert 'Soy Pedro Aravena Medel' in texto, f'Presentación ausente: {ruta}'
               assert 'He trabajado en instituciones públicas y privadas' in texto, f'Reseña ausente: {ruta}'
@@ -33,8 +33,7 @@ jobs:
               assert 'src="/pedro-aravena-medel.webp"' in documento, f'Foto ausente: {ruta}'
               assert 'Pedro Aravena Medel es sociólogo' not in texto, f'Reseña anterior presente: {ruta}'
               print(f'OK {ruta}: presentación en primera persona, repositorio explícito y foto')
-          with urllib.request.urlopen(base + '/pedro-aravena-medel.webp?verificar-autoria=' + cache, timeout=30) as respuesta:
-              foto = respuesta.read()
+          foto = descargar('/pedro-aravena-medel.webp')
           assert hashlib.sha256(foto).digest() == hashlib.sha256(version).digest(), 'La foto publicada difiere del archivo aprobado'
           print('OK foto: SHA256 idéntico al archivo aprobado en el repositorio')
           PY
