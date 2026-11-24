@@ -2,7 +2,7 @@
 
 ## 2026-11-24 — Autenticación SSH rechazada desde GitHub
 
-El reintento 45449566125 llegó al VPS pero rechazó la misma llave para ubuntu, codex-admin y root. No se ejecutó construcción ni publicación. Se agrega al diagnóstico solo la huella pública SHA256 de la llave para compararla con la variable personal de Codex; no se imprime ni transfiere la llave privada. Sigue pendiente obtener una identidad SSH autorizada.
+El reintento 45449566125 llegó al VPS pero rechazó la misma llave para ubuntu, codex-admin y root. No se ejecutó construcción ni publicación. Se agrega al diagnóstico solo la huella pública SHA256 de la llave para compararla con la variable personal de Codex; no se imprime ni transfiere la llave privada. La ejecución 45449886703 confirmó que las huellas públicas de GitHub y Codex coinciden y volvió a recibir rechazo para las tres cuentas. Sigue pendiente confirmar una cuenta autorizada o revisar la autorización de la llave desde la consola web del VPS. No se modificó el servidor.
 
 ## 2026-11-24 — Comprobación del usuario SSH y reintento solicitado por commit
 
