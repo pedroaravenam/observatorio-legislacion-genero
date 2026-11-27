@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-27 — Veredictos de los pendientes aplicados en producción
+
+El desarrollador tomó un respaldo (`ingesta-20261127-0744.dump`, 33 MB, verificado en local y en R2), corrió el ensayo en seco y aplicó los 28 veredictos de `veredictos-pendientes-2026-11-24.json` (16 incluye, 12 excluye; 17003-11 y 18044-13 como incluye débil). La base del sitio se publicó; quedan 24 pendientes en la cola.
+
 ## 2026-11-27 — Criterio del clasificador afinado contra todos los casos conocidos (commit de este avance)
 
 Del 24 al 27 de noviembre se ajustó `criterio.md` con el desarrollador, caso por caso, leyendo el texto de cada proyecto. El agente ahora recibe el articulado (`extraerArticulado`, que reconoce los formatos reales de los PDF del Senado) y fragmentos que reservan lugar a los pasajes de género. Reglas nuevas: la reducción de brechas pesa más que la materia; nombrar no es argumentar; los fundamentos cuentan si la medida apunta a la brecha o si su efecto recae sobre todo en las mujeres según los propios fundamentos; una palabra ambigua no basta pero no deja fuera el proyecto. Resultado con `agente-b0889fdd`: controles 50/50, casos de la regla de fundamentos 45/45, pendientes 23/23 y muestra aleatoria 28/29 (el caso restante alterna entre corridas con confianza media). El desarrollador corrigió 6 veredictos tras leer los textos (2252-04, 17003-11, 18044-13, 5308-18, 14608-13 y el control 5087-07). Se descartó por ahora el piloto de ML (rama `piloto-ml-clasificacion`). Unas 900 llamadas al agente en total, todas aprobadas. Detalle: `docs/mediciones/mejora-clasificador-2026-11/README.md`.
