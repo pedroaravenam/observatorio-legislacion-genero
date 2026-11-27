@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-27 — La cola de validación la resuelve el agente afinado
+
+A pedido del desarrollador, el agente con el criterio `agente-b0889fdd` reclasificó los 24 proyectos de la cola (24 llamadas, en simulacro). 22 repitieron la decisión anterior; cambiaron 2132-11 (salud, con bonificación del 75 % al parto: entra como débil) y 4082-13 (permisos por duelo; el permiso del padre al nacer sigue en 5 días en total: sale). Los veredictos quedaron en `veredictos-cola-2026-11-27.json` (19 incluye, 5 excluye). El desarrollador tomó un respaldo (`ingesta-20261127-1706.dump`) y los aplicó; la base del sitio se publicó y la cola quedó en 0.
+
 ## 2026-11-27 — Veredictos de los pendientes aplicados en producción
 
 El desarrollador tomó un respaldo (`ingesta-20261127-0744.dump`, 33 MB, verificado en local y en R2), corrió el ensayo en seco y aplicó los 28 veredictos de `veredictos-pendientes-2026-11-24.json` (16 incluye, 12 excluye; 17003-11 y 18044-13 como incluye débil). La base del sitio se publicó; quedan 24 pendientes en la cola.
