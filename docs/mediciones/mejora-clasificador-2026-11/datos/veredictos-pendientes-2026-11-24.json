@@ -1,0 +1,158 @@
+[
+ {
+  "boletin": "18020-06",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Condiciones laborales del personal que manipula alimentos en licitaciones públicas. Es un oficio ejercido sobre todo por mujeres y el texto fija un tope por «trabajadora». Efecto en las mujeres deducido del sector: relación débil. El criterio nuevo (agente-c33efc29) lo excluyó y el desarrollador lo corrigió (24-11-2026)."
+ },
+ {
+  "boletin": "17411-07",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Plazo para eliminar antecedentes penales, con el femicidio entre los delitos que regula. Entra como débil porque el articulado nombra el femicidio. El criterio nuevo lo excluyó y el desarrollador lo corrigió (24-11-2026)."
+ },
+ {
+  "boletin": "12535-21",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Ley de Pesca y Acuicultura sobre recursos bentónicos, con una disposición expresa sobre la mujer embarazada. Aunque es acotada, tiene una disposición de género: relación débil. El criterio nuevo lo excluyó y el desarrollador lo corrigió (24-11-2026)."
+ },
+ {
+  "boletin": "17117-03",
+  "incluye": false,
+  "razon": "Marco jurídico de las ferias libres. El género aparece solo como principio general de equidad en los fundamentos; mención aislada en un proyecto de otra materia. El criterio nuevo lo incluyó con confianza baja y el desarrollador lo corrigió (24-11-2026)."
+ },
+ {
+  "boletin": "17483-07",
+  "incluye": false,
+  "razon": "Tipifica el delito de esclavitud y servidumbre. La trata y el trabajo doméstico forzado aparecen solo como antecedentes; no trata a las mujeres de modo diferenciado. El criterio nuevo lo incluyó con confianza baja y el desarrollador lo corrigió (24-11-2026)."
+ },
+ {
+  "boletin": "11858-06",
+  "incluye": false,
+  "razon": "Prohíbe a alcaldes y concejales salir del país con deudas previsionales con su personal. Materia administrativa y laboral sin disposición de género. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "16139-24",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Instituye el Día Nacional de la Mujer de Armas y autoriza monumentos en su honor. Homenaje a las mujeres como grupo, que visibiliza su rol histórico: entra como débil. Distinto de un homenaje a una persona (por ejemplo Gabriela Mistral, que además es poeta y Nobel). Coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "16330-05",
+  "incluye": false,
+  "razon": "Ley de Presupuestos 2024. Materia fiscal general sin disposición de género propia. Coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "164-02",
+  "incluye": false,
+  "razon": "Aumenta la planta de personal de Carabineros. Organización del Estado sin relación con género. Coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "16842-07",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Inhabilitación como pena accesoria a funcionarios o electos condenados por corrupción o delitos sexuales; el articulado nombra los delitos sexuales y los fundamentos citan acoso a funcionarias. Relación débil. Coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "16921-12",
+  "incluye": false,
+  "razon": "Prevenir el abandono de animales y aumentar penas (ley 21.020). Cuidado de animales de compañía, sin relación con género. Coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "16958-07",
+  "incluye": false,
+  "razon": "Objeto: ampliar a los particulares los sujetos activos del delito de tortura en el Código Penal. Es materia penal general sobre derechos humanos, sin disposición ni efecto de género visible por el título; sin texto disponible. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17003-11",
+  "incluye": true,
+  "razon": "Ley integral de salud mental. El articulado modifica la ley 20.584 para prohibir las terapias de conversión por orientación sexual o identidad de género: acción expresa que reduce una desigualdad de género en una ley de salud general, relación débil. El desarrollador lo excluyó el 24-11-2026 sin ver esa cláusula y lo corrigió el 26-11-2026.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "17010-07",
+  "incluye": false,
+  "razon": "Objeto: refuerza la igualdad ante la ley en general y sanciona normas que impidan el ejercicio igualitario de derechos, sin referirse a mujeres ni a orientación sexual o identidad de género. Los términos del léxico son «igualdad/discriminación» en sentido genérico, no de género. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17066-13",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: modifica el Código del Trabajo para proteger los derechos fundamentales de alumnos o egresados en práctica profesional, pasantía o internado. Hay referencias a acoso sexual y no discriminación, pero el objeto es laboral general; relación débil, en la duda entra. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17277-07",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: reforma constitucional que consagra el derecho a la seguridad social según estándares OIT. Los fundamentos señalan que el sistema discrimina por género al no considerar el trabajo de cuidados; la relación con género es dudosa y se deduce del contexto, así que entra como débil. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17307-07",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: tipificar en el Código Penal la generación y difusión de imágenes íntimas o deepfakes creados con IA, sin consentimiento. Norma neutra, pero los fundamentos la describen como violencia digital que afecta sobre todo a mujeres; relación dudosa, entra como débil. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17379-07",
+  "incluye": false,
+  "razon": "Objeto: reforma constitucional para nacionalizar las AFP, es decir, cambiar quién administra los fondos de pensiones. Solo regula la administración del sistema; las menciones a mujeres y equidad de género están en los fundamentos, sin disposición expresa de género. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17532-07",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: tipificar y sancionar la denuncia falsa de delitos contra la libertad e indemnidad sexual en el Código Penal. No tipifica el delito sexual mismo, pero es materia vecina a la violencia sexual, que se trata por tema y no por postura: relación débil. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17598-24",
+  "incluye": false,
+  "razon": "Objeto: cambiar el nombre del Aeródromo La Florida a «Aeropuerto Gabriela Mistral», una denominación de infraestructura que honra a una persona. Es un homenaje individual, como los nombres de calles. «Primera mujer latinoamericana» con Nobel aparece solo de paso. Difiere del precedente del monumento. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "17645-18",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: atención preferente y priorización en beneficios sociales para mujeres embarazadas y niños bajo protección especializada. Como en el precedente de atención preferente a embarazadas, es materia vecina al género (embarazo), sin ser maternidad en sí: relación débil. El desarrollador incluye por las mujeres embarazadas (24-11-2026)."
+ },
+ {
+  "boletin": "1787-02",
+  "incluye": false,
+  "razon": "Ley general del deporte. Los fundamentos señalan de paso que la población femenina quedó fuera de la política de deportes, pero el articulado no tiene ninguna medida al respecto: es diagnóstico, no razón de la medida. Fuera. El desarrollador lo excluyó el 24-11-2026 (sin texto entonces) y lo confirmó el 26-11-2026 leyendo el texto."
+ },
+ {
+  "boletin": "18044-13",
+  "incluye": true,
+  "razon": "Negociación colectiva multinivel. El articulado tiene acciones expresas para reducir brechas de género: pactos de conciliación, corresponsabilidad y equidad de género; propender a un tercio de mujeres en los consejos sectoriales; informe sectorial de brechas de género. Ley laboral general: relación débil. El desarrollador lo excluyó el 24-11-2026 sin ver esas disposiciones y lo corrigió el 26-11-2026.",
+  "grupo": "debil"
+ },
+ {
+  "boletin": "18239-36",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: sancionar acusaciones, denuncias y querellas falsas y regular su procedimiento, con foco en juicios de familia (cuidado personal, alimentos), violencia intrafamiliar y delitos sexuales. Es una materia vecina al género y no una ley de VIF en sí; entra como relación débil por la duda. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "18272-37",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: declarar el trabajo de las mujeres descoladoras de la industria pesquera como patrimonio cultural inmaterial. Es un reconocimiento a las mujeres como grupo laboral, con perspectiva de género y precariedad específica: materia vecina al género, es decir, relación débil. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "18280-21",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: reconocer las actividades conexas a la pesca artesanal en Indespa y regular su inscripción y postulación a beneficios. Se fundamenta en la Ley 21.370 de equidad de género y en trabajadoras mayoritariamente mujeres, pero el articulado es neutro; el efecto sobre ellas se deduce del contexto. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "18283-35",
+  "incluye": true,
+  "grupo": "debil",
+  "razon": "Objeto: incluir a cuidadores no remunerados como beneficiarios de la cuota preferente de inclusión laboral (Ley 21.015). Los fundamentos vinculan el cuidado no remunerado con la desigualdad de género y las mujeres, pero el efecto se deduce del contexto; relación débil. El desarrollador coincide con el agente (24-11-2026)."
+ },
+ {
+  "boletin": "18299-35",
+  "incluye": false,
+  "razon": "Objeto: responsabilidad familiar y abandono sociosanitario de adultos mayores hospitalizados (notificación, Tribunales de Familia, alimentos). Es un asunto de personas mayores, sin disposición expresa sobre mujeres ni género; el cuidado es neutro y aislado, como en el precedente ELEAM. El desarrollador coincide con el agente (24-11-2026)."
+ }
+]

@@ -1,0 +1,32 @@
+Prueba con 17 casos de control. Agente sonnet, criterio agente-dae0bc91.
+[1/17] 14866-07 incluye (media)
+[2/17] 12695-13 excluye (alta)
+[3/17] 12081-03 incluye (media)
+[4/17] 15759-17 excluye (alta)
+[5/17] 15024-07 excluye (alta)
+[6/17] 16623-13 excluye (alta)
+[7/17] 18044-13 incluye (media)
+[8/17] 17277-07 excluye (media)
+[9/17] 18239-36 incluye (media)
+[10/17] 18299-35 excluye (alta)
+[11/17] 4450-07 excluye (alta)
+[12/17] 18283-35 incluye (media)
+[13/17] 5915-11 excluye (alta)
+[14/17] 5623-07 incluye (media)
+[15/17] 5308-18 incluye (media)
+[16/17] 8688-07 excluye (alta)
+[17/17] 9998-07 excluye (alta)
+
+Aciertos: 15 de 17 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 2.
+  nivel 18044-13: esperado debil, agente componente
+  nivel 18283-35: esperado debil, agente componente
+
+NO COINCIDE 17277-07 esperado=incluye agente=excluye (media)
+  Modifica la Carta Fundamental, con el objeto de fortalecer el derecho a la seguridad social
+  Objeto: reforma constitucional que reemplaza el art. 19 N°18 para consagrar los principios de la seguridad social (OIT) y su financiamiento tripartito. Es reforma constitucional con articulado neutro; «igualdad» es genérica y la brecha de cuidados aparece solo en los fundamentos.
+
+NO COINCIDE 5308-18 esperado=excluye agente=incluye (media)
+  Modifica normas sobre parricidio.
+  Objeto: modifica el Código Penal en parricidio y homicidio: separa el miedo insuperable como eximente y atenúa la pena a quien mata a quien le infligió sevicias. Débil: el texto es neutro, pero los fundamentos muestran que favorece a mujeres víctimas de violencia intrafamiliar que matan a su agresor.
+
+Sin decisión del desarrollador (solo informativo):

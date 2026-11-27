@@ -1,0 +1,77 @@
+Prueba con 31 casos de control. Agente sonnet, criterio agente-4416aad7.
+[1/31] 13773-18 incluye (baja)
+[2/31] 1318-04 incluye (baja)
+[3/31] 1611-10 excluye (baja)
+[4/31] 1307-18 incluye (baja)
+[5/31] 18624-36 incluye (alta)
+[6/31] 18255-31 incluye (media)
+[7/31] 16623-13 incluye (media)
+[8/31] 16503-07 incluye (media)
+[9/31] 16379-04 incluye (media)
+[10/31] 15318-25 excluye (media)
+[11/31] 15180-13 incluye (media)
+[12/31] 14921-07 incluye (media)
+[13/31] 14866-07 incluye (media)
+[14/31] 14638-07 incluye (baja)
+[15/31] 14608-13 excluye (media)
+[16/31] 13849-04 incluye (media)
+[17/31] 13681-10 incluye (media)
+[18/31] 13460-18 incluye (media)
+[19/31] 13663-06 incluye (media)
+[20/31] 13224-18 incluye (media)
+[21/31] 13102-05 excluye (media)
+[22/31] 13247-07 incluye (media)
+[23/31] 12759-07 incluye (media)
+[24/31] 11581-07 excluye (alta)
+[25/31] 5567-18 excluye (alta)
+[26/31] 18020-06 incluye (media)
+[27/31] 4759-07 incluye (baja)
+[28/31] 17411-07 incluye (media)
+[29/31] 17483-07 excluye (media)
+[30/31] 17117-03 excluye (alta)
+[31/31] 12535-21 incluye (media)
+
+Aciertos: 21 de 31 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+NO COINCIDE 1611-10 esperado=incluye agente=excluye (baja)
+  Proyecto de acuerdo sobre aprobación del convenio de seguridad social entre la República de Chile y el Reino de Dinamarca, suscrito en Copen
+  Objeto: aprueba un convenio bilateral de seguridad social entre Chile y Dinamarca para coordinar prestaciones. «8 de marzo» es solo la fecha del tratado (palabra que engaña); sin texto disponible, queda para validación.
+
+NO COINCIDE 1318-04 esperado=excluye agente=incluye (baja)
+  Proyecto de ley sobre expresiones discriminatorias.
+  Objeto: sancionar o regular las expresiones discriminatorias (materia del Senado: discriminación), sin texto disponible. Es una norma antidiscriminación general que podría proteger el sexo o la orientación sexual entre otras categorías: entra como débil por duda, pendiente de validar.
+
+NO COINCIDE 18255-31 esperado=excluye agente=incluye (media)
+  Establece un beneficio de compensación por la compra de pañales y de medicamentos
+  Objeto: bonificación equivalente al IVA por compra de pañales y medicamentos para el 80% más vulnerable. El articulado nombra a las madres como beneficiarias y a las personas cuidadoras; hay un vínculo con los cuidados, pero el objeto es una medida económica general: relación débil.
+
+NO COINCIDE 16623-13 esperado=excluye agente=incluye (media)
+  Modifica el Código del Trabajo para perfeccionar la protección de quienes trabajan en el transporte público de pasajeros
+  Objeto: lleva al Código del Trabajo las obligaciones de higiene y seguridad (baños, agua) para quienes trabajan en el transporte público. Los fundamentos dicen que la falta de baños afecta más a conductoras e inspectoras y la medida la corrige; no se ve una disposición expresa.
+
+NO COINCIDE 15180-13 esperado=excluye agente=incluye (media)
+  Modifica el Código del Trabajo para otorgar a los trabajadores un permiso especial para asistir a reuniones en calidad de apoderados de niño
+  Objeto: crea un permiso laboral de dos horas cada dos meses para que trabajadores asistan a reuniones de apoderados de sus hijos o pupilos. Es un permiso ligado a la responsabilidad parental, que recae sobre todo en las mujeres (lo dicen los fundamentos); texto neutro y vínculo indirecto con cuidados: débil.
+
+NO COINCIDE 14921-07 esperado=excluye agente=incluye (media)
+  Reforma constitucional que establece, en el marco de la seguridad social, una destinación específica del financiamiento para fines prevision
+  Objeto: reforma constitucional que reserva los fondos de cotizaciones para fines previsionales y protege la propiedad de los ahorros individuales. Es seguridad social y el artículo único incluye de forma expresa el pago de pensiones alimenticias como fin previsional, un tema de componente.
+
+NO COINCIDE 13681-10 esperado=excluye agente=incluye (media)
+  Aprueba el "Protocolo de 2014 relativo al convenio sobre el trabajo forzoso, 1930", adoptado por la Conferencia General de la Organización I
+  Objeto: aprueba el Protocolo OIT de 2014 sobre trabajo forzoso. El Protocolo exige medidas específicas contra la trata de personas, materia que el criterio trata como de género, pero no es su objeto central; las mujeres migrantes se nombran solo de paso.
+
+NO COINCIDE 13663-06 esperado=excluye agente=incluye (media)
+  Establece normas especiales aplicables al cambio de domicilio electoral requerido para efectos del plebiscito a que alude el artículo 130 de
+  Objeto: permite cambiar el domicilio electoral de forma excepcional para el plebiscito de 2020 por el Covid-19. El art. 2 da un plazo especial a quienes rectificaron su partida según la Ley 21.120 de identidad de género, para proteger el voto de las personas trans: es una disposición expresa.
+
+NO COINCIDE 12759-07 esperado=excluye agente=incluye (media)
+  Modifica el Código Penal, el Código Procesal Penal, y la ley N°20.066 sobre Violencia Intrafamiliar, para prevenir y sancionar penalmente el
+  Objeto: tipifica el abuso patrimonial contra adultos mayores y personas con discapacidad, y lo incorpora como violencia intrafamiliar en la Ley 20.066. Aplica la regla de VIF: modificar esa ley es tema central aunque el texto sea neutro y el foco sean los adultos mayores.
+
+NO COINCIDE 4759-07 esperado=excluye agente=incluye (baja)
+  Reforma constitucional que modifica el artículo 19, prohibiendo establecer edad máxima para postular a un cargo.
+  Objeto: prohíbe, por reforma constitucional, fijar una edad máxima para postular a un empleo público o privado. Es materia laboral de discriminación por edad, y el artículo fija topes distintos según el sexo (65 años para hombres y 60 para mujeres): hay duda real y entra como débil.
+
+Sin decisión del desarrollador (solo informativo):
+salida: 3

@@ -1,7 +1,7 @@
 // Pruebas de las funciones puras del clasificador. Uso: node --test despliegue/clasificador/
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { construirEvidencia, contarLexico, esLimiteDeUso, textoRtf, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
+import { extraerArticulado, construirEvidencia, contarLexico, esLimiteDeUso, textoRtf, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
 
 test('normalizar conserva el largo y quita tildes', () => {
 	const t = 'Violación y Género: ¿Año nuevo?';
@@ -232,4 +232,47 @@ test('sqlPrioridadV5 ordena por duda del agente y temas sensibles, y valida el m
 	assert.match(sql, /LIMIT 50;/);
 	assert.throws(() => sqlPrioridadV5(-1));
 	assert.throws(() => sqlPrioridadV5(1.5));
+});
+
+test('extraerArticulado toma lo que dispone el proyecto y no las citas a otras leyes', () => {
+	const t = 'FUNDAMENTOS. El artículo 1° de la ley N° 20.680 establece el cuidado compartido. ARTÍCULO ÚNICO: Agrégase al artículo 19 el inciso: «Toda persona, con independencia de su sexo, orientación sexual o estado civil, tiene derecho…»';
+	const a = extraerArticulado(t);
+	assert.ok(a.startsWith('ARTÍCULO ÚNICO'));
+	assert.ok(a.includes('con independencia de su sexo'));
+	assert.ok(!a.includes('FUNDAMENTOS'));
+});
+
+test('extraerArticulado reconoce «PROYECTO DE LEY.» y devuelve vacío si no hay articulado', () => {
+	assert.ok(extraerArticulado('Título: PROYECTO DE LEY QUE MODIFICA X. Antecedentes largos. PROYECTO DE LEY. Modifíquese la ley 16.618 para agregar un artículo 48 bis').startsWith('PROYECTO DE LEY. Modifíquese'));
+	assert.equal(extraerArticulado('Solo fundamentos, sin parte dispositiva.'), '');
+	assert.equal(extraerArticulado('x'.repeat(10) + ' Artículo 1° ' + 'y'.repeat(5000)).length, 2500);
+});
+
+test('extraerArticulado reconoce las variantes reales de los PDF del Senado', () => {
+	const fund = 'PROYECTO DE LEY QUE MODIFICA EL CÓDIGO DEL TRABAJO. Fundamentos. El presente proyecto de ley tiene por objeto X. ';
+	assert.ok(extraerArticulado(fund + 'P R O Y E C T O D E L E Y: “Artículo primero.- Modifícase el Código').startsWith('Artículo primero'));
+	assert.ok(extraerArticulado(fund + 'PROYECTO DE LEY Artículo 1o. Objeto. La presente ley').startsWith('Artículo 1o.'));
+	assert.ok(extraerArticulado(fund + 'PROYECTO DE LEY Párrafo 1: Del ámbito Artículo 1: Dos personas').startsWith('Artículo 1:'));
+	assert.ok(extraerArticulado(fund + 'PROYECTO DE LEY Modifíquese el Código Penal').startsWith('PROYECTO DE LEY Modifíquese'));
+	assert.ok(extraerArticulado(fund + 'PROYECTO DE LEY: 1.- Incorpora el siguiente artículo 5°').startsWith('PROYECTO DE LEY: 1.-'));
+	assert.ok(extraerArticulado(fund + 'PROYECTO DE LEY: - Agréguese el siguiente inciso').startsWith('PROYECTO DE LEY: - Agréguese'));
+	assert.ok(extraerArticulado(fund + 'el siguiente: Proyecto de ley Sustitúyase la letra b').startsWith('Proyecto de ley Sustitúyase'));
+	assert.equal(extraerArticulado(fund + 'PROYECTO DE LEY SOBRE la materia, sin parte dispositiva.'), '');
+	// Fundamentos que resumen el proyecto artículo por artículo: manda el encabezado.
+	assert.ok(extraerArticulado(fund + 'Artículo 1: Dispone un plazo. Artículo 2: Dispone otro. vienen en presentar el siguiente PROYECTO DE LEY ARTÍCULO ÚNICO: Establece normas').startsWith('ARTÍCULO ÚNICO: Establece'));
+});
+
+test('construirEvidencia incluye el articulado cuando existe y lo omite si no', () => {
+	const p = { boletin: '1-01', titulo: 'T', iniciativa: 'Moción', camara: 'Senado', fecha_ingreso: '2026-10-01', materias: '' };
+	const base = { largo: 100, apariciones: 1, densidad: 1, inicio: 'ini', fragmentos: [] };
+	assert.match(construirEvidencia(p, { ...base, articulado: 'Artículo único: dispone X' }), /Articulado[^\n]*\n«Artículo único: dispone X»/);
+	assert.doesNotMatch(construirEvidencia(p, { ...base, articulado: '' }), /Articulado/);
+});
+
+test('los fragmentos reservan lugar al núcleo de género aunque otros términos llenen la lista', () => {
+	const relleno = (n) => Array.from({ length: n }, () => 'el cónyuge o conviviente civil, la embarazada y la madre cumplen requisitos ' + 'x'.repeat(300)).join(' ');
+	const t = relleno(40) + ' La diferencia entre hombres y mujeres en las pensiones es de 320 mil y 192 mil. ' + relleno(40);
+	const f = fragmentos(t, contarLexico(t).posiciones, 6, 120);
+	assert.ok(f.some((v) => v.includes('hombres y mujeres')), 'el pasaje de la brecha debe estar entre los fragmentos');
+	assert.ok(f.length <= 6);
 });

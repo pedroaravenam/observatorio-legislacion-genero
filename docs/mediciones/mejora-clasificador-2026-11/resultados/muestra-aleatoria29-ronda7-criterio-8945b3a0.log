@@ -1,0 +1,59 @@
+Prueba con 29 casos de control. Agente sonnet, criterio agente-8945b3a0.
+[1/29] 5623-07 incluye (media)
+[2/29] 5308-18 incluye (media)
+[3/29] 9771-07 incluye (media)
+[4/29] 5989-07 excluye (alta)
+[5/29] 9199-05 excluye (alta)
+[6/29] 18704-19 excluye (alta)
+[7/29] 953-07 incluye (baja)
+[8/29] 2252-04 excluye (media)
+[9/29] 8708-04 incluye (media)
+[10/29] 9118-05 excluye (alta)
+[11/29] 18018-13 excluye (media)
+[12/29] 16484-24 incluye (baja)
+[13/29] 15759-17 excluye (alta)
+[14/29] 16634-07 excluye (alta)
+[15/29] 14489-06 excluye (alta)
+[16/29] 11943-07 excluye (alta)
+[17/29] 13226-03 excluye (alta)
+[18/29] 18103-07 excluye (alta)
+[19/29] 8379-07 excluye (media)
+[20/29] 1192-11 excluye (media)
+[21/29] 15958-24 incluye (media)
+[22/29] 688-07 incluye (media)
+[23/29] 10347-05 incluye (media)
+[24/29] 18010-07 excluye (alta)
+[25/29] 6212-13 excluye (alta)
+[26/29] 8688-07 excluye (alta)
+[27/29] 13443-17 excluye (alta)
+[28/29] 8199-13 excluye (media)
+[29/29] 12695-13 incluye (media)
+
+Aciertos: 23 de 29 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+NO COINCIDE 9771-07 esperado=excluye agente=incluye (media)
+  Reforma constitucional que prohíbe las discriminaciones arbitrarias en contra de las personas en situación de discapacidad, y las basadas en
+  Objeto: reforma constitucional que prohíbe la discriminación arbitraria contra personas con discapacidad y por otras categorías. Aplica «debil»: es una norma antidiscriminación general cuyo artículo nombra de modo expreso la orientación sexual, aunque el foco sea la discapacidad.
+
+NO COINCIDE 5308-18 esperado=excluye agente=incluye (media)
+  Modifica normas sobre parricidio.
+  Objeto: reforma los delitos de parricidio y homicidio de parientes (incluye al conviviente) y las eximentes y agravantes, a partir de la violencia intrafamiliar. Es un delito ligado a la violencia en la pareja que afecta sobre todo a mujeres, pero no consta una disposición expresa de género: relación débil.
+
+NO COINCIDE 8379-07 esperado=incluye agente=excluye (media)
+  Agrava la pena establecida por el artículo 211 del Código Penal a la denuncia calumniosa por comisión de delitos sexuales en contra de menor
+  Objeto: agrava la pena de la denuncia calumniosa por delitos sexuales contra hijos menores cuando se hace en una disputa por su cuidado personal. Los delitos sexuales contra menores son materia penal y de infancia y quedan fuera, y el proyecto no regula la relación entre los padres.
+
+NO COINCIDE 688-07 esperado=excluye agente=incluye (media)
+  Concede amnistía a quienes hayan cometido el delito de suposición de parto
+  Objeto: amnistía para el delito de suposición de parto cometido para dar estado civil de hijo legítimo al hijo de una descendiente menor de edad. Toca la filiación materna y el estigma hacia las madres solteras adolescentes, pero es una amnistía penal: hay duda razonable y entra como débil.
+
+NO COINCIDE 10347-05 esperado=excluye agente=incluye (media)
+  Equipara el tratamiento de actuaciones del Servicio de Registro Civil e Identificación respecto del Acuerdo de Unión Civil.
+  Objeto: fija aranceles y exenciones del Registro Civil para trámites del Acuerdo de Unión Civil, igualándolos a los del matrimonio. Débil: pone en práctica la ley que reconoce a las parejas del mismo sexo, aunque el texto solo trata de aranceles.
+
+NO COINCIDE 12695-13 esperado=excluye agente=incluye (media)
+  Modifica el Código del Trabajo y el Código Penal en materia de caracterización, investigación y sanción del acoso laboral
+  Objeto: refuerza la regulación del acoso laboral (protocolos, tutela, delito) y lo incorpora al título IV del Código del Trabajo sobre investigación y sanción del acoso sexual. Se aplica la regla del marco contra el acoso que incluye el acoso sexual: débil.
+
+Sin decisión del desarrollador (solo informativo):
+salida: 3

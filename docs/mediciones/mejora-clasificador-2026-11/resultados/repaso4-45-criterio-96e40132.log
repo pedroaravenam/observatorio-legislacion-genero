@@ -1,0 +1,57 @@
+Prueba con 45 casos de control. Agente sonnet, criterio agente-96e40132.
+[1/45] 1611-10 excluye (media)
+[2/45] 13773-18 incluye (baja)
+[3/45] 1318-04 excluye (baja)
+[4/45] 18624-36 incluye (alta)
+[5/45] 18255-31 excluye (media)
+[6/45] 1307-18 incluye (baja)
+[7/45] 16623-13 excluye (alta)
+[8/45] 16379-04 incluye (media)
+[9/45] 16503-07 incluye (media)
+[10/45] 15318-25 excluye (media)
+[11/45] 15180-13 excluye (alta)
+[12/45] 14866-07 incluye (media)
+[13/45] 14921-07 incluye (media)
+[14/45] 14638-07 incluye (media)
+[15/45] 14608-13 incluye (alta)
+[16/45] 13849-04 incluye (media)
+[17/45] 13681-10 excluye (alta)
+[18/45] 13663-06 incluye (media)
+[19/45] 13460-18 incluye (media)
+[20/45] 13247-07 incluye (alta)
+[21/45] 13224-18 incluye (media)
+[22/45] 13102-05 excluye (alta)
+[23/45] 12759-07 excluye (alta)
+[24/45] 11581-07 excluye (alta)
+[25/45] 5567-18 excluye (alta)
+[26/45] 4759-07 excluye (alta)
+[27/45] 18020-06 incluye (media)
+[28/45] 17411-07 incluye (media)
+[29/45] 12535-21 incluye (media)
+[30/45] 17483-07 excluye (alta)
+[31/45] 17117-03 excluye (media)
+[32/45] 1787-02 excluye (alta)
+[33/45] 2252-04 incluye (media)
+[34/45] 5308-18 incluye (media)
+[35/45] 17277-07 incluye (media)
+[36/45] 18044-13 incluye (media)
+[37/45] 18283-35 incluye (media)
+[38/45] 17379-07 excluye (alta)
+[39/45] 17307-07 incluye (media)
+[40/45] 18280-21 incluye (media)
+[41/45] 18081-17 excluye (alta)
+[42/45] 16842-07 incluye (media)
+[43/45] 17066-13 incluye (media)
+[44/45] 5087-07 incluye (media)
+[45/45] 18018-13 excluye (media)
+
+Aciertos: 44 de 45 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 3.
+  nivel 18283-35: esperado debil, agente componente
+  nivel 18044-13: esperado debil, agente componente
+  nivel 17066-13: esperado debil, agente componente
+
+NO COINCIDE 5087-07 esperado=excluye agente=incluye (media)
+  Para garantizar el acceso universal e igualitario a la pensión de vejez.
+  Objeto: reforma constitucional que garantiza a toda persona el acceso a la pensión de vejez, con un monto mínimo financiado por el Estado. «Igualitario» no significa aquí igualdad de género, pero se aplica la regla de pensiones de ingreso bajo: componente.
+
+Sin decisión del desarrollador (solo informativo):

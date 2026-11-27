@@ -1,0 +1,127 @@
+{
+ "13773-18": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "1611-10": {
+  "esperado": "excluye",
+  "nota": "veredicto corregido por el desarrollador el 2026-11-24: acuerdo entre Estados, sin relación con género"
+ },
+ "1318-04": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "1307-18": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "18624-36": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "18255-31": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "16623-13": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "16503-07": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "16379-04": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "15318-25": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "15180-13": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "14921-07": {
+  "esperado": "incluye",
+  "nota": "veredicto corregido por el desarrollador el 2026-11-24: el agente tenía razón"
+ },
+ "14866-07": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "14638-07": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "14608-13": {
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "corregido por el desarrollador el 2026-11-26 tras leer el texto: el 70% del retail son mujeres y los fundamentos dan su inseguridad nocturna y su carga de cuidados como razón del cierre a las 19:00"
+ },
+ "13849-04": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "13681-10": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "13663-06": {
+  "esperado": "incluye",
+  "nota": "veredicto corregido por el desarrollador el 2026-11-24: el agente tenía razón"
+ },
+ "13460-18": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "13247-07": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "13224-18": {
+  "esperado": "incluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "13102-05": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "12759-07": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "11581-07": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "5567-18": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "4759-07": {
+  "esperado": "excluye",
+  "nota": "desacuerdo de la cola del 2026-11-18"
+ },
+ "18020-06": {
+  "esperado": "incluye",
+  "nota": "pendiente corregido por el desarrollador el 2026-11-24"
+ },
+ "17411-07": {
+  "esperado": "incluye",
+  "nota": "pendiente corregido por el desarrollador el 2026-11-24"
+ },
+ "12535-21": {
+  "esperado": "incluye",
+  "nota": "pendiente corregido por el desarrollador el 2026-11-24"
+ },
+ "17117-03": {
+  "esperado": "excluye",
+  "nota": "pendiente corregido por el desarrollador el 2026-11-24"
+ },
+ "17483-07": {
+  "esperado": "excluye",
+  "nota": "pendiente corregido por el desarrollador el 2026-11-24"
+ }
+}

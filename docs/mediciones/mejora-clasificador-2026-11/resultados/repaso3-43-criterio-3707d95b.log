@@ -1,0 +1,55 @@
+Prueba con 43 casos de control. Agente sonnet, criterio agente-3707d95b.
+[1/43] 13773-18 incluye (baja)
+[2/43] 1318-04 excluye (baja)
+[3/43] 1611-10 excluye (baja)
+[4/43] 1307-18 incluye (baja)
+[5/43] 18624-36 incluye (alta)
+[6/43] 18255-31 excluye (media)
+[7/43] 16623-13 excluye (alta)
+[8/43] 16379-04 incluye (media)
+[9/43] 16503-07 incluye (media)
+[10/43] 15318-25 excluye (media)
+[11/43] 15180-13 excluye (alta)
+[12/43] 14866-07 incluye (media)
+[13/43] 14921-07 incluye (media)
+[14/43] 13849-04 incluye (media)
+[15/43] 14638-07 incluye (baja)
+[16/43] 14608-13 incluye (baja)
+[17/43] 13681-10 excluye (alta)
+[18/43] 13460-18 incluye (media)
+[19/43] 13663-06 incluye (media)
+[20/43] 13247-07 incluye (alta)
+[21/43] 13224-18 incluye (media)
+[22/43] 13102-05 excluye (alta)
+[23/43] 12759-07 excluye (alta)
+[24/43] 5567-18 excluye (alta)
+[25/43] 11581-07 excluye (alta)
+[26/43] 4759-07 excluye (alta)
+[27/43] 18020-06 incluye (media)
+[28/43] 17411-07 incluye (media)
+[29/43] 12535-21 incluye (media)
+[30/43] 17483-07 excluye (alta)
+[31/43] 17117-03 excluye (media)
+[32/43] 1787-02 excluye (alta)
+[33/43] 5308-18 incluye (media)
+[34/43] 2252-04 incluye (media)
+[35/43] 17277-07 incluye (media)
+[36/43] 18283-35 incluye (media)
+[37/43] 18044-13 incluye (media)
+[38/43] 17307-07 incluye (media)
+[39/43] 17379-07 excluye (media)
+[40/43] 18280-21 incluye (media)
+[41/43] 16842-07 incluye (media)
+[42/43] 18081-17 excluye (alta)
+[43/43] 17066-13 incluye (media)
+
+Aciertos: 42 de 43 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 3.
+  nivel 18283-35: esperado debil, agente componente
+  nivel 18044-13: esperado debil, agente componente
+  nivel 17307-07: esperado debil, agente componente
+
+NO COINCIDE 14608-13 esperado=excluye agente=incluye (baja)
+  Modifica el Código del Trabajo en lo relativo al horario de cierre de comercios y servicios de atención directa al público
+  Objeto: limita a las 19:00 la jornada en el comercio de atención al público. El articulado es neutro, pero los fundamentos dan la mayor inseguridad nocturna de las trabajadoras y su carga de cuidados como razón del cierre temprano; es dudoso por ser el comercio un rubro mixto.
+
+Sin decisión del desarrollador (solo informativo):

@@ -1,0 +1,26 @@
+Prueba con 16 casos de control. Agente sonnet, criterio agente-dae0bc91.
+[1/16] 17010-07 excluye (alta)
+[2/16] 16842-07 incluye (media)
+[3/16] 17277-07 incluye (media)
+[4/16] 17379-07 excluye (alta)
+[5/16] 17066-13 incluye (media)
+[6/16] 17307-07 incluye (media)
+[7/16] 17598-24 excluye (alta)
+[8/16] 17532-07 incluye (media)
+[9/16] 17645-18 incluye (media)
+[10/16] 1787-02 excluye (media)
+[11/16] 18044-13 incluye (media)
+[12/16] 18239-36 incluye (media)
+[13/16] 18272-37 incluye (alta)
+[14/16] 18283-35 incluye (media)
+[15/16] 18280-21 incluye (media)
+[16/16] 18299-35 excluye (alta)
+
+Aciertos: 15 de 16 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+NO COINCIDE 18044-13 esperado=excluye agente=incluye (media)
+  Modifica el Código del Trabajo con el objeto de regular un sistema de negociación colectiva multinivel
+  Objeto: regula la negociación colectiva multinivel (sectorial y subsectorial) en el Código del Trabajo. Es materia laboral con disposiciones expresas de género: pactos de corresponsabilidad y equidad de género, un tercio de mujeres en los consejos e informe sobre brechas de género.
+
+Sin decisión del desarrollador (solo informativo):
+salida: 0

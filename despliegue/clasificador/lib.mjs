@@ -21,7 +21,7 @@ export function contarLexico(texto) {
 		let m;
 		while ((m = re.exec(n)) !== null) {
 			if (m[0].length === 0) re.lastIndex++;
-			else posiciones.push({ desde: m.index, hasta: m.index + m[0].length });
+			else posiciones.push({ desde: m.index, hasta: m.index + m[0].length, termino: m[0] });
 		}
 	}
 	posiciones.sort((a, b) => a.desde - b.desde);
@@ -33,12 +33,26 @@ export function contarLexico(texto) {
 	};
 }
 
-/** Hasta `max` fragmentos del texto original, repartidos a lo largo del documento y sin solaparse. */
+/** Palabras que casi siempre indican que el pasaje habla de género (no de cónyuges, madres o embarazo citados en listas de requisitos). */
+const NUCLEO = /mujer|genero|sexo|femin|femicid|brecha|diversidad|identidad/;
+
+/**
+ * Hasta `max` fragmentos del texto original, sin solaparse. La mitad de los lugares se reserva para las apariciones del núcleo
+ * de género (si las hay), repartidas por el documento, y el resto se reparte entre todas las apariciones. Así un pasaje decisivo
+ * (por ejemplo, la brecha entre hombres y mujeres) no queda fuera porque «cónyuge» o «embarazada» llenan la lista.
+ */
 export function fragmentos(texto, posiciones, max = 12, radio = 220) {
 	if (posiciones.length === 0) return [];
-	const elegidas = [];
-	const paso = Math.max(1, Math.floor(posiciones.length / max));
-	for (let i = 0; i < posiciones.length && elegidas.length < max; i += paso) elegidas.push(posiciones[i]);
+	const reparto = (lista, cuantas) => {
+		const paso = Math.max(1, Math.floor(lista.length / cuantas));
+		const salida = [];
+		for (let i = 0; i < lista.length && salida.length < cuantas; i += paso) salida.push(lista[i]);
+		return salida;
+	};
+	const nucleo = posiciones.filter((p) => p.termino && NUCLEO.test(p.termino));
+	const reservadas = nucleo.length ? reparto(nucleo, Math.ceil(max / 2)) : [];
+	const resto = posiciones.filter((p) => !reservadas.includes(p));
+	const elegidas = [...reservadas, ...reparto(resto, max - reservadas.length)].sort((x, y) => x.desde - y.desde);
 	const ventanas = [];
 	for (const p of elegidas) {
 		const desde = Math.max(0, p.desde - radio);
@@ -53,6 +67,40 @@ export function fragmentos(texto, posiciones, max = 12, radio = 220) {
 const miles = new Intl.NumberFormat('es-CL');
 
 /** Texto que ve el agente: título, metadatos y, si hay, el análisis del texto del proyecto. */
+/**
+ * Parte dispositiva del proyecto: desde «Artículo único» o «Artículo 1°» hasta `max` caracteres. Los fundamentos son largos y
+ * concentran las palabras del léxico, así que los fragmentos casi nunca llegan al articulado, que es lo que el proyecto dispone.
+ * Solo reconoce «Artículo» con mayúscula inicial para no tomar las citas a otras leyes. Devuelve '' si no encuentra el comienzo.
+ */
+export function extraerArticulado(texto, max = 2500) {
+	const limpio = texto.replace(/\s+/g, ' ').trim();
+	// «Artículo primero», «Artículo 1°», «Artículo 1:», «Artículo 1o.» (la «o» volada que deja el PDF).
+	const ART = /(?:ART[ÍI]CULO|Art[íi]culo)\s+(?:[ÚU]NICO|[Úú]nico|PRIMERO|[Pp]rimero|1\s?(?:[°º.:\-–]|o[\s.]))/;
+	// El encabezado «PROYECTO DE LEY» (también «Proyecto de ley» o espaciado «P R O Y E C T O D E L E Y»), que el título
+	// («PROYECTO DE LEY QUE…») no imita porque va seguido de una frase dispositiva.
+	const ENC = /(?:PROYECTO DE (?:LEY|REFORMA CONSTITUCIONAL)|Proyecto de [Ll]ey|P R O Y E C T O D E L E Y)\s*[.:;]?\s*/g;
+	const VERBO = /^[-–“"]?\s*(?:[Mm]odif|[Aa]gr[ée]g|[Rr]eempl|[Ss]ustit|[Ii]ncorp|[Ii]nterc|[Ee]lim|[Dd]er[óo]g|[Cc]r[ée]a|[Ii]ntrod|[Ee]stabl|[Pp][áa]rrafo|T[ÍI]TULO|T[íi]tulo|CAP[ÍI]TULO|Cap[íi]tulo)/;
+	const NUMERO = /^[-–“"]?\s*\d+\s?[.)°º:\-–]/;
+	const encabezados = [...limpio.matchAll(ENC)].map((e) => ({ desde: e.index, tras: e.index + e[0].length, resto: limpio.slice(e.index + e[0].length, e.index + e[0].length + 80) }));
+	const corta = (desde) => limpio.slice(desde, desde + max);
+	// 1. Encabezado seguido de «Artículo 1»: manda sobre todo, porque algunos fundamentos resumen el proyecto artículo por
+	//    artículo o citan el «Artículo 1» de otra ley.
+	for (const e of encabezados) {
+		const a = ART.exec(e.resto);
+		if (a && a.index < 60) return corta(e.tras + a.index);
+	}
+	// 2. Encabezado seguido de una frase dispositiva («Modifíquese…», «Párrafo 1»).
+	const v = encabezados.find((e) => VERBO.test(e.resto));
+	if (v) return corta(v.desde);
+	// 3. El primer «Artículo 1» del texto.
+	const m = ART.exec(limpio);
+	if (m) return corta(m.index);
+	// 4. Encabezado seguido de un número («PROYECTO DE LEY: 1.- Incorpora…»); va al final porque los fundamentos también
+	//    numeran sus secciones.
+	const n = encabezados.find((e) => NUMERO.test(e.resto));
+	return n ? corta(n.desde) : '';
+}
+
 export function construirEvidencia(p, analisis) {
 	const l = [
 		`Boletín: ${p.boletin}`,
@@ -67,6 +115,7 @@ export function construirEvidencia(p, analisis) {
 			`Texto del proyecto: ${miles.format(analisis.largo)} caracteres. Términos del léxico de género: ${analisis.apariciones} apariciones, ${analisis.densidad.toFixed(1)} por cada 10.000 caracteres.`
 		);
 		l.push(`Inicio del texto: «${analisis.inicio}»`);
+		if (analisis.articulado) l.push(`Articulado (lo que dispone el proyecto; los fundamentos no cuentan como disposición):\n«${analisis.articulado}»`);
 		if (analisis.fragmentos.length) {
 			l.push(`Fragmentos donde aparecen términos del léxico (${analisis.fragmentos.length}):`);
 			analisis.fragmentos.forEach((f, i) => l.push(`${i + 1}. «${f}»`));

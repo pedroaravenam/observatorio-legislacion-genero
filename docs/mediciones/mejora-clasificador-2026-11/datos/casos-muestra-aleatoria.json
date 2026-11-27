@@ -1,0 +1,120 @@
+{
+ "5623-07": {
+  "esperado": "incluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "9771-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "5308-18": {
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "muestra aleatoria validada el 2026-11-24; corregido a incluye débil el 2026-11-26: exime o atenúa a quien mata a su agresor tras sufrir sevicias; los fundamentos lo dirigen a las mujeres víctimas de violencia intrafamiliar"
+ },
+ "5989-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "9199-05": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "18704-19": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "2252-04": {
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "muestra aleatoria validada el 2026-11-24; corregido a incluye débil el 2026-11-26: los fundamentos argumentan la discriminación de las alumnas embarazadas y madres adolescentes (brecha de acceso a la educación)"
+ },
+ "953-07": {
+  "esperado": "incluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "8708-04": {
+  "esperado": "incluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "9118-05": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "16484-24": {
+  "esperado": "incluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "18018-13": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "15759-17": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "16634-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "14489-06": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "11943-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "13226-03": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "18103-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "8379-07": {
+  "esperado": "incluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "1192-11": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "15958-24": {
+  "esperado": "incluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "688-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "10347-05": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "18010-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "6212-13": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "8688-07": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "13443-17": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "8199-13": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ },
+ "12695-13": {
+  "esperado": "excluye",
+  "nota": "muestra aleatoria validada por el desarrollador el 2026-11-24"
+ }
+}

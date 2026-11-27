@@ -20,7 +20,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlPrioridadV5, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { extraerArticulado, esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlPrioridadV5, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -134,7 +134,7 @@ async function obtenerTexto(url) {
 
 function analizar(texto) {
 	const r = contarLexico(texto);
-	return { largo: r.largo, apariciones: r.apariciones, densidad: r.densidad, inicio: texto.replace(/\s+/g, ' ').trim().slice(0, 1500), fragmentos: fragmentos(texto, r.posiciones) };
+	return { largo: r.largo, apariciones: r.apariciones, densidad: r.densidad, inicio: texto.replace(/\s+/g, ' ').trim().slice(0, 1500), articulado: extraerArticulado(texto), fragmentos: fragmentos(texto, r.posiciones) };
 }
 
 /**

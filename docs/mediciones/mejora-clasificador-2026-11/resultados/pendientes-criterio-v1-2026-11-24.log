@@ -1,0 +1,62 @@
+Prueba con 28 casos de control. Agente sonnet, criterio agente-c33efc29.
+[1/28] 11858-06 excluye (alta)
+[2/28] 16139-24 incluye (alta)
+[3/28] 12535-21 excluye (media)
+[4/28] 164-02 excluye (media)
+[5/28] 16330-05 excluye (media)
+[6/28] 16842-07 incluye (media)
+[7/28] 16921-12 excluye (alta)
+[8/28] 16958-07 excluye (alta)
+[9/28] 17010-07 excluye (media)
+[10/28] 17003-11 excluye (media)
+[11/28] 17066-13 incluye (media)
+[12/28] 17277-07 incluye (baja)
+[13/28] 17117-03 incluye (baja)
+[14/28] 17307-07 incluye (media)
+[15/28] 17379-07 excluye (alta)
+[16/28] 17411-07 excluye (media)
+[17/28] 17483-07 incluye (baja)
+[18/28] 17598-24 excluye (alta)
+[19/28] 17532-07 incluye (media)
+[20/28] 17645-18 incluye (media)
+[21/28] 1787-02 excluye (media)
+[22/28] 18020-06 excluye (media)
+[23/28] 18044-13 excluye (media)
+[24/28] 18272-37 incluye (media)
+[25/28] 18239-36 incluye (media)
+[26/28] 18280-21 incluye (media)
+[27/28] 18283-35 incluye (media)
+[28/28] 18299-35 excluye (media)
+
+Aciertos: 0 de 0 con respuesta esperada (28 sin decisión). Nivel distinto del esperado en 0.
+
+Sin decisión del desarrollador (solo informativo):
+  11858-06 agente=excluye (alta) Modifica la ley N° 18.695, orgánica constitucional de Municipalidades, con el ob
+  12535-21 agente=excluye (media) Proyecto de ley que modifica la Ley General de Pesca y Acuicultura en el ámbito 
+  16139-24 agente=incluye (alta) Instituye el Día Nacional de la Mujer de Armas y autoriza a erigir monumentos y 
+  16330-05 agente=excluye (media) Ley de Presupuestos del Sector Público correspondiente al año 2024
+  164-02 agente=excluye (media) Aumenta planta de personal de Carabineros de Chile
+  16842-07 agente=incluye (media) Modifica el Código Penal para hacer aplicable la pena accesoria que indica a per
+  16921-12 agente=excluye (alta) Modifica la ley N° 21.020 con el objeto de establecer medidas para prevenir el a
+  16958-07 agente=excluye (alta) Modifica el Código Penal, con el objeto de incluir a los particulares entre los 
+  17003-11 agente=excluye (media) Establece la ley integral de salud mental y modifica los cuerpos legales que ind
+  17010-07 agente=excluye (media) Refuerza el principio de igualdad ante la ley y sanciona su inobservancia
+  17066-13 agente=incluye (media) Modifica el Código del Trabajo para regular los derechos del alumno o egresado e
+  17117-03 agente=incluye (baja) Reconoce y fortalece a las ferias libres como pilar de la alimentación y el desa
+  17277-07 agente=incluye (baja) Modifica la Carta Fundamental, con el objeto de fortalecer el derecho a la segur
+  17307-07 agente=incluye (media) Modifica el Código Penal, con el objeto de tipificar la generación y difusión de
+  17379-07 agente=excluye (alta) Modifica la Carta Fundamental para nacionalizar las Administradoras de Fondos de
+  17411-07 agente=excluye (media) Modifica diversos cuerpos legales para diferir la eliminación de antecedentes pe
+  17483-07 agente=incluye (baja) Modifica el Código Penal, con el objeto de tipificar el delito de esclavitud
+  17532-07 agente=incluye (media) Modifica el Código Penal para tipificar el delito de denuncia falsa en materia s
+  17598-24 agente=excluye (alta) Denomina «Aeropuerto Gabriela Mistral» al actual Aeródromo La Florida, de la ciu
+  17645-18 agente=incluye (media) Establece derecho de atención preferente para realizar trámites presenciales y d
+  1787-02 agente=excluye (media) Ley del deporte
+  18020-06 agente=excluye (media) Modifica la ley N° 19.886, Ley de Bases sobre Contratos Administrativos de Sumin
+  18044-13 agente=excluye (media) Modifica el Código del Trabajo con el objeto de regular un sistema de negociació
+  18239-36 agente=incluye (media) Establece sanciones en el caso de acusaciones, denuncias o querellas falsas y re
+  18272-37 agente=incluye (media) Declara el trabajo de las mujeres descoladoras en la industria pesquera como pat
+  18280-21 agente=incluye (media) Modifica la ley N°21.069, que crea el Instituto Nacional de Desarrollo Sustentab
+  18283-35 agente=incluye (media) Dispone como beneficiarios de la cuota preferente de inclusión laboral a las y l
+  18299-35 agente=excluye (media) Modifica diversos cuerpos legales, con el objeto de promover la responsabilidad 
+salida: 0

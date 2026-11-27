@@ -1,0 +1,173 @@
+{
+  "nota": "Borrador de razones reales para los 26 casos donde el desarrollador discrepó del agente (cola del 18-11-2026). Hoy 139 de 212 veredictos validados guardan solo «coincide/discrepa del agente», y esa razón es la que el agente lee como precedente. Estados: «confirmada» = el desarrollador la dio o la aprobó en la conversación; «derivada» = aplica una regla que el desarrollador confirmó, pero el caso concreto no se revisó con él; «por confirmar» = suposición del redactor, el desarrollador debe corregirla o completarla. No se ha escrito nada en la base.",
+  "razones": [
+    {
+      "boletin": "13773-18",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "confirmada",
+      "razon": "Cuidado personal compartido que el juez puede imponer aunque un progenitor se oponga. Los fundamentos explican que la corresponsabilidad deshace el rol histórico de la mujer como única cuidadora. Regula la relación entre padres separados."
+    },
+    {
+      "boletin": "18624-36",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "confirmada",
+      "razon": "Cuidado personal compartido sin acuerdo: el veto de un progenitor no lo impide, y se vincula con los alimentos, que se fijan según la distribución efectiva de las cargas de cuidado. Regula la relación entre padres separados; no es solo el interés del niño."
+    },
+    {
+      "boletin": "13224-18",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "confirmada",
+      "razon": "Obliga a mediación previa en causas de alimentos, cuidado personal y relación directa y regular. Regula la relación entre padres separados y afecta a quien demanda alimentos o cuidado, sobre todo madres."
+    },
+    {
+      "boletin": "13460-18",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "confirmada",
+      "razon": "Permite recuperar el tiempo de relación directa y regular perdido en un estado de catástrofe. Los regímenes de visita entre padres separados entran como débil, aunque el texto sea neutro."
+    },
+    {
+      "boletin": "1307-18",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "por confirmar",
+      "razon": "Causales de nulidad del matrimonio civil. Reglas sobre la disolución del matrimonio que afectan a las mujeres frente a la separación. Confirmar si la nulidad cuenta igual que el divorcio."
+    },
+    {
+      "boletin": "14866-07",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "derivada",
+      "razon": "Divorcio de mutuo acuerdo extrajudicial y sin plazo de cese de convivencia. Las reglas del divorcio cambian la situación de las mujeres frente a la separación, aunque el texto sea neutro."
+    },
+    {
+      "boletin": "14638-07",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "por confirmar",
+      "razon": "Iguala al conviviente con el cónyuge en la pensión de sobrevivencia. Supuesto: la pensión de sobrevivencia beneficia sobre todo a mujeres. Confirmar el motivo."
+    },
+    {
+      "boletin": "16503-07",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "derivada",
+      "razon": "Impide pensiones de gracia a inscritos en el Registro de Deudores de Alimentos. Toca el cobro de alimentos, que se trata como autonomía económica de las mujeres."
+    },
+    {
+      "boletin": "16379-04",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "por confirmar",
+      "razon": "Regula guarderías y servicios de cuidado infantil. Supuesto: el cuidado de niños recae sobre todo en las mujeres y limita su empleo. Confirmar el motivo."
+    },
+    {
+      "boletin": "13247-07",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "por confirmar",
+      "razon": "Renta básica universal por reforma constitucional. Supuesto: autonomía económica y trabajo de cuidados no remunerado. Confirmar el motivo; el articulado es neutro."
+    },
+    {
+      "boletin": "13849-04",
+      "incluye": true,
+      "grupo": "debil",
+      "estado": "por confirmar",
+      "razon": "Monumento y paseo en memoria de Gabriela Mistral. Motivo no conocido; puede ser el reconocimiento a una mujer. Confirmar."
+    },
+    {
+      "boletin": "1611-10",
+      "incluye": false,
+      "estado": "confirmada",
+      "razon": "Convenio de seguridad social entre Chile y Dinamarca: es un acuerdo entre Estados, sin relación con género. El desarrollador corrigió su veredicto original (24-11-2026)."
+    },
+    {
+      "boletin": "1318-04",
+      "incluye": false,
+      "estado": "derivada",
+      "razon": "Sanciona expresiones discriminatorias en general. Sin disposición con implicancia de género; una ley general de no discriminación no basta."
+    },
+    {
+      "boletin": "18255-31",
+      "incluye": false,
+      "estado": "confirmada",
+      "razon": "Reembolso de IVA en pañales y medicamentos. Es una ayuda monetaria a las familias y no a las mujeres, aunque el articulado nombre a las madres como receptoras (desarrollador, 24-11-2026)."
+    },
+    {
+      "boletin": "16623-13",
+      "incluye": false,
+      "estado": "derivada",
+      "razon": "Servicios higiénicos para conductores del transporte público. La perspectiva de género aparece en los fundamentos; el articulado es neutro y no cambia la brecha."
+    },
+    {
+      "boletin": "15318-25",
+      "incluye": false,
+      "estado": "derivada",
+      "razon": "Reiteración de delitos en el Código Procesal Penal. Los fundamentos citan violaciones; el articulado es de penas en general y no trata de género."
+    },
+    {
+      "boletin": "15180-13",
+      "incluye": false,
+      "estado": "derivada",
+      "razon": "Permiso laboral para reuniones de apoderados. Texto neutro; las mujeres solo se mencionan en los fundamentos."
+    },
+    {
+      "boletin": "14921-07",
+      "incluye": true,
+      "estado": "confirmada",
+      "razon": "Reforma constitucional que destina las cotizaciones a fines previsionales e incluye expresamente el pago de pensiones alimenticias entre ellos. Por la regla de alimentos entra como componente. El desarrollador corrigió su veredicto original (24-11-2026); su grupo está por definir."
+    },
+    {
+      "boletin": "14608-13",
+      "incluye": true,
+      "estado": "derivada",
+      "razon": "Horario de cierre del comercio (19:00). Articulado neutro, pero el 70% del retail son mujeres y los fundamentos dan su inseguridad nocturna y su carga de cuidados como razón de la medida: relación débil. Corregido por el desarrollador el 26-11-2026 tras leer el texto.",
+      "grupo": "debil"
+    },
+    {
+      "boletin": "13681-10",
+      "incluye": false,
+      "estado": "derivada",
+      "razon": "Protocolo de la OIT sobre trabajo forzoso. La trata es un vínculo lejano; el objeto es laboral."
+    },
+    {
+      "boletin": "13663-06",
+      "incluye": true,
+      "estado": "confirmada",
+      "razon": "Normas electorales excepcionales por Covid-19; el artículo 2 da un plazo especial a quienes rectificaron su identidad de género (Ley 21.120). Es una disposición expresa sobre personas trans. El desarrollador corrigió su veredicto original (24-11-2026); su grupo está por definir."
+    },
+    {
+      "boletin": "13102-05",
+      "incluye": false,
+      "estado": "por confirmar",
+      "razon": "Bono extraordinario de apoyo familiar. Confirmar por qué la preferencia por la madre beneficiaria no bastó; puede ser que el efecto recaiga sobre los hijos."
+    },
+    {
+      "boletin": "12759-07",
+      "incluye": false,
+      "estado": "confirmada",
+      "razon": "Abuso patrimonial contra adultos mayores y personas con discapacidad, incorporado a la ley de violencia intrafamiliar. Es VIF, pero el objeto es proteger a otro grupo y no la igualdad de género. Caso difícil (desarrollador, 24-11-2026)."
+    },
+    {
+      "boletin": "11581-07",
+      "incluye": false,
+      "estado": "confirmada",
+      "razon": "Atenuante penal para la madre de un menor de 14 años. La situación impacta más a los hijos que a la madre; el género es un dato accesorio."
+    },
+    {
+      "boletin": "5567-18",
+      "incluye": false,
+      "estado": "confirmada",
+      "razon": "Faculta solo a la madre a girar de la libreta de ahorro de niños. Alcance puntual que impacta a los hijos más que a las madres."
+    },
+    {
+      "boletin": "4759-07",
+      "incluye": false,
+      "estado": "confirmada",
+      "razon": "Reforma constitucional contra la edad máxima para postular. Los 65 años para hombres y 60 para mujeres son la norma de pensiones vigente que el proyecto cita y no cambia (desarrollador, 24-11-2026)."
+    }
+  ]
+}

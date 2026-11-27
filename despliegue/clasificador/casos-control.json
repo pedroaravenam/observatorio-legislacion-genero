@@ -68,8 +68,9 @@
   "nota": "el título trae una palabra que engaña"
  },
  "5087-07": {
-  "esperado": "excluye",
-  "nota": "el título trae una palabra que engaña"
+  "esperado": "incluye",
+  "grupo": "debil",
+  "nota": "decidido por el desarrollador el 2026-11-27: «igualitario» no es de género, pero garantiza una pensión mínima universal con aporte estatal, que beneficia sobre todo a las mujeres (regla de pensiones de ingreso bajo)"
  },
  "5915-11": {
   "esperado": "excluye",
@@ -108,24 +109,24 @@
   "nota": "permiso por duelo (incluye la muerte de un hijo en gestación): tema de salud y duelo, no de igualdad de género; el desarrollador lo cambió de incluye a excluye el 13-11-2026"
  },
  "16863-07": {
-  "esperado": "incluye",
-  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-13: explotación sexual de niñas, niños y adolescentes queda fuera (infancia y materia penal); reemplaza la del 2026-11-04"
  },
  "4450-07": {
-  "esperado": "incluye",
-  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-13: explotación sexual de niñas, niños y adolescentes queda fuera (infancia y materia penal); reemplaza la del 2026-11-04"
  },
  "4793-07": {
-  "esperado": "incluye",
-  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-13: explotación sexual de niñas, niños y adolescentes queda fuera (infancia y materia penal); reemplaza la del 2026-11-04"
  },
  "5215-07": {
-  "esperado": "incluye",
-  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-13: explotación sexual de niñas, niños y adolescentes queda fuera (infancia y materia penal); reemplaza la del 2026-11-04"
  },
  "9998-07": {
-  "esperado": "incluye",
-  "nota": "decisión del desarrollador 2026-11-04: explotación sexual de menores, trata y VIH/ETS entran"
+  "esperado": "excluye",
+  "nota": "decisión del desarrollador 2026-11-13: explotación sexual de niñas, niños y adolescentes queda fuera (infancia y materia penal); reemplaza la del 2026-11-04"
  },
  "12061-07": {
   "esperado": "incluye",

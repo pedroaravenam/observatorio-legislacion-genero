@@ -1,0 +1,39 @@
+Prueba con 29 casos de control. Agente sonnet, criterio agente-c0caa03a.
+[1/29] 9771-07 excluye (media)
+[2/29] 5308-18 excluye (media)
+[3/29] 5623-07 incluye (media)
+[4/29] 5989-07 excluye (alta)
+[5/29] 9199-05 excluye (alta)
+[6/29] 18704-19 excluye (alta)
+[7/29] 953-07 incluye (baja)
+[8/29] 8708-04 incluye (media)
+[9/29] 2252-04 excluye (media)
+[10/29] 9118-05 excluye (alta)
+[11/29] 18018-13 excluye (media)
+[12/29] 15759-17 excluye (alta)
+[13/29] 16484-24 excluye (media)
+[14/29] 16634-07 excluye (alta)
+[15/29] 14489-06 excluye (alta)
+[16/29] 11943-07 excluye (alta)
+[17/29] 13226-03 excluye (alta)
+[18/29] 18103-07 excluye (alta)
+[19/29] 8379-07 incluye (alta)
+[20/29] 1192-11 excluye (media)
+[21/29] 688-07 excluye (media)
+[22/29] 10347-05 excluye (alta)
+[23/29] 15958-24 incluye (baja)
+[24/29] 18010-07 excluye (alta)
+[25/29] 6212-13 excluye (alta)
+[26/29] 8688-07 excluye (alta)
+[27/29] 13443-17 excluye (alta)
+[28/29] 8199-13 excluye (media)
+[29/29] 12695-13 excluye (alta)
+
+Aciertos: 28 de 29 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+NO COINCIDE 16484-24 esperado=incluye agente=excluye (media)
+  Instituye el primer viernes del mes de diciembre de cada año como el Día Nacional de la Funcionaria de la Primera Infancia Vía Transferencia
+  Objeto: declara un día nacional de las funcionarias de jardines VTF de primera infancia. Un día conmemorativo para el personal de un servicio no regula nada; la brecha que citan los fundamentos es con Junji e Integra, no entre mujeres y hombres (regla de gremios y feriados).
+
+Sin decisión del desarrollador (solo informativo):
+salida: 0

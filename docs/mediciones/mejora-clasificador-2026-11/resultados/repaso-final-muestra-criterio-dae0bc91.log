@@ -1,0 +1,39 @@
+Prueba con 29 casos de control. Agente sonnet, criterio agente-dae0bc91.
+[1/29] 9771-07 excluye (media)
+[2/29] 5308-18 excluye (media)
+[3/29] 5623-07 incluye (media)
+[4/29] 5989-07 excluye (alta)
+[5/29] 9199-05 excluye (alta)
+[6/29] 18704-19 excluye (alta)
+[7/29] 953-07 incluye (baja)
+[8/29] 8708-04 incluye (media)
+[9/29] 2252-04 incluye (baja)
+[10/29] 9118-05 excluye (alta)
+[11/29] 16484-24 incluye (alta)
+[12/29] 18018-13 excluye (media)
+[13/29] 15759-17 excluye (alta)
+[14/29] 16634-07 excluye (alta)
+[15/29] 14489-06 excluye (alta)
+[16/29] 11943-07 excluye (alta)
+[17/29] 13226-03 excluye (alta)
+[18/29] 8379-07 incluye (alta)
+[19/29] 18103-07 excluye (alta)
+[20/29] 1192-11 excluye (media)
+[21/29] 15958-24 incluye (alta)
+[22/29] 688-07 excluye (media)
+[23/29] 10347-05 excluye (alta)
+[24/29] 18010-07 excluye (alta)
+[25/29] 6212-13 excluye (alta)
+[26/29] 8688-07 excluye (alta)
+[27/29] 13443-17 excluye (alta)
+[28/29] 12695-13 excluye (alta)
+[29/29] 8199-13 excluye (media)
+
+Aciertos: 28 de 29 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+NO COINCIDE 2252-04 esperado=excluye agente=incluye (baja)
+  Modifica ley de enseñanza prohibiendo prácticas discriminatorias.
+  Objeto: prohíbe y sanciona las prácticas discriminatorias contra alumnos en colegios con financiamiento estatal. El articulado no nombra el sexo ni el embarazo, pero los fundamentos dedican un eje a la discriminación de las alumnas embarazadas y madres, que la cláusula «entre otros» busca cubrir; relación débil.
+
+Sin decisión del desarrollador (solo informativo):
+salida: 0

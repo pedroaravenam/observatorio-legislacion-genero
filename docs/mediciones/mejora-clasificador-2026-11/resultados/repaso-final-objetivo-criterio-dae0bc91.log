@@ -1,0 +1,37 @@
+Prueba con 31 casos de control. Agente sonnet, criterio agente-dae0bc91.
+[1/31] 1611-10 excluye (baja)
+[2/31] 13773-18 incluye (baja)
+[3/31] 1318-04 excluye (baja)
+[4/31] 1307-18 incluye (baja)
+[5/31] 18624-36 incluye (alta)
+[6/31] 18255-31 excluye (alta)
+[7/31] 16623-13 excluye (media)
+[8/31] 16379-04 incluye (media)
+[9/31] 16503-07 incluye (media)
+[10/31] 15318-25 excluye (media)
+[11/31] 15180-13 excluye (alta)
+[12/31] 14921-07 incluye (media)
+[13/31] 14866-07 incluye (media)
+[14/31] 14638-07 incluye (media)
+[15/31] 14608-13 excluye (media)
+[16/31] 13849-04 incluye (media)
+[17/31] 13681-10 excluye (alta)
+[18/31] 13460-18 incluye (media)
+[19/31] 13663-06 incluye (media)
+[20/31] 13247-07 incluye (media)
+[21/31] 13224-18 incluye (media)
+[22/31] 13102-05 excluye (alta)
+[23/31] 12759-07 excluye (alta)
+[24/31] 11581-07 excluye (alta)
+[25/31] 5567-18 excluye (alta)
+[26/31] 4759-07 excluye (alta)
+[27/31] 18020-06 incluye (media)
+[28/31] 17411-07 incluye (media)
+[29/31] 12535-21 incluye (media)
+[30/31] 17117-03 excluye (alta)
+[31/31] 17483-07 excluye (alta)
+
+Aciertos: 31 de 31 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+Sin decisión del desarrollador (solo informativo):
+salida: 0

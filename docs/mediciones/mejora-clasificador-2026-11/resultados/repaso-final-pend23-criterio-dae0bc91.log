@@ -1,0 +1,33 @@
+Prueba con 23 casos de control. Agente sonnet, criterio agente-dae0bc91.
+[1/23] 11858-06 excluye (alta)
+[2/23] 16139-24 incluye (alta)
+[3/23] 16330-05 excluye (media)
+[4/23] 164-02 excluye (media)
+[5/23] 16921-12 excluye (alta)
+[6/23] 16958-07 excluye (alta)
+16842-07 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"59f12af2-60be-4c3b-ab5b-cb8629730d27","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+[7/23] 17003-11 incluye (media)
+17010-07 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"b6d78aad-8734-4958-80b6-02bce415c926","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17277-07 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"1318adf6-4631-4f05-92c2-934a1d78852d","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17066-13 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"150497d7-4e9e-4e92-ab32-356cd81d627f","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17307-07 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"6b67ea30-de1c-4887-bdcf-e5ee2e8aaf70","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17379-07 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"93885b72-fd7f-4803-b22e-67267220287f","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17532-07 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"01b9a15a-8748-4005-9f79-0da3228f21c6","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17598-24 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"90c73163-63dd-431d-9a6e-42effd8b6503","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+17645-18 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"26159859-75c6-41d4-ab37-78d85b9c985e","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+1787-02 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"c7697ee0-fb81-454b-abc9-94a9a6f1f435","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+18044-13 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"7c0955e1-f569-464d-afc7-1c0f61ef68d7","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+18239-36 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"f50717cb-c1e3-4c00-960b-5e4a8b364a7a","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+18272-37 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"601dc806-3d21-4a7d-8d32-48daeca893f8","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+18280-21 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"e492d4c6-8ff1-437d-89d3-9ee12bcfd946","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+18283-35 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"224387f7-d6bc-4950-977c-11f79c3a432d","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+18299-35 FALLÓ: claude terminó con 1: {"duration_api_ms":0,"stop_reason":"stop_sequence","session_id":"7552dcd0-2d91-4b39-a8e8-5e5b2c73b52b","total_cost_usd":0,"usage":{"output_tokens_details":{"thinking_tokens":0},"input_tokens":0,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":0,"server_tool_use":{"web_sear
+
+Aciertos: 6 de 7 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 0.
+
+NO COINCIDE 17003-11 esperado=excluye agente=incluye (media)
+  Establece la ley integral de salud mental y modifica los cuerpos legales que indica
+  Objeto: ley integral de salud mental (promoción, atención, institucionalidad). Es salud general, pero el articulado prohíbe expresamente las terapias de conversión por orientación sexual o identidad de género y fija el principio de equidad de género: es una disposición expresa.
+
+Sin decisión del desarrollador (solo informativo):
+salida: 3

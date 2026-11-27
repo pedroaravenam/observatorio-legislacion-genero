@@ -1,0 +1,35 @@
+Prueba con 23 casos de control. Agente sonnet, criterio agente-787ccdde.
+[1/23] 16139-24 incluye (alta)
+[2/23] 11858-06 excluye (alta)
+[3/23] 16330-05 excluye (media)
+[4/23] 164-02 excluye (media)
+[5/23] 16921-12 excluye (alta)
+[6/23] 16842-07 incluye (media)
+[7/23] 16958-07 excluye (alta)
+[8/23] 17010-07 excluye (alta)
+[9/23] 17003-11 incluye (media)
+[10/23] 17066-13 incluye (media)
+[11/23] 17277-07 incluye (media)
+[12/23] 17307-07 incluye (media)
+[13/23] 17598-24 excluye (alta)
+[14/23] 17379-07 excluye (media)
+[15/23] 17532-07 incluye (media)
+[16/23] 17645-18 incluye (media)
+[17/23] 1787-02 incluye (baja)
+[18/23] 18044-13 incluye (media)
+[19/23] 18272-37 incluye (alta)
+[20/23] 18239-36 incluye (media)
+[21/23] 18280-21 incluye (media)
+[22/23] 18283-35 incluye (media)
+[23/23] 18299-35 excluye (media)
+
+Aciertos: 22 de 23 con respuesta esperada (0 sin decisión). Nivel distinto del esperado en 3.
+  nivel 17645-18: esperado debil, agente componente
+  nivel 18044-13: esperado debil, agente componente
+  nivel 18283-35: esperado debil, agente componente
+
+NO COINCIDE 1787-02 esperado=excluye agente=incluye (baja)
+  Ley del deporte
+  Objeto: ley general del deporte (política nacional, formación, organizaciones deportivas). Los fundamentos dan como problema que la población femenina quedó fuera de la política de deportes; es una brecha expresa, aunque el articulado leído no la regula.
+
+Sin decisión del desarrollador (solo informativo):
