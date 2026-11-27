@@ -20,7 +20,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { extraerArticulado, esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlPrioridadV5, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
+import { extraerArticulado, esCasoLimite, SQL_COLA, SQL_PUBLICADOS_LIMITE, SQL_VALIDADOS, bloqueEjemplos, ejemplosParecidos, resumenAcuerdo, sqlEncolar, sqlEncolarPublicados, sqlResolver, SQL_EJEMPLOS_V5, sqlAplicarV5, sqlConteoAplicarV5, SQL_INFORME_V5, SQL_VERSIONES_V5, informeCruceMarkdown, sqlCruce, construirEvidencia, contarLexico, esLimiteDeUso, resumenSalidaClaude, fila, fragmentos, informeV5Markdown, leerCsv, nivelSenal, sqlMuestraAzar, sqlPrioridadV5, sqlReclasificar, textoRtf, validarDecision, versionAgente } from './lib.mjs';
 import { TEMAS } from '../../sitio/src/lib/temas.ts';
 
 const ejecutar = promisify(execFile);
@@ -207,14 +207,19 @@ async function preguntar(evidencia) {
 					const reloj = setTimeout(() => p.kill('SIGKILL'), 240_000);
 					p.stdout.on('data', (d) => (o += d));
 					p.stderr.on('data', (d) => (e += d));
-					p.on('close', (c) => (clearTimeout(reloj), c === 0 ? resolve(o) : reject(new Error(`claude terminó con ${c}: ${(e || o).slice(0, 300)}`))));
+					p.on('close', (c) => {
+						clearTimeout(reloj);
+						if (c === 0) return resolve(o);
+						const { mensaje, sinLlamada } = resumenSalidaClaude(o || e);
+						reject(Object.assign(new Error(`claude terminó con ${c}: ${mensaje}${e && o ? ` · ${e.slice(0, 200)}` : ''}`), { sinLlamada }));
+					});
 					p.stdin.end(`Clasifica este proyecto de ley.\n\n${evidencia}`);
 				});
 				const j = JSON.parse(salidaAgente);
 				if (j.is_error) throw new Error(`error del agente: ${String(j.result).slice(0, 200)}`);
 				return validarDecision(j.structured_output ?? JSON.parse(j.result));
 			} catch (e) {
-				if (esLimiteDeUso(e.message)) {
+				if (esLimiteDeUso(e.message) || e.sinLlamada) {
 					limiteAlcanzado = true;
 					throw Object.assign(new Error(`Se agotó el límite de uso: ${e.message}`), { limite: true });
 				}

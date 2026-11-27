@@ -1,7 +1,7 @@
 // Pruebas de las funciones puras del clasificador. Uso: node --test despliegue/clasificador/
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { extraerArticulado, construirEvidencia, contarLexico, esLimiteDeUso, textoRtf, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
+import { extraerArticulado, construirEvidencia, contarLexico, esLimiteDeUso, resumenSalidaClaude, textoRtf, fila, fragmentos, leerCsv, nivelSenal, normalizarIgualLargo, validarDecision, versionAgente } from './lib.mjs';
 
 test('normalizar conserva el largo y quita tildes', () => {
 	const t = 'Violación y Género: ¿Año nuevo?';
@@ -57,6 +57,17 @@ test('reconoce los mensajes de límite de uso', () => {
 	assert.ok(esLimiteDeUso("You've hit your limit · resets 3pm"));
 	assert.ok(esLimiteDeUso('API Error: 429 rate_limit_error'));
 	assert.ok(!esLimiteDeUso('El motivo es demasiado corto'));
+});
+
+test('lee el aviso de límite dentro de la salida JSON de claude', () => {
+	const uso = { output_tokens_details: { thinking_tokens: 0 }, input_tokens: 0, output_tokens: 0, server_tool_use: { web_search_requests: 0 } };
+	const salida = JSON.stringify({ duration_api_ms: 0, stop_reason: 'stop_sequence', total_cost_usd: 0, usage: uso, is_error: true, result: "You've hit your limit · resets 5am" });
+	const r = resumenSalidaClaude(salida);
+	assert.ok(esLimiteDeUso(r.mensaje));
+	assert.equal(r.sinLlamada, true);
+	const normal = resumenSalidaClaude(JSON.stringify({ duration_api_ms: 900, usage: { input_tokens: 50, output_tokens: 3 }, is_error: true, result: 'otra cosa' }));
+	assert.equal(normal.sinLlamada, false);
+	assert.deepEqual(resumenSalidaClaude('no es json'), { mensaje: 'no es json', sinLlamada: false });
 });
 
 test('RTF: decodifica tildes, saltos de línea y omite tablas de fuentes', () => {

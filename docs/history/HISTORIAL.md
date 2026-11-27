@@ -1,5 +1,9 @@
 # Historial
 
+## 2026-11-27 — La noche reconoce el límite de uso de Claude (pendiente)
+
+La noche del 27 corrió dos veces (00:07, al reactivar el temporizador, y 03:00). En la primera, los 50 controles acertaron y la reevaluación decidió 97 de 115 antes de agotarse el cupo; los 18 restantes y los 115 de las 03:00 fallaron sin llegar a la API (uso 0). El script no lo reconoció como límite: cortaba la salida JSON de `claude` en 300 caracteres y el aviso venía después, en `result`. Así siguió llamando y terminó con «error (código 1)» en vez de detenerse. Ahora `resumenSalidaClaude` (lib.mjs) lee `result` y `api_error_status`, y una respuesta sin llamada a la API detiene la pasada con el código de límite (4); la noche lo informa como límite y retoma lo pendiente al día siguiente. Prueba nueva en `lib.test.mjs` (31 en verde). Los 52 casos del aviso ya se habían resuelto ese día: la cola está en 0.
+
 ## 2026-11-27 — La cola de validación la resuelve el agente afinado
 
 A pedido del desarrollador, el agente con el criterio `agente-b0889fdd` reclasificó los 24 proyectos de la cola (24 llamadas, en simulacro). 22 repitieron la decisión anterior; cambiaron 2132-11 (salud, con bonificación del 75 % al parto: entra como débil) y 4082-13 (permisos por duelo; el permiso del padre al nacer sigue en 5 días en total: sale). Los veredictos quedaron en `veredictos-cola-2026-11-27.json` (19 incluye, 5 excluye). El desarrollador tomó un respaldo (`ingesta-20261127-1706.dump`) y los aplicó; la base del sitio se publicó y la cola quedó en 0.

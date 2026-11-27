@@ -143,6 +143,23 @@ export function esLimiteDeUso(mensaje) {
 	return /hit your limit|usage limit|rate.?limit|quota|\b429\b|overloaded|too many requests/i.test(String(mensaje));
 }
 
+/**
+ * Resume la salida JSON de `claude -p` cuando termina con error. El aviso de límite viene en `result`, después de
+ * cientos de caracteres de uso; cortar el texto crudo lo perdía. `sinLlamada` indica que no llegó a consultar la API
+ * (límite, sesión vencida): seguir llamando no sirve.
+ */
+export function resumenSalidaClaude(texto) {
+	const crudo = String(texto ?? '').trim();
+	try {
+		const j = JSON.parse(crudo);
+		const sinLlamada = j.duration_api_ms === 0 && !j.usage?.input_tokens && !j.usage?.output_tokens;
+		const mensaje = [j.api_error_status, j.result].filter((x) => x != null && x !== '').join(' ').slice(0, 300);
+		return { mensaje: mensaje || crudo.slice(0, 300), sinLlamada };
+	} catch {
+		return { mensaje: crudo.slice(0, 300), sinLlamada: false };
+	}
+}
+
 /** Texto plano de un RTF (la codificación ANSI de los documentos del Senado es windows-1252). */
 export function textoRtf(rtf) {
 	const ignorar = new Set(['fonttbl', 'colortbl', 'stylesheet', 'info', 'pict', 'header', 'footer', 'footnote', 'themedata', 'datastore', 'latentstyles', 'listtable', 'listoverridetable', 'rsidtbl', 'generator', 'fldinst']);

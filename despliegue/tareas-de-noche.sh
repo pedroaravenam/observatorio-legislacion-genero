@@ -60,7 +60,7 @@ if [[ ${puede[claude]:-9} == 0 ]]; then
     linea=$(grep -m1 '^Decididos' "$tmp/paso.log" || true)
     cambios=$(grep -m1 '^Cambian' "$tmp/paso.log" || true)
     if [[ -n $linea && $linea != 'Decididos: 0 (incluye 0)'* ]]; then novedad=1; anotar "$modo: ${linea} ${cambios}"; fi
-    ((c == LIMITE)) && { anotar 'Claude: se agotó el límite en los proyectos nuevos.'; puede[claude]=2; break; }
+    ((c == LIMITE)) && { anotar "Claude: se agotó el límite de uso en «$modo»; se detuvo y lo que falta se retoma la noche siguiente."; puede[claude]=2; break; }
     ((c != 0)) && { novedad=1; anotar "$modo terminó con error (código $c); ver el registro $registro."; }
   done
 fi
